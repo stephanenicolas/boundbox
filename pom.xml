@@ -14,7 +14,7 @@
 	<artifactId>boundbox-parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<description>BoundBox provides an easy way to test an object and accessing all its fields and methods.</description>
+	<description>TODO.</description>
 	<url>https://github.com/stephanenicolas/boundbox.git</url>
 	<inceptionYear>2013</inceptionYear>
 
@@ -41,11 +41,13 @@
 		<developer>
 			<id>SNI</id>
 			<name>Stéphane Nicolas</name>
-			<email>snicolas@octo.com</email>
+			<email>steff.nicolas@gmail.com</email>
 		</developer>
 	</developers>
 
 	<modules>
 		<module>boundbox-library</module>
+		<module>boundbox-sample</module>
+		<module>boundbox-sample-tests</module>
 	</modules>
 </project>
