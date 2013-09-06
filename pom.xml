@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Sonatype config to publish on Maven Central -->
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<groupId>org.boundbox</groupId>
+	<artifactId>boundbox-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<description>BoundBox provides an easy way to test an object and accessing all its fields and methods.</description>
+	<url>https://github.com/stephanenicolas/boundbox.git</url>
+	<inceptionYear>2013</inceptionYear>
+
+	<scm>
+		<connection>scm:git:ssh://git@github.com/stephanenicolas/boundbox.git</connection>
+		<url>git:ssh://git@github.com/stephanenicolas/boundbox.git</url>
+		<developerConnection>scm:git:ssh://git@github.com/stephanenicolas/boundbox.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<issueManagement>
+		<system>Github Issue Tracker</system>
+		<url>https://github.com/stephanenicolas/boundbox/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>SNI</id>
+			<name>Stéphane Nicolas</name>
+			<email>snicolas@octo.com</email>
+		</developer>
+	</developers>
+
+	<modules>
+		<module>boundbox-library</module>
+	</modules>
+</project>
