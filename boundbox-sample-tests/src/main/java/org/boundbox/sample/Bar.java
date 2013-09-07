@@ -10,6 +10,6 @@ public class Bar {
     private static BoundBoxOfFoo boundBoxFoo = new BoundBoxOfFoo( new Foo());
 
     public static void main(String[] args) {
-        System.out.println( "Assert foo.bar is bar " + boundBoxFoo.getBar().equals("bar"));
+        System.out.println( "Assert foo.bar is bar " + boundBoxFoo.boundBox_getBar().equals("bar"));
     }
 }

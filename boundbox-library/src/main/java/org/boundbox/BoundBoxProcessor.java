@@ -18,16 +18,9 @@
 package org.boundbox;
 
 import java.io.IOException;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -51,9 +44,6 @@ import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.tools.Diagnostic.Kind;
-import javax.tools.JavaFileObject;
-
-import com.squareup.java.JavaWriter;
 
 /**
  * Annotation processor
@@ -71,6 +61,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
+    private BoundboxWriter boundboxWriter = new BoundboxWriter();
 
     @Override
     public void init(ProcessingEnvironment env) {
@@ -116,191 +107,19 @@ public class BoundBoxProcessor extends AbstractProcessor {
                         classElement);
                 return true;
             }
-            String boundClassName = boundClass.getQualifiedName().toString();
-            System.out.println( "BoundClassName is "+boundClassName );
-
-            //BoundBox boundBoxAnnotation = classElement.getAnnotation(BoundBox.class);
-            //Class<?> contractClassName = boundBoxAnnotation.boundClass();
-            //boundClassName = boundClassName.substring(0, boundClassName.lastIndexOf('.'));
-            String targetPackageName = boundClassName.substring(0, boundClassName.lastIndexOf('.'));
-            String targetClassName = boundClassName.substring(boundClassName.lastIndexOf('.')+1);
-            String boundBoxClassName = "BoundBoxOf"+targetClassName;
 
             BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
             boundClass.accept(boundClassVisitor, null);
 
-            Writer out = null;
             try {
-                JavaFileObject sourceFile = filer.createSourceFile(targetPackageName+"."+boundBoxClassName, (Element[]) null);
-
-                out = sourceFile.openWriter();
-                JavaWriter writer = new JavaWriter(out);
-                writer.emitPackage(targetPackageName)//
-                .emitEmptyLine()//
-                .emitImports(Field.class.getName())//
-                .emitImports(Method.class.getName())//
-                .emitImports(Constructor.class.getName())//
-                .emitEmptyLine();
-
-                writer.beginType(boundBoxClassName, "class", Modifier.PUBLIC | Modifier.FINAL, null) //
-                .emitEmptyLine()//
-                .emitField(targetClassName, "boundObject", Modifier.PRIVATE)//
-                .emitEmptyLine()//
-                .beginMethod(null, boundBoxClassName, Modifier.PUBLIC, targetClassName, "boundObject")//
-                .emitStatement("this.boundObject = boundObject")//
-                .endMethod()//
-                .emitEmptyLine()//
-                .emitEmptyLine();
-
-                for( Entry<String, TypeMirror> entry : boundClassVisitor.getMapFieldNameToType().entrySet()) {
-                    String fieldType = entry.getValue().toString();
-                    String fieldName = entry.getKey();
-
-                    createDirectGetter(writer, fieldType, fieldName);
-
-                    writer.emitEmptyLine();
-
-                    createDirectSetter(writer, fieldType, fieldName);
-                }
-
-                for( Entry<String, TypeMirror> entry : boundClassVisitor.getMapMethodNameToReturnType().entrySet()) {
-                    String methodName = entry.getKey();
-                    String returnType = entry.getValue().toString();
-                    List<TypeMirror> parameterTypeList = boundClassVisitor.getMapMethodNameToParameterTypeList().get( methodName );
-                    List<? extends TypeMirror> thrownTypeList = boundClassVisitor.getMapMethodNameToThrownTypeList().get(methodName);
-
-                    writer.emitEmptyLine();
-                    createMethodWrapper(writer, methodName, returnType, parameterTypeList, thrownTypeList, targetClassName);
-                }
-
-                writer.endType();
-                writer.close();
+                boundboxWriter.writeBoundBox(boundClass, filer, boundClassVisitor);
             } catch (IOException e) {
                 e.printStackTrace();
-                error(classElement, "can't open java file " + targetClassName);
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
+                error(classElement, e.getMessage() );
             }
         }
 
         return true;
-    }
-
-    private void createDirectSetter(JavaWriter writer, String fieldType, String fieldName) throws IOException {
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String setterName = "boundBox_set" + fieldNameCamelCase;
-        writer.beginMethod("void", setterName, Modifier.PUBLIC, fieldType, fieldName);
-        writer.beginControlFlow("try");
-        writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
-        writer.emitStatement("field.setAccessible(true)");
-        writer.emitStatement("field.set(boundObject, %s)", fieldName);
-        writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.endControlFlow();
-        writer.endMethod();
-    }
-
-    private void createDirectGetter(JavaWriter writer, String fieldType, String fieldName) throws IOException {
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String getterName = "boundBox_get" + fieldNameCamelCase;
-        writer.beginMethod(fieldType, getterName, Modifier.PUBLIC);
-        writer.beginControlFlow("try");
-        writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
-        writer.emitStatement("field.setAccessible(true)");
-        writer.emitStatement("return (%s) field.get(boundObject)", fieldType);
-        writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.emitStatement("throw new RuntimeException()");
-        writer.endControlFlow();
-        writer.endMethod();
-    }
-
-    private void createMethodWrapper(JavaWriter writer, String methodName, String returnType, List<TypeMirror> parameterTypeList,
-            List<? extends TypeMirror> thrownTypeList, String targetClassName) throws IOException {
-        List<String> listParameters = new ArrayList<String>();
-        int anonymousParamCount = 0;
-        for (TypeMirror parameterType : parameterTypeList) {
-            listParameters.add(parameterType.toString());
-            String paramVariableName = "";
-            if( "int".equals(parameterType.toString()) || "Double".equals(parameterType.toString()) ) {
-                paramVariableName = "param"+anonymousParamCount++;
-            } else {
-                paramVariableName = computeCamelCaseNameStartLowerCase(parameterType.toString());
-            }
-            listParameters.add(paramVariableName);
-        }
-        boolean isConstructor = false;
-        if( methodName.equals("<init>") ) {
-            methodName = "boundBox_new";
-            isConstructor = true;
-            returnType = targetClassName;
-        }
-        String[] parameters = listParameters.toArray(new String[0]);
-        writer.beginMethod(returnType, methodName, Modifier.PUBLIC, parameters);
-        writer.beginControlFlow("try");
-        if( !isConstructor ) {
-            writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
-        } else {
-            writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor()", targetClassName);
-        }
-        writer.emitStatement("method.setAccessible(true)");
-        
-        listParameters = new ArrayList<String>();
-        int anonymousParamCount2 = 0;
-        for (TypeMirror parameterType : parameterTypeList) {
-            String paramVariableName = "";
-            if( "int".equals(parameterType.toString()) || "Double".equals(parameterType.toString()) ) {
-                paramVariableName = "param"+anonymousParamCount2++;
-            } else {
-                paramVariableName = computeCamelCaseNameStartLowerCase(parameterType.toString());
-            }
-            listParameters.add(paramVariableName);
-        }
-        parameters = listParameters.toArray(new String[0]);
-        String paramInvoke = "";
-        for (String param : parameters) {
-            paramInvoke += param + ", ";
-        }
-        String returnKeyWord = returnType.equals("void") ? "" : "return ";
-        if( "int".equals(returnType) ) {
-            returnKeyWord +=   "(Integer) ";
-        }
-        if( parameters.length > 0 ) {
-            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
-            if( isConstructor ) {
-                writer.emitStatement("method.newInstance(%s)", paramInvoke);
-            } else {
-                writer.emitStatement(returnKeyWord+"method.invoke(boundObject, %s)", paramInvoke);
-            }
-        } else {
-            if( isConstructor ) {
-                writer.emitStatement(returnKeyWord+"method.newInstance()");
-            } else {
-                writer.emitStatement(returnKeyWord+"method.invoke(boundObject)");
-            }
-        }
-        writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.emitStatement("throw new RuntimeException()");
-        writer.endControlFlow();
-        writer.endMethod();
-    }
-
-    private String computeCamelCaseNameStartUpperCase(String fieldName) {
-        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-    }
-
-    private String computeCamelCaseNameStartLowerCase(String fieldName) {
-        return Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
     private TypeElement getBoundClassAsTypeElement(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
@@ -339,27 +158,24 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     }
 
-    private final class BoundClassVisitor extends ElementKindVisitor6<Void, Void> {
+    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Void> {
 
-        private Map<String, TypeMirror> mapFieldNameToType = new HashMap<String, TypeMirror>();
-        private Map<String, TypeMirror> mapMethodNameToReturnType = new HashMap<String, TypeMirror>();
-        private Map<String, List<TypeMirror>> mapMethodNameToParameterTypeList = new HashMap<String, List<TypeMirror>>();
-        private Map<String, List<? extends TypeMirror>> mapMethodNameToThrownTypeList = new HashMap<String, List<? extends TypeMirror>>();
 
-        public Map<String, TypeMirror> getMapFieldNameToType() {
-            return mapFieldNameToType;
+        private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
+
+
+        public List<FieldInfo> getListFieldInfos() {
+            return listFieldInfos;
         }
 
-        public Map<String, TypeMirror> getMapMethodNameToReturnType() {
-            return mapMethodNameToReturnType;
+        public List<MethodInfo> getListMethodInfos() {
+            return listMethodInfos;
         }
 
-        public Map<String, List<TypeMirror>> getMapMethodNameToParameterTypeList() {
-            return mapMethodNameToParameterTypeList;
-        }
-
-        public Map<String, List<? extends TypeMirror>> getMapMethodNameToThrownTypeList() {
-            return mapMethodNameToThrownTypeList;
+        public List<MethodInfo> getListConstructorInfos() {
+            return listConstructorInfos;
         }
 
         @Override
@@ -386,13 +202,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
         @Override
         public Void visitExecutable(ExecutableElement e, Void p) {
             System.out.println("executable ->" + e.getSimpleName());
-            mapMethodNameToReturnType.put(e.getSimpleName().toString(), e.getReturnType());
-            List<TypeMirror> listTypeMirrors = new ArrayList<TypeMirror>();
-            for (VariableElement element : e.getParameters()) {
-                listTypeMirrors.add(element.asType());
+            MethodInfo methodInfo = new MethodInfo(e);
+            if( methodInfo.isConstructor() ) {
+                listConstructorInfos.add(methodInfo);
+            } else {
+                listMethodInfos.add( methodInfo);
             }
-            mapMethodNameToParameterTypeList.put(e.getSimpleName().toString(), listTypeMirrors);
-            mapMethodNameToThrownTypeList.put(e.getSimpleName().toString(), e.getThrownTypes());
             return super.visitExecutable(e, p);
         }
 
@@ -404,10 +219,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
         @Override
         public Void visitVariableAsField(VariableElement e, Void p) {
-            mapFieldNameToType.put(e.getSimpleName().toString(), e.asType());
+            listFieldInfos.add( new FieldInfo(e));
             System.out.println("field ->" + e.getSimpleName());
             return super.visitVariableAsField(e, p);
         }
-
     }
 }
