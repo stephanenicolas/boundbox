@@ -32,9 +32,9 @@ public class BoundBoxProcessorTest {
         boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
     }
     @Test
-    public void testProcessSetOfQextendsTypeElementRoundEnvironment() throws URISyntaxException {
+    public void testProcess_class_with_single_field() throws URISyntaxException {
         // given
-        String[] testSourceFileNames = new String[] { "Foo.java" };
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleField.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
