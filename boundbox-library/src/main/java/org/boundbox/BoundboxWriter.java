@@ -23,6 +23,15 @@ import org.boundbox.BoundBoxProcessor.BoundClassVisitor;
 
 import com.squareup.javawriter.JavaWriter;
 
+/**
+ * TODO handle inheritance of bounded class
+ * TODO handle imports inside boundbox class
+ * TODO static methods
+ * TODO static initializers
+ * TODO handle inner classes as bounded class ?
+ * @author SNI
+ *
+ */
 public class BoundboxWriter {
 
     private static final String CODE_DECORATOR_TITLE_PREFIX = "\t";
@@ -48,6 +57,7 @@ public class BoundboxWriter {
             .emitImports(Method.class.getName())//
             .emitImports(Constructor.class.getName())//
             .emitImports(InvocationTargetException.class.getName())//
+            .emitImports(BoundBoxException.class.getName())//
             .emitEmptyLine();
 
             writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null) //

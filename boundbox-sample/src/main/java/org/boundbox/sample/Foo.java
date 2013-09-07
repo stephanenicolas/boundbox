@@ -1,11 +1,11 @@
 package org.boundbox.sample;
 
 @SuppressWarnings("unused")
-public class Foo {
+public class Foo extends MotherOfFoo {
 
     private String bar = "bar";
     
-    private int foo() throws Exception {
+    private int foo() {
         return 42;
     }
     
