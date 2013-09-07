@@ -42,4 +42,8 @@ public class MethodInfo {
     public boolean isConstructor() {
         return "<init>".equals( methodName );
     }
+    
+    public boolean hasReturnType() {
+        return returnType != null && !"void".equals(returnType);
+    }
 }

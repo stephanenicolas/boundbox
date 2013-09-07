@@ -4,20 +4,24 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBoxProcessor.BoundClassVisitor;
 
-import com.squareup.java.JavaWriter;
+import com.squareup.javawriter.JavaWriter;
 
 public class BoundboxWriter {
 
@@ -43,13 +47,14 @@ public class BoundboxWriter {
             .emitImports(Field.class.getName())//
             .emitImports(Method.class.getName())//
             .emitImports(Constructor.class.getName())//
+            .emitImports(InvocationTargetException.class.getName())//
             .emitEmptyLine();
 
-            writer.beginType(boundBoxClassName, "class", Modifier.PUBLIC | Modifier.FINAL, null) //
+            writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null) //
             .emitEmptyLine()//
-            .emitField(targetClassName, "boundObject", Modifier.PRIVATE)//
+            .emitField(targetClassName, "boundObject", newHashSet(Modifier.PRIVATE))//
             .emitEmptyLine()//
-            .beginMethod(null, boundBoxClassName, Modifier.PUBLIC, targetClassName, "boundObject")//
+            .beginMethod(null, boundBoxClassName, newHashSet(Modifier.PUBLIC), targetClassName, "boundObject")//
             .emitStatement("this.boundObject = boundObject")//
             .endMethod()//
             .emitEmptyLine();
@@ -83,9 +88,9 @@ public class BoundboxWriter {
     }
 
     private void writeCodeDecoration(JavaWriter writer, String decorationTitle) throws IOException {
-        writer.emitEndOfLineComment(CODE_DECORATOR);
-        writer.emitEndOfLineComment(CODE_DECORATOR_TITLE_PREFIX+decorationTitle);
-        writer.emitEndOfLineComment(CODE_DECORATOR);
+        writer.emitSingleLineComment(CODE_DECORATOR);
+        writer.emitSingleLineComment(CODE_DECORATOR_TITLE_PREFIX+decorationTitle);
+        writer.emitSingleLineComment(CODE_DECORATOR);
         writer.emitEmptyLine();
     }
 
@@ -95,15 +100,13 @@ public class BoundboxWriter {
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String setterName = "boundBox_set" + fieldNameCamelCase;
-        writer.beginMethod("void", setterName, Modifier.PUBLIC, fieldType, fieldName);
+        writer.beginMethod("void", setterName, newHashSet(Modifier.PUBLIC), fieldType, fieldName);
         writer.beginControlFlow("try");
         writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
         writer.emitStatement("field.set(boundObject, %s)", fieldName);
         writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.endControlFlow();
+        addReflectionExceptionCatchClause(writer, Exception.class);
         writer.endMethod();
     }
 
@@ -113,16 +116,13 @@ public class BoundboxWriter {
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String getterName = "boundBox_get" + fieldNameCamelCase;
-        writer.beginMethod(fieldType, getterName, Modifier.PUBLIC);
+        writer.beginMethod(fieldType, getterName, newHashSet(Modifier.PUBLIC));
         writer.beginControlFlow("try");
         writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
         writer.emitStatement("return (%s) field.get(boundObject)", fieldType);
         writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.emitStatement("throw new RuntimeException()");
-        writer.endControlFlow();
+        addReflectionExceptionCatchClause(writer, Exception.class);
         writer.endMethod();
     }
 
@@ -132,7 +132,8 @@ public class BoundboxWriter {
         List<FieldInfo> parameterTypeList = methodInfo.getParameterTypes();
         List<? extends TypeMirror> thrownTypeList = methodInfo.getThrownTypes();
 
-        String[] parameters = createListOfParameterTypesAndNames(parameterTypeList);
+        List<String> parameters = createListOfParameterTypesAndNames(parameterTypeList);
+        List<String> thrownTypesCommaSeparated = createListOfThownTypes(thrownTypeList);
 
         boolean isConstructor = methodInfo.isConstructor();
         if( isConstructor ) {
@@ -140,7 +141,9 @@ public class BoundboxWriter {
             returnType = targetClassName;
         }
 
-        writer.beginMethod(returnType, methodName, Modifier.PUBLIC, parameters);
+        writer.beginMethod(returnType, methodName, newHashSet(Modifier.PUBLIC), parameters, thrownTypesCommaSeparated);
+        
+        
         writer.beginControlFlow("try");
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
@@ -161,31 +164,41 @@ public class BoundboxWriter {
 
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
-        String returnKeyWord = returnType.equals("void") ? "" : "return ";
-        String castReturnTypeString = createCastReturnTypeString(returnType);
-        if( !castReturnTypeString.isEmpty() ) {
-            returnKeyWord += castReturnTypeString;
+        String returnString = "";
+        if( methodInfo.hasReturnType() ) {
+            returnString = "return ";
+            String castReturnTypeString = createCastReturnTypeString(returnType);
+            returnString += castReturnTypeString;
         }
 
         if( parameterTypeList.isEmpty() ) {
             if( isConstructor ) {
-                writer.emitStatement(returnKeyWord+"method.newInstance()");
+                writer.emitStatement(returnString+"method.newInstance()");
             } else {
-                writer.emitStatement(returnKeyWord+"method.invoke(boundObject)");
+                writer.emitStatement(returnString+"method.invoke(boundObject)");
             }
         } else {
             if( isConstructor ) {
-                writer.emitStatement("method.newInstance(%s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString+"method.newInstance(%s)", parametersNamesCommaSeparated);
             } else {
-                writer.emitStatement(returnKeyWord+"method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString+"method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
             }
         }
         writer.endControlFlow();
-        writer.beginControlFlow("catch( Exception e )");
-        writer.emitStatement("  e.printStackTrace()", (Object[]) null);
-        writer.emitStatement("throw new RuntimeException()");
-        writer.endControlFlow();
+        addReflectionExceptionCatchClause(writer, IllegalAccessException.class);
+        addReflectionExceptionCatchClause(writer, IllegalArgumentException.class);
+        addReflectionExceptionCatchClause(writer, InvocationTargetException.class);
+        addReflectionExceptionCatchClause(writer, NoSuchMethodException.class);
+        if( methodInfo.isConstructor() ) {
+            addReflectionExceptionCatchClause(writer, InstantiationException.class);
+        }
         writer.endMethod();
+    }
+
+    private void addReflectionExceptionCatchClause(JavaWriter writer, Class<? extends Exception> exceptionClass) throws IOException {
+        writer.beginControlFlow("catch( "+exceptionClass.getSimpleName() +" e )");
+        writer.emitStatement("throw new BoundBoxException(e)");
+        writer.endControlFlow();
     }
 
     private String createCastReturnTypeString(String returnType) {
@@ -201,55 +214,49 @@ public class BoundboxWriter {
     }
 
     private String createListOfParametersTypesCommaSeparated(List<FieldInfo> parameterTypeList) {
-        String[] parameters;
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
             listParameters.add(fieldInfo.getType().toString()+".class");
         }
-        parameters = listParameters.toArray(new String[0]);
-        String paramInvoke = "";
-        for (String param : parameters) {
-            paramInvoke += param + ", ";
+        return StringUtils.join(listParameters, ", ");
+    }
+
+    private List<String> createListOfThownTypes(List<? extends TypeMirror> thrownTypeList) {
+        List<String> thrownTypes = new ArrayList<String>();
+        for (TypeMirror typeMirror : thrownTypeList) {
+            thrownTypes.add(typeMirror.toString());
         }
-        if( parameters.length > 0 ) {
-            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
-        }
-        return paramInvoke;
+        return thrownTypes;
     }
 
     private String createListOfParametersNamesCommaSeparated(List<FieldInfo> parameterTypeList) {
-        String[] parameters;
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
             listParameters.add(fieldInfo.getFieldName());
         }
-        parameters = listParameters.toArray(new String[0]);
-        String paramInvoke = "";
-        for (String param : parameters) {
-            paramInvoke += param + ", ";
-        }
-        if( parameters.length > 0 ) {
-            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
-        }
-        return paramInvoke;
+        return StringUtils.join(listParameters, ", ");
     }
 
-    private String[] createListOfParameterTypesAndNames(List<FieldInfo> parameterTypeList) {
+    private List<String> createListOfParameterTypesAndNames(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
             listParameters.add(fieldInfo.getType().toString());
             listParameters.add(fieldInfo.getFieldName());
         }
-        String[] parameters = listParameters.toArray(new String[0]);
-        return parameters;
+        return listParameters;
     }
 
     private String computeCamelCaseNameStartUpperCase(String fieldName) {
         return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
-    private String computeCamelCaseNameStartLowerCase(String fieldName) {
-        return Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
+    //from http://stackoverflow.com/q/2041778/693752
+    public static <T> Set<T> newHashSet(T... objs) {
+        Set<T> set = new HashSet<T>();
+        for (T o : objs) {
+            set.add(o);
+        }
+        return set;
     }
 
 }
