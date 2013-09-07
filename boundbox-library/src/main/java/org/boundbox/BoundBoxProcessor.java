@@ -58,6 +58,7 @@ import javax.tools.Diagnostic.Kind;
 public class BoundBoxProcessor extends AbstractProcessor {
 
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS = "boundClass";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS = "maxSuperClass";
 
     private Filer filer;
     private Messager messager;
@@ -69,14 +70,13 @@ public class BoundBoxProcessor extends AbstractProcessor {
         filer = env.getFiler();
         messager = env.getMessager();
     }
-    
+
     public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
         this.boundboxWriter = boundboxWriter;
     }
 
     @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnvironment) {
-
         // Get all classes that has the annotation
         Set<? extends Element> classElements = roundEnvironment.getElementsAnnotatedWith(BoundBox.class);
 
@@ -85,6 +85,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             // Get the annotation information
             TypeElement boundClass = null;
+            String maxSuperClass = null;
             List<? extends AnnotationMirror> listAnnotationMirrors = classElement.getAnnotationMirrors();
             if( listAnnotationMirrors ==  null ) {
                 messager.printMessage(Kind.WARNING,
@@ -103,6 +104,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     if( BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS.equals(entry.getKey().getSimpleName().toString())) {
                         boundClass = getBoundClassAsTypeElement(entry);
                     }
+                    if( BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS.equals(entry.getKey().getSimpleName().toString())) {
+                        maxSuperClass = getBoundClassAsTypeElement(entry).asType().toString();
+                    }
                 }
             }
 
@@ -113,8 +117,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 return true;
             }
 
-            
-            boundClass.accept(boundClassVisitor, true);
+            if( maxSuperClass != null ) {
+                boundClassVisitor.setMaxSuperClass(maxSuperClass);
+            }
+            boundClass.accept(boundClassVisitor, 0);
 
             try {
                 boundboxWriter.writeBoundBox(boundClass, filer, boundClassVisitor);
@@ -126,6 +132,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
         return true;
     }
+
 
     private TypeElement getBoundClassAsTypeElement(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
         return entry.getValue().accept(new TypeNameExtractorAnnotationValueVisitor(), null);
@@ -163,14 +170,26 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     }
 
-    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Boolean> {
+    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Integer> {
 
-
+        private String maxSuperClassName = Object.class.getName();
         private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
         private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
 
+        public void setMaxSuperClass(Class<?> maxSuperClass) {
+            this.maxSuperClassName = maxSuperClass.getName();
+        }
+        
+        public void setMaxSuperClass(String className ) {
+            System.out.println( "Max super class is set to " + className);
+            this.maxSuperClassName = className;
+        }
 
+        public String getMaxSuperClass() {
+            return maxSuperClassName;
+        }
+        
         public List<FieldInfo> getListFieldInfos() {
             return listFieldInfos;
         }
@@ -184,38 +203,40 @@ public class BoundBoxProcessor extends AbstractProcessor {
         }
 
         @Override
-        public Void visitTypeAsClass(TypeElement e, Boolean isBoundClass) {
+        public Void visitTypeAsClass(TypeElement e, final Integer inheritanceLevel) {
             System.out.println("class ->" + e.getSimpleName());
             //http://stackoverflow.com/q/7738171/693752
             for (Element enclosedElement : e.getEnclosedElements()) {
-                enclosedElement.accept(this, isBoundClass);
+                enclosedElement.accept(this, inheritanceLevel);
             }
 
             System.out.println("super class ->" + e.getSuperclass().toString());
             TypeMirror superclassOfBoundClass = e.getSuperclass();
             //TODO should be not needed to visit : http://stackoverflow.com/a/7739269/693752
-            if( !"java.lang.Object".equals(superclassOfBoundClass.toString()) ) {
+            if( !maxSuperClassName.equals(superclassOfBoundClass.toString()) ) {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
                     public Void visitDeclared(DeclaredType t, Void p) {
-                        t.asElement().accept(BoundClassVisitor.this, false);
+                        int inheritanceLevelOfSuperClass = inheritanceLevel + 1;
+                        t.asElement().accept(BoundClassVisitor.this, inheritanceLevelOfSuperClass);
                         System.out.println("super declared type ->" + t.toString());
                         return super.visitDeclared(t, p);
                     }
                 }, null);
             }
-            return super.visitTypeAsClass(e, isBoundClass);
+            return super.visitTypeAsClass(e, inheritanceLevel);
         }
 
         @Override
-        public Void visitExecutable(ExecutableElement e, Boolean isBoundClass) {
+        public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
             System.out.println("executable ->" + e.getSimpleName());
             MethodInfo methodInfo = new MethodInfo(e);
             if( methodInfo.isConstructor() ) {
-                if( isBoundClass ) {
+                if( inheritanceLevel ==0 ) {
                     listConstructorInfos.add(methodInfo);
                 }
             } else {
+                methodInfo.setInheritanceLevel( inheritanceLevel );
                 //prevents methods overriden in subclass to be re-added in super class. 
                 if( !listMethodInfos.contains( listMethodInfos ) ) {
                     listMethodInfos.add( methodInfo);
@@ -224,22 +245,23 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     System.out.println("method ->" + methodInfo.getMethodName() + " already added.");
                 }
             }
-            return super.visitExecutable(e, isBoundClass);
+            return super.visitExecutable(e, inheritanceLevel);
         }
 
         @Override
-        public Void visitVariableAsField(VariableElement e, Boolean isBoundClass) {
+        public Void visitVariableAsField(VariableElement e, Integer inheritanceLevel) {
             FieldInfo fieldInfo = new FieldInfo(e);
+            fieldInfo.setInheritanceLevel( inheritanceLevel );
             if( !listFieldInfos.contains( fieldInfo ) ) {
                 listFieldInfos.add( fieldInfo);
                 System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
             } else {
                 System.out.println("field ->" + fieldInfo.getFieldName() + " already added.");
             }
-            return super.visitVariableAsField(e, isBoundClass);
+            return super.visitVariableAsField(e, inheritanceLevel);
         }
     }
-    
+
     public BoundClassVisitor getBoundClassVisitor() {
         return boundClassVisitor;
     }

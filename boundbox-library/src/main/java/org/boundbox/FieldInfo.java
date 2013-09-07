@@ -3,9 +3,10 @@ package org.boundbox;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-public class FieldInfo {
+public class FieldInfo implements Inheritable {
     private String fieldName;
     private TypeMirror fieldType;
+    private int inheritanceLevel;
     
     public FieldInfo( VariableElement e ) {
         fieldName = e.getSimpleName().toString();
@@ -25,6 +26,26 @@ public class FieldInfo {
     
     public TypeMirror getFieldType() {
         return fieldType;
+    }
+    
+    public void setInheritanceLevel(int inheritanceLevel) {
+        this.inheritanceLevel = inheritanceLevel;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.boundbox.Inheritable#getInheritanceLevel()
+     */
+    @Override
+    public int getInheritanceLevel() {
+        return inheritanceLevel;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.boundbox.Inheritable#isInherited()
+     */
+    @Override
+    public boolean isInherited() {
+        return inheritanceLevel != 0;
     }
 
     @Override

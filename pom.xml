@@ -47,7 +47,6 @@
 
 	<modules>
 		<module>boundbox-library</module>
-		<module>boundbox-sample</module>
-		<module>boundbox-sample-tests</module>
+		<module>samples/boundbox-sample</module>
 	</modules>
 </project>

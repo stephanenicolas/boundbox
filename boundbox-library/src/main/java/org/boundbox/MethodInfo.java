@@ -7,11 +7,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-public class MethodInfo {
+public class MethodInfo implements Inheritable {
     private String methodName;
     private TypeMirror returnType;
     private List<FieldInfo> parameterTypes;
     private List<? extends TypeMirror> thrownTypes;
+    private int inheritanceLevel;
 
     public MethodInfo( ExecutableElement element ) {
         methodName = element.getSimpleName().toString();
@@ -45,6 +46,18 @@ public class MethodInfo {
     
     public boolean hasReturnType() {
         return returnType != null && !"void".equals(returnType);
+    }
+    
+    public void setInheritanceLevel(int inheritanceLevel) {
+        this.inheritanceLevel = inheritanceLevel;
+    }
+    
+    public int getInheritanceLevel() {
+        return inheritanceLevel;
+    }
+    
+    public boolean isInherited() {
+        return inheritanceLevel != 0;
     }
 
     @Override
@@ -83,4 +96,5 @@ public class MethodInfo {
         return "MethodInfo [methodName=" + methodName + ", returnType=" + returnType + ", parameterTypes=" + parameterTypes
                 + ", thrownTypes=" + thrownTypes + "]";
     }
+
 }

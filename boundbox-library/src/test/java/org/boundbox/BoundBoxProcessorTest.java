@@ -31,6 +31,7 @@ public class BoundBoxProcessorTest {
         boundBoxProcessor = new BoundBoxProcessor();
         boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
     }
+    
     @Test
     public void testProcess_class_with_single_field() throws URISyntaxException {
         // given
@@ -46,6 +47,25 @@ public class BoundBoxProcessorTest {
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+    
+    @Test
+    public void testProcess_class_with_inherited_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedField.java", "TestClassWithSingleField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        List<FieldInfo> listFieldInfos = boundBoxProcessor.getBoundClassVisitor().getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setInheritanceLevel(1);
         assertContains(listFieldInfos, fakeFieldInfo);
     }
 
@@ -84,6 +104,7 @@ public class BoundBoxProcessorTest {
         FieldInfo fieldInfo2 = retrieveFieldInfo(listFieldInfos, fakeFieldInfo);
         assertNotNull(fieldInfo2);
         assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldType().toString());
+        assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
     }
 
     private FieldInfo retrieveFieldInfo(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {

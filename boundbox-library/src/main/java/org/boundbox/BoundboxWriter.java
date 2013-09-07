@@ -116,7 +116,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         String setterName = "boundBox_set" + fieldNameCamelCase;
         writer.beginMethod("void", setterName, newHashSet(Modifier.PUBLIC), fieldType, fieldName);
         writer.beginControlFlow("try");
-        writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
+        String superClassChain = getSuperClassChain(fieldInfo);
+        writer.emitStatement("Field field = boundObject.getClass()"+superClassChain+".getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
         writer.emitStatement("field.set(boundObject, %s)", fieldName);
         writer.endControlFlow();
@@ -132,7 +133,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         String getterName = "boundBox_get" + fieldNameCamelCase;
         writer.beginMethod(fieldType, getterName, newHashSet(Modifier.PUBLIC));
         writer.beginControlFlow("try");
-        writer.emitStatement("Field field = boundObject.getClass().getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
+        String superClassChain = getSuperClassChain(fieldInfo);
+        writer.emitStatement("Field field = boundObject.getClass()"+superClassChain+".getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
         writer.emitStatement("return (%s) field.get(boundObject)", fieldType);
         writer.endControlFlow();
@@ -156,22 +158,23 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
 
         writer.beginMethod(returnType, methodName, newHashSet(Modifier.PUBLIC), parameters, thrownTypesCommaSeparated);
-        
-        
+
+
         writer.beginControlFlow("try");
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
+        String superClassChain = getSuperClassChain(methodInfo);
         if( parameterTypeList.isEmpty() ) {
             if( isConstructor ) {
                 writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor()", targetClassName);
             } else {
-                writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
+                writer.emitStatement("Method method = boundObject.getClass()"+superClassChain+".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
             }
         } else {
             if( isConstructor ) {
                 writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor(%s)", targetClassName,parametersTypesCommaSeparated);
             } else {
-                writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
+                writer.emitStatement("Method method = boundObject.getClass()"+superClassChain+".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             }
         }
         writer.emitStatement("method.setAccessible(true)");
@@ -209,6 +212,22 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endMethod();
     }
 
+
+    private String getSuperClassChain(Inheritable inheritable) {
+        String superClassChain = "";
+        for( int inheritanceLevel = 0; inheritanceLevel< inheritable.getInheritanceLevel(); inheritanceLevel ++ ) {
+            superClassChain += ".getSuperclass()";
+        }
+        return superClassChain;
+    }
+
+    private String getSuperChain(Inheritable inheritable) {
+        String superClassChain = "";
+        for( int inheritanceLevel = 0; inheritanceLevel< inheritable.getInheritanceLevel(); inheritanceLevel ++ ) {
+            superClassChain += "_super()";
+        }
+        return superClassChain;
+    }
     private void addReflectionExceptionCatchClause(JavaWriter writer, Class<? extends Exception> exceptionClass) throws IOException {
         writer.beginControlFlow("catch( "+exceptionClass.getSimpleName() +" e )");
         writer.emitStatement("throw new BoundBoxException(e)");
