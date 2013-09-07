@@ -35,19 +35,15 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.tools.Diagnostic.Kind;
-
-import org.apache.commons.lang3.reflect.TypeUtils;
 
 /**
  * Annotation processor
@@ -65,13 +61,17 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
-    private BoundboxWriter boundboxWriter = new BoundboxWriter();
+    private IBoundboxWriter boundboxWriter = new BoundboxWriter();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
 
     @Override
     public void init(ProcessingEnvironment env) {
         filer = env.getFiler();
         messager = env.getMessager();
+    }
+    
+    public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
+        this.boundboxWriter = boundboxWriter;
     }
 
     @Override

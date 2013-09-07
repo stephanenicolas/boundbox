@@ -32,11 +32,15 @@ import com.squareup.javawriter.JavaWriter;
  * @author SNI
  *
  */
-public class BoundboxWriter {
+public class BoundboxWriter implements IBoundboxWriter {
 
     private static final String CODE_DECORATOR_TITLE_PREFIX = "\t";
     private static final String CODE_DECORATOR = "******************************";
 
+    /* (non-Javadoc)
+     * @see org.boundbox.IBoundboxWriter#writeBoundBox(javax.lang.model.element.TypeElement, javax.annotation.processing.Filer, org.boundbox.BoundBoxProcessor.BoundClassVisitor)
+     */
+    @Override
     public void writeBoundBox(TypeElement boundClass, Filer filer, BoundClassVisitor boundClassVisitor) throws IOException {
         String boundClassName = boundClass.getQualifiedName().toString();
         System.out.println( "BoundClassName is "+boundClassName );

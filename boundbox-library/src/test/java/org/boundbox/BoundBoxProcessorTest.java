@@ -1,11 +1,12 @@
 package org.boundbox;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,16 +17,24 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 public class BoundBoxProcessorTest {
 
+    private BoundBoxProcessor boundBoxProcessor;
+
+    @Before
+    public void setup() {
+        boundBoxProcessor = new BoundBoxProcessor();
+        boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
+    }
     @Test
     public void testProcessSetOfQextendsTypeElementRoundEnvironment() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "Foo.java" };
-        BoundBoxProcessor boundBoxProcessor = new BoundBoxProcessor();
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
