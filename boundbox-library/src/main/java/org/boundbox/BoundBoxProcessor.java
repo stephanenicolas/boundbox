@@ -192,6 +192,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             System.out.println("super class ->" + e.getSuperclass().toString());
             TypeMirror superclassOfBoundClass = e.getSuperclass();
+            //should be not needed to visit : http://stackoverflow.com/a/7739269/693752
             if( !"java.lang.Object".equals(superclassOfBoundClass.toString()) ) {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
@@ -214,6 +215,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     listConstructorInfos.add(methodInfo);
                 }
             } else {
+                //TODO if !isBoundClass (is super class), don't had already present method
                 listMethodInfos.add( methodInfo);
             }
             return super.visitExecutable(e, isBoundClass);
@@ -221,6 +223,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
         @Override
         public Void visitVariableAsField(VariableElement e, Boolean isBoundClass) {
+            //TODO if !isBoundClass (is super class), don't had already present field
             listFieldInfos.add( new FieldInfo(e));
             System.out.println("field ->" + e.getSimpleName());
             return super.visitVariableAsField(e, isBoundClass);
