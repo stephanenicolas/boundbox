@@ -66,6 +66,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Filer filer;
     private Messager messager;
     private BoundboxWriter boundboxWriter = new BoundboxWriter();
+    private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
 
     @Override
     public void init(ProcessingEnvironment env) {
@@ -112,7 +113,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 return true;
             }
 
-            BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
+            
             boundClass.accept(boundClassVisitor, true);
 
             try {
@@ -192,7 +193,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             System.out.println("super class ->" + e.getSuperclass().toString());
             TypeMirror superclassOfBoundClass = e.getSuperclass();
-            //should be not needed to visit : http://stackoverflow.com/a/7739269/693752
+            //TODO should be not needed to visit : http://stackoverflow.com/a/7739269/693752
             if( !"java.lang.Object".equals(superclassOfBoundClass.toString()) ) {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
@@ -215,18 +216,31 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     listConstructorInfos.add(methodInfo);
                 }
             } else {
-                //TODO if !isBoundClass (is super class), don't had already present method
-                listMethodInfos.add( methodInfo);
+                //prevents methods overriden in subclass to be re-added in super class. 
+                if( !listMethodInfos.contains( listMethodInfos ) ) {
+                    listMethodInfos.add( methodInfo);
+                    System.out.println("method ->" + methodInfo.getMethodName() + " added." );
+                } else {
+                    System.out.println("method ->" + methodInfo.getMethodName() + " already added.");
+                }
             }
             return super.visitExecutable(e, isBoundClass);
         }
 
         @Override
         public Void visitVariableAsField(VariableElement e, Boolean isBoundClass) {
-            //TODO if !isBoundClass (is super class), don't had already present field
-            listFieldInfos.add( new FieldInfo(e));
-            System.out.println("field ->" + e.getSimpleName());
+            FieldInfo fieldInfo = new FieldInfo(e);
+            if( !listFieldInfos.contains( fieldInfo ) ) {
+                listFieldInfos.add( fieldInfo);
+                System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
+            } else {
+                System.out.println("field ->" + fieldInfo.getFieldName() + " already added.");
+            }
             return super.visitVariableAsField(e, isBoundClass);
         }
+    }
+    
+    public BoundClassVisitor getBoundClassVisitor() {
+        return boundClassVisitor;
     }
 }

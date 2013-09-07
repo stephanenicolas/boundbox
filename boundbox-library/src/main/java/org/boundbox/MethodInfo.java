@@ -46,4 +46,41 @@ public class MethodInfo {
     public boolean hasReturnType() {
         return returnType != null && !"void".equals(returnType);
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
+        result = prime * result + ((parameterTypes == null) ? 0 : parameterTypes.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof MethodInfo))
+            return false;
+        MethodInfo other = (MethodInfo) obj;
+        if (methodName == null) {
+            if (other.methodName != null)
+                return false;
+        } else if (!methodName.equals(other.methodName))
+            return false;
+        if (parameterTypes == null) {
+            if (other.parameterTypes != null)
+                return false;
+        } else if (!parameterTypes.equals(other.parameterTypes))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "MethodInfo [methodName=" + methodName + ", returnType=" + returnType + ", parameterTypes=" + parameterTypes
+                + ", thrownTypes=" + thrownTypes + "]";
+    }
 }

@@ -5,19 +5,56 @@ import javax.lang.model.type.TypeMirror;
 
 public class FieldInfo {
     private String fieldName;
-    private TypeMirror type;
+    private TypeMirror fieldType;
     
     public FieldInfo( VariableElement e ) {
         fieldName = e.getSimpleName().toString();
-        type = e.asType();
+        fieldType = e.asType();
     }
     
+    
+    public FieldInfo(String fieldName, TypeMirror fieldType) {
+        this.fieldName = fieldName;
+        this.fieldType = fieldType;
+    }
+
+
     public String getFieldName() {
         return fieldName;
     }
     
-    public TypeMirror getType() {
-        return type;
+    public TypeMirror getFieldType() {
+        return fieldType;
     }
-    
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof FieldInfo))
+            return false;
+        FieldInfo other = (FieldInfo) obj;
+        if (fieldName == null) {
+            if (other.fieldName != null)
+                return false;
+        } else if (!fieldName.equals(other.fieldName))
+            return false;
+        return true;
+    }
+
+
+    @Override
+    public String toString() {
+        return "FieldInfo [fieldName=" + fieldName + ", fieldType=" + fieldType + "]";
+    }
 }

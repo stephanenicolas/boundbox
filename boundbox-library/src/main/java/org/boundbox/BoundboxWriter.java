@@ -106,7 +106,7 @@ public class BoundboxWriter {
 
     private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
-        String fieldType = fieldInfo.getType().toString();
+        String fieldType = fieldInfo.getFieldType().toString();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String setterName = "boundBox_set" + fieldNameCamelCase;
@@ -122,7 +122,7 @@ public class BoundboxWriter {
 
     private void createDirectGetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
-        String fieldType = fieldInfo.getType().toString();
+        String fieldType = fieldInfo.getFieldType().toString();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String getterName = "boundBox_get" + fieldNameCamelCase;
@@ -226,7 +226,7 @@ public class BoundboxWriter {
     private String createListOfParametersTypesCommaSeparated(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
-            listParameters.add(fieldInfo.getType().toString()+".class");
+            listParameters.add(fieldInfo.getFieldType().toString()+".class");
         }
         return StringUtils.join(listParameters, ", ");
     }
@@ -250,7 +250,7 @@ public class BoundboxWriter {
     private List<String> createListOfParameterTypesAndNames(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
-            listParameters.add(fieldInfo.getType().toString());
+            listParameters.add(fieldInfo.getFieldType().toString());
             listParameters.add(fieldInfo.getFieldName());
         }
         return listParameters;
