@@ -88,7 +88,7 @@ public class BoundboxWriter {
         writer.emitEndOfLineComment(CODE_DECORATOR);
         writer.emitEmptyLine();
     }
-    
+
     private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getType().toString();
@@ -129,69 +129,55 @@ public class BoundboxWriter {
     private void createMethodWrapper(JavaWriter writer, MethodInfo methodInfo, String targetClassName) throws IOException {
         String methodName = methodInfo.getMethodName();
         String returnType = methodInfo.getReturnType().toString();
-        List<TypeMirror> parameterTypeList = methodInfo.getParameterTypes();
+        List<FieldInfo> parameterTypeList = methodInfo.getParameterTypes();
         List<? extends TypeMirror> thrownTypeList = methodInfo.getThrownTypes();
 
-        List<String> listParameters = new ArrayList<String>();
-        int anonymousParamCount = 0;
-        for (TypeMirror parameterType : parameterTypeList) {
-            listParameters.add(parameterType.toString());
-            String paramVariableName = "";
-            if( "int".equals(parameterType.toString()) || "Double".equals(parameterType.toString()) ) {
-                paramVariableName = "param"+anonymousParamCount++;
-            } else {
-                paramVariableName = computeCamelCaseNameStartLowerCase(parameterType.toString());
-            }
-            listParameters.add(paramVariableName);
-        }
+        String[] parameters = createListOfParameterTypesAndNames(parameterTypeList);
+
         boolean isConstructor = methodInfo.isConstructor();
         if( isConstructor ) {
             methodName = "boundBox_new";
             returnType = targetClassName;
         }
-        
-        String[] parameters = listParameters.toArray(new String[0]);
+
         writer.beginMethod(returnType, methodName, Modifier.PUBLIC, parameters);
         writer.beginControlFlow("try");
-        if( !isConstructor ) {
-            writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
+        String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
+
+        if( parameterTypeList.isEmpty() ) {
+            if( isConstructor ) {
+                writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor()", targetClassName);
+            } else {
+                writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
+            }
         } else {
-            writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor()", targetClassName);
+            if( isConstructor ) {
+                writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor(%s)", targetClassName,parametersTypesCommaSeparated);
+            } else {
+                writer.emitStatement("Method method = boundObject.getClass().getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
+            }
         }
         writer.emitStatement("method.setAccessible(true)");
 
-        listParameters = new ArrayList<String>();
-        int anonymousParamCount2 = 0;
-        for (TypeMirror parameterType : parameterTypeList) {
-            String paramVariableName = "";
-            if( "int".equals(parameterType.toString()) || "Double".equals(parameterType.toString()) ) {
-                paramVariableName = "param"+anonymousParamCount2++;
-            } else {
-                paramVariableName = computeCamelCaseNameStartLowerCase(parameterType.toString());
-            }
-            listParameters.add(paramVariableName);
-        }
-        parameters = listParameters.toArray(new String[0]);
-        String paramInvoke = "";
-        for (String param : parameters) {
-            paramInvoke += param + ", ";
-        }
+        String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
+
         String returnKeyWord = returnType.equals("void") ? "" : "return ";
-        if( "int".equals(returnType) ) {
-            returnKeyWord +=   "(Integer) ";
+        String castReturnTypeString = createCastReturnTypeString(returnType);
+        if( !castReturnTypeString.isEmpty() ) {
+            returnKeyWord += castReturnTypeString;
         }
-        if( parameters.length > 0 ) {
-            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
-            if( isConstructor ) {
-                writer.emitStatement("method.newInstance(%s)", paramInvoke);
-            } else {
-                writer.emitStatement(returnKeyWord+"method.invoke(boundObject, %s)", paramInvoke);
-            }
-        } else {
+
+        if( parameterTypeList.isEmpty() ) {
             if( isConstructor ) {
                 writer.emitStatement(returnKeyWord+"method.newInstance()");
             } else {
                 writer.emitStatement(returnKeyWord+"method.invoke(boundObject)");
+            }
+        } else {
+            if( isConstructor ) {
+                writer.emitStatement("method.newInstance(%s)", parametersNamesCommaSeparated);
+            } else {
+                writer.emitStatement(returnKeyWord+"method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
             }
         }
         writer.endControlFlow();
@@ -200,6 +186,62 @@ public class BoundboxWriter {
         writer.emitStatement("throw new RuntimeException()");
         writer.endControlFlow();
         writer.endMethod();
+    }
+
+    private String createCastReturnTypeString(String returnType) {
+        String castReturnTypeString = "";
+        if( "int".equals(returnType) ) {
+            castReturnTypeString = "(Integer)";
+        }
+
+        if( !castReturnTypeString.isEmpty() ) {
+            castReturnTypeString +=" ";
+        }
+        return castReturnTypeString;
+    }
+
+    private String createListOfParametersTypesCommaSeparated(List<FieldInfo> parameterTypeList) {
+        String[] parameters;
+        List<String> listParameters = new ArrayList<String>();
+        for (FieldInfo fieldInfo : parameterTypeList) {
+            listParameters.add(fieldInfo.getType().toString()+".class");
+        }
+        parameters = listParameters.toArray(new String[0]);
+        String paramInvoke = "";
+        for (String param : parameters) {
+            paramInvoke += param + ", ";
+        }
+        if( parameters.length > 0 ) {
+            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
+        }
+        return paramInvoke;
+    }
+
+    private String createListOfParametersNamesCommaSeparated(List<FieldInfo> parameterTypeList) {
+        String[] parameters;
+        List<String> listParameters = new ArrayList<String>();
+        for (FieldInfo fieldInfo : parameterTypeList) {
+            listParameters.add(fieldInfo.getFieldName());
+        }
+        parameters = listParameters.toArray(new String[0]);
+        String paramInvoke = "";
+        for (String param : parameters) {
+            paramInvoke += param + ", ";
+        }
+        if( parameters.length > 0 ) {
+            paramInvoke = paramInvoke.substring(0, paramInvoke.length() - 2);
+        }
+        return paramInvoke;
+    }
+
+    private String[] createListOfParameterTypesAndNames(List<FieldInfo> parameterTypeList) {
+        List<String> listParameters = new ArrayList<String>();
+        for (FieldInfo fieldInfo : parameterTypeList) {
+            listParameters.add(fieldInfo.getType().toString());
+            listParameters.add(fieldInfo.getFieldName());
+        }
+        String[] parameters = listParameters.toArray(new String[0]);
+        return parameters;
     }
 
     private String computeCamelCaseNameStartUpperCase(String fieldName) {

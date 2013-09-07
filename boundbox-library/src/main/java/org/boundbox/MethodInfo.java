@@ -10,15 +10,15 @@ import javax.lang.model.type.TypeMirror;
 public class MethodInfo {
     private String methodName;
     private TypeMirror returnType;
-    private List<TypeMirror> parameterTypes;
+    private List<FieldInfo> parameterTypes;
     private List<? extends TypeMirror> thrownTypes;
 
     public MethodInfo( ExecutableElement element ) {
         methodName = element.getSimpleName().toString();
         returnType = element.getReturnType();
-        parameterTypes = new ArrayList<TypeMirror>();
+        parameterTypes = new ArrayList<FieldInfo>();
         for (VariableElement variableElement : element.getParameters()) {
-            parameterTypes.add(variableElement.asType());
+            parameterTypes.add( new FieldInfo(variableElement));
         }      
         thrownTypes = element.getThrownTypes();
     }
@@ -31,7 +31,7 @@ public class MethodInfo {
         return returnType;
     }
     
-    public List<TypeMirror> getParameterTypes() {
+    public List<FieldInfo> getParameterTypes() {
         return parameterTypes;
     }
     
