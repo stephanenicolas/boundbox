@@ -39,11 +39,15 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
+import javax.lang.model.util.TypeKindVisitor6;
 import javax.tools.Diagnostic.Kind;
+
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 /**
  * Annotation processor
@@ -109,7 +113,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
 
             BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
-            boundClass.accept(boundClassVisitor, null);
+            boundClass.accept(boundClassVisitor, true);
 
             try {
                 boundboxWriter.writeBoundBox(boundClass, filer, boundClassVisitor);
@@ -158,7 +162,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     }
 
-    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Void> {
+    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Boolean> {
 
 
         private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
@@ -179,49 +183,47 @@ public class BoundBoxProcessor extends AbstractProcessor {
         }
 
         @Override
-        public Void visitTypeAsClass(TypeElement e, Void p) {
+        public Void visitTypeAsClass(TypeElement e, Boolean isBoundClass) {
             System.out.println("class ->" + e.getSimpleName());
+            //http://stackoverflow.com/q/7738171/693752
             for (Element enclosedElement : e.getEnclosedElements()) {
-                enclosedElement.accept(this, null);
+                enclosedElement.accept(this, isBoundClass);
             }
-            return super.visitTypeAsClass(e, p);
+
+            System.out.println("super class ->" + e.getSuperclass().toString());
+            TypeMirror superclassOfBoundClass = e.getSuperclass();
+            if( !"java.lang.Object".equals(superclassOfBoundClass.toString()) ) {
+                superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
+                    @Override
+                    public Void visitDeclared(DeclaredType t, Void p) {
+                        t.asElement().accept(BoundClassVisitor.this, false);
+                        System.out.println("super declared type ->" + t.toString());
+                        return super.visitDeclared(t, p);
+                    }
+                }, null);
+            }
+            return super.visitTypeAsClass(e, isBoundClass);
         }
 
         @Override
-        public Void visitPackage(PackageElement e, Void p) {
-            System.out.println("package ->" + e.getSimpleName());
-            return super.visitPackage(e, p);
-        }
-
-        @Override
-        public Void visitType(TypeElement e, Void p) {
-            System.out.println("type ->" + e.getSimpleName());
-            return super.visitType(e, p);
-        }
-
-        @Override
-        public Void visitExecutable(ExecutableElement e, Void p) {
+        public Void visitExecutable(ExecutableElement e, Boolean isBoundClass) {
             System.out.println("executable ->" + e.getSimpleName());
             MethodInfo methodInfo = new MethodInfo(e);
             if( methodInfo.isConstructor() ) {
-                listConstructorInfos.add(methodInfo);
+                if( isBoundClass ) {
+                    listConstructorInfos.add(methodInfo);
+                }
             } else {
                 listMethodInfos.add( methodInfo);
             }
-            return super.visitExecutable(e, p);
+            return super.visitExecutable(e, isBoundClass);
         }
 
         @Override
-        public Void visitVariable(VariableElement e, Void p) {
-            System.out.println("variable ->" + e.getSimpleName());
-            return super.visitVariable(e, p);
-        }
-
-        @Override
-        public Void visitVariableAsField(VariableElement e, Void p) {
+        public Void visitVariableAsField(VariableElement e, Boolean isBoundClass) {
             listFieldInfos.add( new FieldInfo(e));
             System.out.println("field ->" + e.getSimpleName());
-            return super.visitVariableAsField(e, p);
+            return super.visitVariableAsField(e, isBoundClass);
         }
     }
 }
