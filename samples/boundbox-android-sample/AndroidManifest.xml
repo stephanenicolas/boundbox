@@ -24,11 +24,6 @@
         </activity>
         <activity android:name="org.boundbox.sample.android.Activity2" />
         
-        <uses-library android:name="android.test.runner" />
     </application>
-
-    <instrumentation
-        android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="org.boundbox.sample.android" />
 
 </manifest>
