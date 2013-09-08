@@ -205,6 +205,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
         @Override
         public Void visitTypeAsClass(TypeElement e, final Integer inheritanceLevel) {
             System.out.println("class ->" + e.getSimpleName());
+            boolean isInnerClass = e.getNestingKind().isNested();
+            System.out.println("nested ->" + isInnerClass);
+            if( isInnerClass ) {
+                return super.visitTypeAsClass(e, inheritanceLevel);
+            }
             //http://stackoverflow.com/q/7738171/693752
             for (Element enclosedElement : e.getEnclosedElements()) {
                 enclosedElement.accept(this, inheritanceLevel);
@@ -217,8 +222,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
                     public Void visitDeclared(DeclaredType t, Void p) {
-                        int inheritanceLevelOfSuperClass = inheritanceLevel + 1;
-                        t.asElement().accept(BoundClassVisitor.this, inheritanceLevelOfSuperClass);
+                        t.asElement().accept(BoundClassVisitor.this, inheritanceLevel + 1);
                         System.out.println("super declared type ->" + t.toString());
                         return super.visitDeclared(t, p);
                     }

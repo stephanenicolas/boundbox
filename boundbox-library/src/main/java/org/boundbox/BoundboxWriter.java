@@ -182,7 +182,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
         String returnString = "";
-        if( methodInfo.hasReturnType() ) {
+        if( methodInfo.isConstructor() || methodInfo.hasReturnType() ) {
             returnString = "return ";
             String castReturnTypeString = createCastReturnTypeString(returnType);
             returnString += castReturnTypeString;
@@ -238,6 +238,10 @@ public class BoundboxWriter implements IBoundboxWriter {
         String castReturnTypeString = "";
         if( "int".equals(returnType) ) {
             castReturnTypeString = "(Integer)";
+        }
+
+        if( "boolean".equals(returnType) ) {
+            castReturnTypeString = "(Boolean)";
         }
 
         if( !castReturnTypeString.isEmpty() ) {

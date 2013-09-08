@@ -45,7 +45,7 @@ public class MethodInfo implements Inheritable {
     }
     
     public boolean hasReturnType() {
-        return returnType != null && !"void".equals(returnType);
+        return returnType != null && !"void".equalsIgnoreCase(returnType.toString());
     }
     
     public void setInheritanceLevel(int inheritanceLevel) {

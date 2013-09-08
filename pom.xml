@@ -48,5 +48,6 @@
 	<modules>
 		<module>boundbox-library</module>
 		<module>samples/boundbox-sample</module>
+		<module>samples/boundbox-android-sample</module>
 	</modules>
 </project>
