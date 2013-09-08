@@ -1,8 +1,6 @@
 package org.boundbox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -32,6 +30,9 @@ public class BoundBoxProcessorTest {
         boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
     }
     
+    // ----------------------------------
+    //  FIELDS
+    // ----------------------------------
     @Test
     public void testProcess_class_with_single_field() throws URISyntaxException {
         // given
@@ -67,6 +68,45 @@ public class BoundBoxProcessorTest {
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         fakeFieldInfo.setInheritanceLevel(1);
         assertContains(listFieldInfos, fakeFieldInfo);
+    }
+    
+    // ----------------------------------
+    //  CONSTRUCTOR
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_single_constructor() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleConstructor.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        List<MethodInfo> listConstructorInfos = boundBoxProcessor.getBoundClassVisitor().getListConstructorInfos();
+        assertFalse(listConstructorInfos.isEmpty());
+        assertEquals( 1, listConstructorInfos.size());
+    }
+    
+    // ----------------------------------
+    //  METHODS
+    // ----------------------------------
+    
+    @Test
+    public void testProcess_class_with_single_method() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        List<MethodInfo> listMethodInfos = boundBoxProcessor.getBoundClassVisitor().getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        assertEquals( 1, listMethodInfos.size());
     }
 
     private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor)
