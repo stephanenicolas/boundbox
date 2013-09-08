@@ -221,13 +221,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         return superClassChain;
     }
 
-    private String getSuperChain(Inheritable inheritable) {
-        String superClassChain = "";
-        for( int inheritanceLevel = 0; inheritanceLevel< inheritable.getInheritanceLevel(); inheritanceLevel ++ ) {
-            superClassChain += "_super()";
-        }
-        return superClassChain;
-    }
     private void addReflectionExceptionCatchClause(JavaWriter writer, Class<? extends Exception> exceptionClass) throws IOException {
         writer.beginControlFlow("catch( "+exceptionClass.getSimpleName() +" e )");
         writer.emitStatement("throw new BoundBoxException(e)");
