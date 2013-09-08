@@ -1,4 +1,4 @@
-package org.boundbox;
+package org.boundbox.model;
 
 import java.util.ArrayList;
 import java.util.List;

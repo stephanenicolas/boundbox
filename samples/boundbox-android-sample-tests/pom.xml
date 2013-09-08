@@ -91,7 +91,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<annotationProcessors>
-						<annotationProcessor>org.boundbox.BoundBoxProcessor</annotationProcessor>
+						<annotationProcessor>org.boundbox.processor.BoundBoxProcessor</annotationProcessor>
 					</annotationProcessors>
 				</configuration>
 			</plugin>

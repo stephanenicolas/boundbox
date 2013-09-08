@@ -1,5 +1,7 @@
 package org.boundbox;
 
+import org.boundbox.model.FieldInfo;
+
 public class FakeFieldInfo extends FieldInfo {
     
     private String fieldTypeName;

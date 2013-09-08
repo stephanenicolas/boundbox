@@ -15,7 +15,7 @@
  * information regarding copyright ownership.
  */
 
-package org.boundbox;
+package org.boundbox.processor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +45,12 @@ import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.tools.Diagnostic.Kind;
 
+import org.boundbox.BoundBox;
+import org.boundbox.model.FieldInfo;
+import org.boundbox.model.MethodInfo;
+import org.boundbox.writer.BoundboxWriter;
+import org.boundbox.writer.IBoundboxWriter;
+
 /**
  * Annotation processor
  * @author <a href=\"mailto:christoffer@christoffer.me\">Christoffer Pettersson</a>
@@ -52,7 +58,17 @@ import javax.tools.Diagnostic.Kind;
  *         .org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
  *         https://forums.oracle.com/thread/1184190
  */
-
+/*
+ * TODO handle inheritance of bounded class
+ * TODO handle imports inside boundbox class
+ * TODO static methods
+ * TODO static initializers
+ * TODO handle inner classes as bounded class ?
+ * TODO introduce class Info for each processed class containing fieldinfos, methodinfos, constructorInfos, superclassesInfos, etc.
+ * TODO test writer, remove adherence to annotation processing layer (parameters of public method), use classInfo param.
+ * @author SNI
+ *
+ */
 @SupportedAnnotationTypes("org.boundbox.BoundBox")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
 public class BoundBoxProcessor extends AbstractProcessor {

@@ -1,11 +1,11 @@
-package org.boundbox;
+package org.boundbox.writer;
 
 import java.io.IOException;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.TypeElement;
 
-import org.boundbox.BoundBoxProcessor.BoundClassVisitor;
+import org.boundbox.processor.BoundBoxProcessor.BoundClassVisitor;
 
 public interface IBoundboxWriter {
 

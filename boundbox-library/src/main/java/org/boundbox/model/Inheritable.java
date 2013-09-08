@@ -1,4 +1,4 @@
-package org.boundbox;
+package org.boundbox.model;
 
 public interface Inheritable {
 

@@ -18,6 +18,10 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.boundbox.model.FieldInfo;
+import org.boundbox.model.MethodInfo;
+import org.boundbox.processor.BoundBoxProcessor;
+import org.boundbox.writer.IBoundboxWriter;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package org.boundbox;
+package org.boundbox.model;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;

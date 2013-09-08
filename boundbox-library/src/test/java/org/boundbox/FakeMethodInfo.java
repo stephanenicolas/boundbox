@@ -2,6 +2,9 @@ package org.boundbox;
 
 import java.util.List;
 
+import org.boundbox.model.FieldInfo;
+import org.boundbox.model.MethodInfo;
+
 public class FakeMethodInfo extends MethodInfo {
     
     private String returnTypeName;

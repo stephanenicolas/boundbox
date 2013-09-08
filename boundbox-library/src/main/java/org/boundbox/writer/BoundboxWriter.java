@@ -1,4 +1,4 @@
-package org.boundbox;
+package org.boundbox.writer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -19,27 +19,23 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.boundbox.BoundBoxProcessor.BoundClassVisitor;
+import org.boundbox.BoundBoxException;
+import org.boundbox.model.FieldInfo;
+import org.boundbox.model.Inheritable;
+import org.boundbox.model.MethodInfo;
+import org.boundbox.processor.BoundBoxProcessor.BoundClassVisitor;
 
 import com.squareup.javawriter.JavaWriter;
 
-/**
- * TODO handle inheritance of bounded class
- * TODO handle imports inside boundbox class
- * TODO static methods
- * TODO static initializers
- * TODO handle inner classes as bounded class ?
- * @author SNI
- *
- */
 public class BoundboxWriter implements IBoundboxWriter {
 
     private static final String CODE_DECORATOR_TITLE_PREFIX = "\t";
     private static final String CODE_DECORATOR = "******************************";
 
-    /* (non-Javadoc)
-     * @see org.boundbox.IBoundboxWriter#writeBoundBox(javax.lang.model.element.TypeElement, javax.annotation.processing.Filer, org.boundbox.BoundBoxProcessor.BoundClassVisitor)
-     */
+
+    //TODO : refactor as 
+    //public void writeBoundBox(ClassInfo boundClassInfo, Writer writer) throws IOException {
+
     @Override
     public void writeBoundBox(TypeElement boundClass, Filer filer, BoundClassVisitor boundClassVisitor) throws IOException {
         String boundClassName = boundClass.getQualifiedName().toString();
@@ -151,6 +147,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         List<String> parameters = createListOfParameterTypesAndNames(parameterTypeList);
         List<String> thrownTypesCommaSeparated = createListOfThownTypes(thrownTypeList);
 
+        //beginBoundInvocationMethod
         boolean isConstructor = methodInfo.isConstructor();
         if( isConstructor ) {
             methodName = "boundBox_new";
@@ -161,6 +158,8 @@ public class BoundboxWriter implements IBoundboxWriter {
 
 
         writer.beginControlFlow("try");
+
+        //emit method retrieval
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
         String superClassChain = getSuperClassChain(methodInfo);
@@ -179,6 +178,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
         writer.emitStatement("method.setAccessible(true)");
 
+        //emit method invocation
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
         String returnString = "";
@@ -227,6 +227,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endControlFlow();
     }
 
+    //TODO find appropriate wrapper class by code ?
     private String createCastReturnTypeString(String returnType) {
         String castReturnTypeString = "";
         if( "int".equals(returnType) ) {
