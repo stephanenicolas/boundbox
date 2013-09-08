@@ -8,10 +8,10 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 public class MethodInfo implements Inheritable {
-    private String methodName;
-    private TypeMirror returnType;
-    private List<FieldInfo> parameterTypes;
-    private List<? extends TypeMirror> thrownTypes;
+    protected String methodName;
+    protected TypeMirror returnType;
+    protected List<FieldInfo> parameterTypes;
+    protected List<? extends TypeMirror> thrownTypes;
     private int inheritanceLevel;
 
     public MethodInfo( ExecutableElement element ) {
@@ -22,6 +22,10 @@ public class MethodInfo implements Inheritable {
             parameterTypes.add( new FieldInfo(variableElement));
         }      
         thrownTypes = element.getThrownTypes();
+    }
+    
+    //for testing
+    protected MethodInfo() {
     }
     
     public String getMethodName() {

@@ -3,12 +3,15 @@ package org.boundbox;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
@@ -29,7 +32,7 @@ public class BoundBoxProcessorTest {
         boundBoxProcessor = new BoundBoxProcessor();
         boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
     }
-    
+
     // ----------------------------------
     //  FIELDS
     // ----------------------------------
@@ -50,7 +53,7 @@ public class BoundBoxProcessorTest {
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, fakeFieldInfo);
     }
-    
+
     @Test
     public void testProcess_class_with_inherited_field() throws URISyntaxException {
         // given
@@ -69,7 +72,7 @@ public class BoundBoxProcessorTest {
         fakeFieldInfo.setInheritanceLevel(1);
         assertContains(listFieldInfos, fakeFieldInfo);
     }
-    
+
     // ----------------------------------
     //  CONSTRUCTOR
     // ----------------------------------
@@ -88,11 +91,11 @@ public class BoundBoxProcessorTest {
         assertFalse(listConstructorInfos.isEmpty());
         assertEquals( 1, listConstructorInfos.size());
     }
-    
+
     // ----------------------------------
     //  METHODS
     // ----------------------------------
-    
+
     @Test
     public void testProcess_class_with_single_method() throws URISyntaxException {
         // given
@@ -108,6 +111,55 @@ public class BoundBoxProcessorTest {
         assertFalse(listMethodInfos.isEmpty());
         assertEquals( 1, listMethodInfos.size());
     }
+
+    @Test
+    public void testProcess_class_with_may_methods() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithManyMethods.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        List<MethodInfo> listMethodInfos = boundBoxProcessor.getBoundClassVisitor().getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("simple", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfo);
+        
+        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("withPrimitiveArgument", "void", Arrays.asList(paramInt), null);
+        assertContains(listMethodInfos, fakeMethodInfo2);
+
+        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
+        FakeMethodInfo fakeMethodInfo3 = new FakeMethodInfo("withObjectArgument", "void", Arrays.asList(paramObject), null);
+        assertContains(listMethodInfos, fakeMethodInfo3);
+
+        FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
+        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("withManyArguments", "void", Arrays.asList(paramInt,paramObject2), null);
+        assertContains(listMethodInfos, fakeMethodInfo4);
+        
+        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("withPrimitiveIntReturnType", int.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfo5);
+        
+        FakeMethodInfo fakeMethodInfo6 = new FakeMethodInfo("withPrimitiveDoubleReturnType", double.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfo6);
+
+        FakeMethodInfo fakeMethodInfo7 = new FakeMethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfo7);
+        
+        FakeMethodInfo fakeMethodInfo8= new FakeMethodInfo("withSingleThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName()));
+        assertContains(listMethodInfos, fakeMethodInfo8);
+
+        FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        assertContains(listMethodInfos, fakeMethodInfo9);
+    }
+
+    // ----------------------------------
+    //  PRIVATE METHODS
+    // ----------------------------------
 
     private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor)
             throws URISyntaxException {
@@ -147,6 +199,17 @@ public class BoundBoxProcessorTest {
         assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
     }
 
+    private void assertContains(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
+        MethodInfo methodInfo2 = retrieveMethodInfo(listMethodInfos, fakeMethodInfo);
+        assertNotNull(methodInfo2);
+        assertEquals(fakeMethodInfo.getReturnTypeName(), methodInfo2.getReturnType().toString());
+        assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
+        for( int indexThrownType =0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType ++ ) {
+            TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
+            assertEquals(fakeMethodInfo.getListThrownTypeNames().get(indexThrownType), thrownType.toString());
+        }
+    }
+
     private FieldInfo retrieveFieldInfo(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {
         for (FieldInfo fieldInfo : listFieldInfos) {
             if (fieldInfo.equals(fakeFieldInfo)) {
@@ -155,5 +218,15 @@ public class BoundBoxProcessorTest {
         }
         return null;
     }
+
+    private MethodInfo retrieveMethodInfo(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
+        for (MethodInfo methodInfo : listMethodInfos) {
+            if (methodInfo.equals(fakeMethodInfo)) {
+                return methodInfo;
+            }
+        }
+        return null;
+    }
+
 
 }
