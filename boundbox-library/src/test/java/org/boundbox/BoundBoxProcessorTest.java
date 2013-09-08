@@ -91,6 +91,41 @@ public class BoundBoxProcessorTest {
         assertFalse(listConstructorInfos.isEmpty());
         assertEquals( 1, listConstructorInfos.size());
     }
+    
+    @Test
+    public void testProcess_class_with_many_constructors() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithManyConstructors.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        List<MethodInfo> listConstructorInfos = boundBoxProcessor.getBoundClassVisitor().getListConstructorInfos();
+        assertFalse(listConstructorInfos.isEmpty());
+        
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listConstructorInfos, fakeMethodInfo);
+
+        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        assertContains(listConstructorInfos, fakeMethodInfo2);
+
+        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
+        FakeMethodInfo fakeMethodInfo3 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        assertContains(listConstructorInfos, fakeMethodInfo3);
+
+        FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
+        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt,paramObject2), null);
+        assertContains(listConstructorInfos, fakeMethodInfo4);
+        
+        FieldInfo paramObject3 = new FakeFieldInfo("c", Object.class.getName());
+        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt,paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        assertContains(listConstructorInfos, fakeMethodInfo5);
+
+    }
 
     // ----------------------------------
     //  METHODS
