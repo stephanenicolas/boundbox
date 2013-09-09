@@ -95,7 +95,36 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     //  CONSTRUCTORS
     // ----------------------------------
-    
+    @Test
+    public void testProcess_class_with_single_constructor() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithSingleConstructor";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add(classUnderTestName);
+        
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
+        listConstructorInfos.add(fakeMethodInfo);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(listConstructorInfos);
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("boundBox_new");
+        assertNotNull(method);
+    }
+
     // ----------------------------------
     //  METHODS
     // ----------------------------------
