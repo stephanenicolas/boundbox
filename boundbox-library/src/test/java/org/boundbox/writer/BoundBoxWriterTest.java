@@ -31,6 +31,7 @@ import org.junit.Test;
 
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 //http://stackoverflow.com/a/7989365/693752
+//TODO clean generated classes, put in sandbox and clean sandbox.
 public class BoundBoxWriterTest {
 
     private BoundboxWriter writer;

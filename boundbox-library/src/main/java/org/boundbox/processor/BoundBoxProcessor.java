@@ -146,7 +146,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
 
-                String boundBoxFQN = targetPackageName == null ? boundBoxClassName : targetPackageName+"."+boundBoxClassName; 
+                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName+"."+boundBoxClassName; 
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 
@@ -166,7 +166,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     }
 
     private void error(final Element element, final String message) {
-        processingEnv.getMessager().printMessage(Kind.ERROR, message, element);
+        messager.printMessage(Kind.ERROR, message, element);
     }
 
     // ----------------------------------

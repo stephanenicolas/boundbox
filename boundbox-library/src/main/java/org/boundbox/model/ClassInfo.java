@@ -11,36 +11,36 @@ public class ClassInfo {
     private String targetPackageName;
     private String targetClassName;
     private String boundBoxClassName;
-    
-    
+
+
     public ClassInfo(String className) {
         this.className = className;
         if( className.contains(".")) {
-        targetPackageName = className.substring(0, className.lastIndexOf('.'));
-        targetClassName = className.substring(className.lastIndexOf('.')+1);
+            targetPackageName = className.substring(0, className.lastIndexOf('.'));
+            targetClassName = className.substring(className.lastIndexOf('.')+1);
         } else {
             targetPackageName = "";
             targetClassName = className;
         }
         boundBoxClassName = "BoundBoxOf"+targetClassName;
     }
-    
+
     public String getClassName() {
         return className;
     }
-    
+
     public String getTargetPackageName() {
         return targetPackageName;
     }
-    
+
     public String getTargetClassName() {
         return targetClassName;
     }
-    
+
     public String getBoundBoxClassName() {
         return boundBoxClassName;
     }
-    
+
     public List<FieldInfo> getListFieldInfos() {
         return listFieldInfos;
     }
