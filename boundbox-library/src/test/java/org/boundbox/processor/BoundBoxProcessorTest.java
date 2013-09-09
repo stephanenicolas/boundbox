@@ -20,14 +20,15 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.io.FileUtils;
 import org.boundbox.FakeFieldInfo;
 import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
-import org.boundbox.processor.BoundBoxProcessor;
 import org.boundbox.writer.IBoundboxWriter;
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,11 +36,24 @@ import org.junit.Test;
 public class BoundBoxProcessorTest {
 
     private BoundBoxProcessor boundBoxProcessor;
+    private File sandBoxDir;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         boundBoxProcessor = new BoundBoxProcessor();
         boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
+        sandBoxDir = new File("target/sandbox");
+        if( sandBoxDir.exists() ) {
+            FileUtils.deleteDirectory(sandBoxDir);
+        }
+        sandBoxDir.mkdirs();
+    }
+    
+    @After
+    public void tearDown() throws IOException {
+        if( sandBoxDir.exists() ) {
+            FileUtils.deleteDirectory(sandBoxDir);
+        }
     }
 
     // ----------------------------------
@@ -297,7 +311,8 @@ public class BoundBoxProcessorTest {
         Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(listSourceFiles);
 
         // Create the compilation task
-        CompilationTask task = compiler.getTask(null, fileManager, null, null, null, compilationUnits1);
+        Iterable<String> options = Arrays.asList("-d", sandBoxDir.getAbsolutePath());
+        CompilationTask task = compiler.getTask(null, fileManager, null, options, null, compilationUnits1);
 
         // Create a list to hold annotation processors
         LinkedList<AbstractProcessor> processors = new LinkedList<AbstractProcessor>();

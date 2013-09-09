@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.boundbox.FakeFieldInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,28 +37,42 @@ import org.junit.Test;
 public class BoundBoxWriterTest {
 
     private BoundboxWriter writer;
+    private File sandBoxDir;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         writer = new BoundboxWriter();
+        sandBoxDir = new File("target/sandbox");
+        if (sandBoxDir.exists()) {
+            FileUtils.deleteDirectory(sandBoxDir);
+        }
+        sandBoxDir.mkdirs();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        if (sandBoxDir.exists()) {
+            FileUtils.deleteDirectory(sandBoxDir);
+        }
     }
 
     // ----------------------------------
-    //  FIELDS
+    // FIELDS
     // ----------------------------------
     @Test
-    public void testProcess_class_with_single_field() throws URISyntaxException, IOException, ClassNotFoundException, SecurityException, NoSuchFieldException, NoSuchMethodException {
+    public void testProcess_class_with_single_field() throws URISyntaxException, IOException, ClassNotFoundException,
+            SecurityException, NoSuchFieldException, NoSuchMethodException {
         // given
         ClassInfo classInfo = new ClassInfo("TestClassWithSingleField");
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
         listFieldInfos.add(fakeFieldInfo);
-        classInfo.setListFieldInfos( listFieldInfos);
-        classInfo.setListConstructorInfos( Collections.<MethodInfo>emptyList() );
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
-        
-        File output = new File("BoundBoxOfTestClassWithSingleField.java");
-        Writer out = new FileWriter( output);
+
+        File output = new File(sandBoxDir, "BoundBoxOfTestClassWithSingleField.java");
+        Writer out = new FileWriter(output);
 
         // when
         writer.writeBoundBox(classInfo, out);
@@ -66,20 +82,17 @@ public class BoundBoxWriterTest {
         String[] testSourceFileNames = new String[] { "TestClassWithSingleField.java" };
         CompilationTask task = processAnnotations(writtenSourceFileNames, testSourceFileNames);
         boolean result = task.call();
-        assertTrue( result );
-        
+        assertTrue(result);
+
         Class<?> clazz = new CustomClassLoader().loadClass("BoundBoxOfTestClassWithSingleField");
-        Method method= clazz.getDeclaredMethod("boundBox_getFoo");
+        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
     }
 
-
-   
-    
     // ----------------------------------
-    //  PRIVATE METHODS
+    // PRIVATE METHODS
     // ----------------------------------
 
     private CompilationTask processAnnotations(String[] writtenSourceFileNames, String[] testSourceFileNames)
@@ -95,29 +108,31 @@ public class BoundBoxWriterTest {
         // http://stackoverflow.com/a/676102/693752
         List<File> listSourceFiles = new ArrayList<File>();
         for (String sourceFileName : writtenSourceFileNames) {
-            listSourceFiles.add(new File(sourceFileName));
+            listSourceFiles.add(new File(sandBoxDir, sourceFileName));
         }
-        
+
         for (String sourceFileName : testSourceFileNames) {
             listSourceFiles.add(new File(ClassLoader.getSystemResource(sourceFileName).toURI()));
         }
         Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(listSourceFiles);
 
+        Iterable<String> options = Arrays.asList("-d", sandBoxDir.getAbsolutePath());
+
         // Create the compilation task
-        CompilationTask task = compiler.getTask(null, fileManager, null, null, null, compilationUnits1);
-        
-        task.setProcessors( new LinkedList<Processor>());
+        CompilationTask task = compiler.getTask(null, fileManager, null, options, null, compilationUnits1);
+
+        task.setProcessors(new LinkedList<Processor>());
         return task;
     }
-    
+
     // ----------------------------------
-    //  INNER CLASS
+    // INNER CLASS
     // ----------------------------------
-    private final static class CustomClassLoader extends ClassLoader {
+    private final class CustomClassLoader extends ClassLoader {
         @Override
         public Class<?> loadClass(String name) throws ClassNotFoundException {
-            File classFile = new File(name+".class");
-            if( !classFile.exists() ) {
+            File classFile = new File(sandBoxDir, name + ".class");
+            if (!classFile.exists()) {
                 return super.loadClass(name);
             } else {
                 byte[] bytes;
@@ -131,7 +146,7 @@ public class BoundBoxWriterTest {
                 }
             }
         }
-        
+
     }
 
 }
