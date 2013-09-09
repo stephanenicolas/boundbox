@@ -64,28 +64,6 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo);
     }
 
-    @Test
-    public void testProcess_class_with_inherited_field() throws URISyntaxException {
-        // given
-        String[] testSourceFileNames = new String[] { "TestClassWithInheritedField.java", "TestClassWithSingleField.java" };
-        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
-
-        // when
-        // Perform the compilation task.
-        task.call();
-
-        // then
-        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
-        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
-        
-        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        assertFalse(listFieldInfos.isEmpty());
-
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(1);
-        assertContains(listFieldInfos, fakeFieldInfo);
-    }
-
     // ----------------------------------
     //  CONSTRUCTOR
     // ----------------------------------
@@ -216,7 +194,57 @@ public class BoundBoxProcessorTest {
         FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listMethodInfos, fakeMethodInfo9);
     }
+    
+    // ----------------------------------
+    //  INHERITANCE OF FIELDS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_inherited_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedField.java", "TestClassWithSingleField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setInheritanceLevel(1);
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+    
+    // ----------------------------------
+    //  INHERITANCE OF METHODS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_inherited_method() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedMethod.java", "TestClassWithSingleMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setInheritanceLevel(1);
+        assertContains(listMethodInfos, fakeMethodInfo);
+    }
+    
     // ----------------------------------
     //  PRIVATE METHODS
     // ----------------------------------
