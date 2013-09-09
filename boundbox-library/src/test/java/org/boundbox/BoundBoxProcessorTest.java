@@ -1,6 +1,8 @@
 package org.boundbox;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.processor.BoundBoxProcessor;
@@ -51,7 +54,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<FieldInfo> listFieldInfos = boundBoxProcessor.getBoundClassVisitor().getListFieldInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
@@ -69,7 +75,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<FieldInfo> listFieldInfos = boundBoxProcessor.getBoundClassVisitor().getListFieldInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
@@ -91,7 +100,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<MethodInfo> listConstructorInfos = boundBoxProcessor.getBoundClassVisitor().getListConstructorInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
         assertEquals( 1, listConstructorInfos.size());
     }
@@ -107,7 +119,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<MethodInfo> listConstructorInfos = boundBoxProcessor.getBoundClassVisitor().getListConstructorInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
         
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
@@ -146,7 +161,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<MethodInfo> listMethodInfos = boundBoxProcessor.getBoundClassVisitor().getListMethodInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
         assertEquals( 1, listMethodInfos.size());
     }
@@ -162,7 +180,10 @@ public class BoundBoxProcessorTest {
         task.call();
 
         // then
-        List<MethodInfo> listMethodInfos = boundBoxProcessor.getBoundClassVisitor().getListMethodInfos();
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
 
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("simple", "void", new ArrayList<FieldInfo>(), null);

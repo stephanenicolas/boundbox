@@ -18,6 +18,7 @@
 package org.boundbox.processor;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +44,11 @@ import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
+import javax.tools.JavaFileObject;
 import javax.tools.Diagnostic.Kind;
 
 import org.boundbox.BoundBox;
+import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
@@ -64,8 +67,6 @@ import org.boundbox.writer.IBoundboxWriter;
  * TODO static methods
  * TODO static initializers
  * TODO handle inner classes as bounded class ?
- * TODO introduce class Info for each processed class containing fieldinfos, methodinfos, constructorInfos, superclassesInfos, etc.
- * TODO test writer, remove adherence to annotation processing layer (parameters of public method), use classInfo param.
  * @author SNI
  *
  */
@@ -80,6 +81,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Messager messager;
     private IBoundboxWriter boundboxWriter = new BoundboxWriter();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
+    private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
 
     @Override
     public void init(ProcessingEnvironment env) {
@@ -136,10 +138,19 @@ public class BoundBoxProcessor extends AbstractProcessor {
             if( maxSuperClass != null ) {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
-            boundClass.accept(boundClassVisitor, 0);
-
+            
+            ClassInfo classInfo = boundClassVisitor.scan(boundClass);
+            listClassInfo.add(classInfo);
+            
             try {
-                boundboxWriter.writeBoundBox(boundClass, filer, boundClassVisitor);
+                String targetPackageName = classInfo.getTargetPackageName();
+                String boundBoxClassName = classInfo.getBoundBoxClassName();
+
+                String boundBoxFQN = targetPackageName == null ? boundBoxClassName : targetPackageName+"."+boundBoxClassName; 
+                JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
+                Writer out = sourceFile.openWriter();
+
+                boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
                 error(classElement, e.getMessage() );
@@ -193,29 +204,30 @@ public class BoundBoxProcessor extends AbstractProcessor {
         private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
 
+        public ClassInfo scan( TypeElement boundClass ) {
+            boundClass.accept(this, 0);
+            ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
+            classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
+            classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
+            classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
+            listClassInfo.add(classInfo);
+            listConstructorInfos.clear();
+            listMethodInfos.clear();
+            listFieldInfos.clear();
+            maxSuperClassName = Object.class.getName();
+            return classInfo;
+        }
+
         public void setMaxSuperClass(Class<?> maxSuperClass) {
             this.maxSuperClassName = maxSuperClass.getName();
         }
         
         public void setMaxSuperClass(String className ) {
-            System.out.println( "Max super class is set to " + className);
             this.maxSuperClassName = className;
         }
 
         public String getMaxSuperClass() {
             return maxSuperClassName;
-        }
-        
-        public List<FieldInfo> getListFieldInfos() {
-            return listFieldInfos;
-        }
-
-        public List<MethodInfo> getListMethodInfos() {
-            return listMethodInfos;
-        }
-
-        public List<MethodInfo> getListConstructorInfos() {
-            return listConstructorInfos;
         }
 
         @Override
@@ -280,9 +292,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
             return super.visitVariableAsField(e, inheritanceLevel);
         }
+        
     }
 
-    public BoundClassVisitor getBoundClassVisitor() {
-        return boundClassVisitor;
+    public List<ClassInfo> getListClassInfo() {
+        return listClassInfo;
     }
 }

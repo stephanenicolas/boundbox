@@ -11,19 +11,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.processing.Filer;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import javax.tools.JavaFileObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBoxException;
+import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.Inheritable;
 import org.boundbox.model.MethodInfo;
-import org.boundbox.processor.BoundBoxProcessor.BoundClassVisitor;
 
 import com.squareup.javawriter.JavaWriter;
 
@@ -37,19 +33,15 @@ public class BoundboxWriter implements IBoundboxWriter {
     //public void writeBoundBox(ClassInfo boundClassInfo, Writer writer) throws IOException {
 
     @Override
-    public void writeBoundBox(TypeElement boundClass, Filer filer, BoundClassVisitor boundClassVisitor) throws IOException {
-        String boundClassName = boundClass.getQualifiedName().toString();
+    public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
+        String boundClassName = classInfo.getClassName();
         System.out.println( "BoundClassName is "+boundClassName );
 
-        String targetPackageName = boundClassName.substring(0, boundClassName.lastIndexOf('.'));
-        String targetClassName = boundClassName.substring(boundClassName.lastIndexOf('.')+1);
-        String boundBoxClassName = "BoundBoxOf"+targetClassName;
+        String targetPackageName = classInfo.getTargetPackageName();
+        String targetClassName = classInfo.getTargetClassName();
+        String boundBoxClassName = classInfo.getBoundBoxClassName();
 
-        Writer out = null;
         try {
-            JavaFileObject sourceFile = filer.createSourceFile(targetPackageName+"."+boundBoxClassName, (Element[]) null);
-
-            out = sourceFile.openWriter();
             JavaWriter writer = new JavaWriter(out);
             writer.emitPackage(targetPackageName)//
             .emitEmptyLine()//
@@ -70,20 +62,20 @@ public class BoundboxWriter implements IBoundboxWriter {
             .emitEmptyLine();
 
             writeCodeDecoration(writer,"Access to constructors");
-            for( MethodInfo methodInfo : boundClassVisitor.getListConstructorInfos()) {
+            for( MethodInfo methodInfo : classInfo.getListConstructorInfos()) {
                 writer.emitEmptyLine();
                 createMethodWrapper(writer, methodInfo, targetClassName);
             }
 
             writeCodeDecoration(writer,"Direct access to fields");
-            for( FieldInfo fieldInfo: boundClassVisitor.getListFieldInfos()) {
+            for( FieldInfo fieldInfo: classInfo.getListFieldInfos()) {
                 createDirectGetter(writer, fieldInfo);
                 writer.emitEmptyLine();
                 createDirectSetter(writer, fieldInfo);
             }
 
             writeCodeDecoration(writer,"Access to methods");
-            for( MethodInfo methodInfo : boundClassVisitor.getListMethodInfos()) {
+            for( MethodInfo methodInfo : classInfo.getListMethodInfos()) {
                 writer.emitEmptyLine();
                 createMethodWrapper(writer, methodInfo, targetClassName);
             }
