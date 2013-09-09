@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeMirror;
 
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBoxException;
@@ -132,12 +131,11 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private void createMethodWrapper(JavaWriter writer, MethodInfo methodInfo, String targetClassName) throws IOException {
         String methodName = methodInfo.getMethodName();
-        String returnType = methodInfo.getReturnType().toString();
+        String returnType = methodInfo.getReturnTypeName();
         List<FieldInfo> parameterTypeList = methodInfo.getParameterTypes();
-        List<? extends TypeMirror> thrownTypeList = methodInfo.getThrownTypes();
 
         List<String> parameters = createListOfParameterTypesAndNames(parameterTypeList);
-        List<String> thrownTypesCommaSeparated = createListOfThownTypes(thrownTypeList);
+        List<String> thrownTypesCommaSeparated = methodInfo.getThrownTypeNames();
 
         //beginBoundInvocationMethod
         boolean isConstructor = methodInfo.isConstructor();
@@ -242,14 +240,6 @@ public class BoundboxWriter implements IBoundboxWriter {
             listParameters.add(fieldInfo.getFieldTypeName()+".class");
         }
         return StringUtils.join(listParameters, ", ");
-    }
-
-    private List<String> createListOfThownTypes(List<? extends TypeMirror> thrownTypeList) {
-        List<String> thrownTypes = new ArrayList<String>();
-        for (TypeMirror typeMirror : thrownTypeList) {
-            thrownTypes.add(typeMirror.toString());
-        }
-        return thrownTypes;
     }
 
     private String createListOfParametersNamesCommaSeparated(List<FieldInfo> parameterTypeList) {

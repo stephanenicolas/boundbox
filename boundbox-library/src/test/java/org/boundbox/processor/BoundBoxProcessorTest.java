@@ -339,7 +339,7 @@ public class BoundBoxProcessorTest {
         assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
         for( int indexThrownType =0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType ++ ) {
             TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
-            assertEquals(fakeMethodInfo.getListThrownTypeNames().get(indexThrownType), thrownType.toString());
+            assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
         }
     }
 

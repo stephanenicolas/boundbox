@@ -19,11 +19,13 @@ public class FakeMethodInfo extends MethodInfo {
         this.listThrownTypeNames = listThrownTypeNames;
     }
     
+    @Override
     public String getReturnTypeName() {
         return returnTypeName;
     }
     
-    public List<String> getListThrownTypeNames() {
+    @Override
+    public List<String> getThrownTypeNames() {
         return listThrownTypeNames;
     }
 }

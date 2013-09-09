@@ -23,43 +23,55 @@ public class MethodInfo implements Inheritable {
         }      
         thrownTypes = element.getThrownTypes();
     }
-    
+
     //for testing
     protected MethodInfo() {
     }
-    
+
     public String getMethodName() {
         return methodName;
     }
-    
+
     public TypeMirror getReturnType() {
         return returnType;
     }
-    
+
+    public String getReturnTypeName() {
+        return returnType.toString();
+    }
+
     public List<FieldInfo> getParameterTypes() {
         return parameterTypes;
     }
-    
+
     public List<? extends TypeMirror> getThrownTypes() {
         return thrownTypes;
     }
-    
+
+    public List<String> getThrownTypeNames() {
+        List<String> thrownTypeNames = new ArrayList<String>();
+        for (TypeMirror typeMirror : thrownTypes) {
+            thrownTypeNames.add(typeMirror.toString());
+        }
+        return thrownTypeNames;
+    }
+
     public boolean isConstructor() {
         return "<init>".equals( methodName );
     }
-    
+
     public boolean hasReturnType() {
         return returnType != null && !"void".equalsIgnoreCase(returnType.toString());
     }
-    
+
     public void setInheritanceLevel(int inheritanceLevel) {
         this.inheritanceLevel = inheritanceLevel;
     }
-    
+
     public int getInheritanceLevel() {
         return inheritanceLevel;
     }
-    
+
     public boolean isInherited() {
         return inheritanceLevel != 0;
     }
@@ -100,5 +112,6 @@ public class MethodInfo implements Inheritable {
         return "MethodInfo [methodName=" + methodName + ", returnType=" + returnType + ", parameterTypes=" + parameterTypes
                 + ", thrownTypes=" + thrownTypes + "]";
     }
+
 
 }
