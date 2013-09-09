@@ -224,8 +224,28 @@ public class BoundboxWriter implements IBoundboxWriter {
             castReturnTypeString = "(Integer)";
         }
 
+        if( "long".equals(returnType) ) {
+            castReturnTypeString = "(Long)";
+        }
+
+        if( "byte".equals(returnType) ) {
+            castReturnTypeString = "(Byte)";
+        }
+
         if( "boolean".equals(returnType) ) {
             castReturnTypeString = "(Boolean)";
+        }
+
+        if( "double".equals(returnType) ) {
+            castReturnTypeString = "(Double)";
+        }
+
+        if( "float".equals(returnType) ) {
+            castReturnTypeString = "(Float)";
+        }
+
+        if( "char".equals(returnType) ) {
+            castReturnTypeString = "(Character)";
         }
 
         if( !castReturnTypeString.isEmpty() ) {

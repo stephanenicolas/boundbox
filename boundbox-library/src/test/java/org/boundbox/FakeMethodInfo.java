@@ -28,4 +28,9 @@ public class FakeMethodInfo extends MethodInfo {
     public List<String> getThrownTypeNames() {
         return listThrownTypeNames;
     }
+    
+    @Override
+    public boolean hasReturnType() {
+        return super.hasReturnType() || (returnTypeName != null && !"void".equalsIgnoreCase(returnTypeName));
+    }
 }

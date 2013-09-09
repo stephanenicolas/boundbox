@@ -53,7 +53,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            FileUtils.deleteDirectory(sandBoxDir);
+            //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -65,8 +65,7 @@ public class BoundBoxWriterTest {
         // given
         String classUnderTestName = "TestClassWithSingleField";
         List<String> neededClasses = new ArrayList<String>();
-        neededClasses.add(classUnderTestName);
-        
+
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
@@ -91,7 +90,7 @@ public class BoundBoxWriterTest {
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
     }
-    
+
     // ----------------------------------
     //  CONSTRUCTORS
     // ----------------------------------
@@ -100,8 +99,7 @@ public class BoundBoxWriterTest {
         // given
         String classUnderTestName = "TestClassWithSingleConstructor";
         List<String> neededClasses = new ArrayList<String>();
-        neededClasses.add(classUnderTestName);
-        
+
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
@@ -125,6 +123,60 @@ public class BoundBoxWriterTest {
         assertNotNull(method);
     }
 
+    @Test
+    public void testProcess_class_with_many_constructors() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithManyConstructors";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
+
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null));
+        FakeFieldInfo fieldInfo = new FakeFieldInfo("a", "int");
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo ), null));
+        FakeFieldInfo fieldInfo2 = new FakeFieldInfo("a", Object.class.getName());
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo2 ), null));
+        FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3 ), null));
+        FakeFieldInfo fieldInfo4 = new FakeFieldInfo("c", Object.class.getName());
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3, fieldInfo4 ), Arrays.asList("java.io.IOException","java.lang.RuntimeException")));
+
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(listConstructorInfos);
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        assertNotNull(clazz.getDeclaredMethod("boundBox_new"));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_new",int.class));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_new",Object.class));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_new",int.class, Object.class));
+        Method declaredMethod = clazz.getDeclaredMethod("boundBox_new",int.class, Object.class, Object.class);
+        assertNotNull(declaredMethod);
+        boolean containsIOException = false;
+        boolean containsRuntimeException = false;
+        for( Class<?> exceptionClass : declaredMethod.getExceptionTypes() ) {
+            if( exceptionClass.equals(IOException.class) ) {
+                containsIOException = true;
+            }
+            if( exceptionClass.equals(RuntimeException.class) ) {
+                containsRuntimeException = true;
+            }
+        }
+        assertTrue(containsIOException);
+        assertTrue(containsRuntimeException);
+    }
+
     // ----------------------------------
     //  METHODS
     // ----------------------------------
@@ -133,8 +185,7 @@ public class BoundBoxWriterTest {
         // given
         String classUnderTestName = "TestClassWithSingleMethod";
         List<String> neededClasses = new ArrayList<String>();
-        neededClasses.add(classUnderTestName);
-        
+
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
@@ -158,14 +209,161 @@ public class BoundBoxWriterTest {
         assertNotNull(method);
     }
 
+    @Test
+    public void testProcess_class_with_many_methods() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithManyMethods";
+        List<String> neededClasses = new ArrayList<String>();
 
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
+
+        listConstructorInfos.add(new FakeMethodInfo("simple", "void", new ArrayList<FieldInfo>(), null));
+        FakeFieldInfo fieldInfo = new FakeFieldInfo("a", "int");
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveArgument", "void", Arrays.<FieldInfo>asList(fieldInfo ), null));
+        FakeFieldInfo fieldInfo2 = new FakeFieldInfo("a", Object.class.getName());
+        listConstructorInfos.add(new FakeMethodInfo("withObjectArgument", "void", Arrays.<FieldInfo>asList(fieldInfo2 ), null));
+        FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
+        listConstructorInfos.add(new FakeMethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3 ), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException")));
+        listConstructorInfos.add(new FakeMethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException","java.lang.RuntimeException")));
+
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(listConstructorInfos);
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        assertNotNull(clazz.getDeclaredMethod("simple"));
+        assertNotNull(clazz.getDeclaredMethod("withPrimitiveArgument",int.class));
+        assertNotNull(clazz.getDeclaredMethod("withObjectArgument",Object.class));
+        assertNotNull(clazz.getDeclaredMethod("withManyArguments",int.class, Object.class));
+        Method declaredMethod = clazz.getDeclaredMethod("withPrimitiveIntReturnType");
+        assertNotNull(declaredMethod);
+        assertTrue(int.class.equals(declaredMethod.getReturnType()));
+        Method declaredMethod2 = clazz.getDeclaredMethod("withPrimitiveDoubleReturnType");
+        assertNotNull(declaredMethod2);
+        assertTrue(double.class.equals(declaredMethod2.getReturnType()));
+        Method declaredMethod3 = clazz.getDeclaredMethod("withPrimitiveBooleanReturnType");
+        assertNotNull(declaredMethod3);
+        assertTrue(boolean.class.equals(declaredMethod3.getReturnType()));
+        Method declaredMethod4 = clazz.getDeclaredMethod("withSingleThrownType");
+        assertNotNull(declaredMethod4);
+        boolean containsIOException = false;
+        for( Class<?> exceptionClass : declaredMethod4.getExceptionTypes() ) {
+            if( exceptionClass.equals(IOException.class) ) {
+                containsIOException = true;
+            }
+        }
+        assertTrue(containsIOException);
+        Method declaredMethod5 = clazz.getDeclaredMethod("withManyThrownType");
+        assertNotNull(declaredMethod5);
+        containsIOException = false;
+        boolean containsRuntimeException = false;
+        for( Class<?> exceptionClass : declaredMethod5.getExceptionTypes() ) {
+            if( exceptionClass.equals(IOException.class) ) {
+                containsIOException = true;
+            }
+            if( exceptionClass.equals(RuntimeException.class) ) {
+                containsRuntimeException = true;
+            }
+        }
+        assertTrue(containsIOException);
+        assertTrue(containsRuntimeException);
+
+
+    }
+
+    // ----------------------------------
+    // FIELDS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_inherited_field() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithInheritedField";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithSingleField");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setInheritanceLevel(1);
+        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        listFieldInfos.add(fakeFieldInfo);
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
+        assertNotNull(method);
+        Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
+        assertNotNull(method2);
+    }
+
+    @Test
+    public void testProcess_class_with_inherited_and_hidingfield() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithInheritedAndHidingField";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithSingleField");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setInheritanceLevel(0);
+        listFieldInfos.add(fakeFieldInfo);
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo2.setInheritanceLevel(1);
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        assertNotNull(clazz.getDeclaredMethod("boundBox_getFoo"));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_setFoo", String.class));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_TestClassWithSingleField_getFoo"));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_TestClassWithSingleField_setFoo", String.class));
+
+    }
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------
     private Class<?> loadBoundBoxClass(ClassInfo classInfo) throws ClassNotFoundException {
         return new CustomClassLoader().loadClass(classInfo.getBoundBoxClassName());
     }
-    
+
     private CompilationTask createCompileTask(ClassInfo classInfo, List<String> neededClasses) throws URISyntaxException {
         String[] writtenSourceFileNames = new String[] { classNameToJavaFile(classInfo.getBoundBoxClassName()) };
         List<String> neededJavaFiles = new ArrayList<String>();
@@ -176,15 +374,15 @@ public class BoundBoxWriterTest {
         CompilationTask task = processAnnotations(writtenSourceFileNames, testSourceFileNames);
         return task;
     }
-    
+
     private FileWriter createWriterInSandbox(ClassInfo classInfo) throws IOException {
         return new FileWriter(new File(sandBoxDir, classNameToJavaFile(classInfo.getBoundBoxClassName())));
     }
-    
+
     private String classNameToJavaFile(String className) {
         return className.replaceAll("\\.", "/").concat(".java");
     }
-    
+
     private CompilationTask processAnnotations(String[] writtenSourceFileNames, String[] testSourceFileNames)
             throws URISyntaxException {
         // Get an instance of java compiler
@@ -225,11 +423,9 @@ public class BoundBoxWriterTest {
             if (!classFile.exists()) {
                 return super.loadClass(name);
             } else {
-                byte[] bytes;
                 try {
-                    bytes = FileUtils.readFileToByteArray(classFile);
-                    Class<?> clazz = defineClass(name, bytes, 0, bytes.length);
-                    return clazz;
+                    byte[] bytes = FileUtils.readFileToByteArray(classFile);
+                    return defineClass(name, bytes, 0, bytes.length);
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
