@@ -98,7 +98,7 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
-        String fieldType = fieldInfo.getFieldType().toString();
+        String fieldType = fieldInfo.getFieldTypeName();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String setterName = "boundBox_set" + fieldNameCamelCase;
@@ -115,7 +115,7 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private void createDirectGetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
-        String fieldType = fieldInfo.getFieldType().toString();
+        String fieldType = fieldInfo.getFieldTypeName();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String getterName = "boundBox_get" + fieldNameCamelCase;
@@ -239,7 +239,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     private String createListOfParametersTypesCommaSeparated(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
-            listParameters.add(fieldInfo.getFieldType().toString()+".class");
+            listParameters.add(fieldInfo.getFieldTypeName()+".class");
         }
         return StringUtils.join(listParameters, ", ");
     }
@@ -263,7 +263,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     private List<String> createListOfParameterTypesAndNames(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
-            listParameters.add(fieldInfo.getFieldType().toString());
+            listParameters.add(fieldInfo.getFieldTypeName());
             listParameters.add(fieldInfo.getFieldName());
         }
         return listParameters;

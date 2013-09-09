@@ -138,10 +138,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
             if( maxSuperClass != null ) {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
-            
+
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
             listClassInfo.add(classInfo);
-            
+
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
@@ -221,7 +221,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public void setMaxSuperClass(Class<?> maxSuperClass) {
             this.maxSuperClassName = maxSuperClass.getName();
         }
-        
+
         public void setMaxSuperClass(String className ) {
             this.maxSuperClassName = className;
         }
@@ -284,15 +284,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public Void visitVariableAsField(VariableElement e, Integer inheritanceLevel) {
             FieldInfo fieldInfo = new FieldInfo(e);
             fieldInfo.setInheritanceLevel( inheritanceLevel );
-            if( !listFieldInfos.contains( fieldInfo ) ) {
-                listFieldInfos.add( fieldInfo);
-                System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
-            } else {
-                System.out.println("field ->" + fieldInfo.getFieldName() + " already added.");
-            }
+            listFieldInfos.add( fieldInfo);
+            System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
             return super.visitVariableAsField(e, inheritanceLevel);
         }
-        
+
     }
 
     public List<ClassInfo> getListClassInfo() {

@@ -1,4 +1,4 @@
-package org.boundbox;
+package org.boundbox.processor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,6 +20,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import org.boundbox.FakeFieldInfo;
+import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
@@ -148,7 +150,7 @@ public class BoundBoxProcessorTest {
     }
 
     @Test
-    public void testProcess_class_with_may_methods() throws URISyntaxException {
+    public void testProcess_class_with_many_methods() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithManyMethods.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -220,6 +222,34 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo);
     }
     
+    @Test
+    public void testProcess_class_with_inherited_and_conflicting_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedAndHidingField.java", "TestClassWithSingleField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setInheritanceLevel(0);
+        assertContains(listFieldInfos, fakeFieldInfo);
+        
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo2.setInheritanceLevel(1);
+        assertContains(listFieldInfos, fakeFieldInfo2);
+    }
+    
+    
+    
     // ----------------------------------
     //  INHERITANCE OF METHODS
     // ----------------------------------
@@ -283,7 +313,7 @@ public class BoundBoxProcessorTest {
     private void assertContains(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {
         FieldInfo fieldInfo2 = retrieveFieldInfo(listFieldInfos, fakeFieldInfo);
         assertNotNull(fieldInfo2);
-        assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldType().toString());
+        assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldTypeName());
         assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
     }
 

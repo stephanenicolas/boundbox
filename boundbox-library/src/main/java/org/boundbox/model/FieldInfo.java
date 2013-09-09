@@ -24,8 +24,8 @@ public class FieldInfo implements Inheritable {
         return fieldName;
     }
     
-    public TypeMirror getFieldType() {
-        return fieldType;
+    public String getFieldTypeName() {
+        return fieldType.toString();
     }
     
     public void setInheritanceLevel(int inheritanceLevel) {
@@ -53,8 +53,10 @@ public class FieldInfo implements Inheritable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+        result = prime * result + inheritanceLevel;
         return result;
     }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -69,6 +71,8 @@ public class FieldInfo implements Inheritable {
             if (other.fieldName != null)
                 return false;
         } else if (!fieldName.equals(other.fieldName))
+            return false;
+        if (inheritanceLevel != other.inheritanceLevel)
             return false;
         return true;
     }

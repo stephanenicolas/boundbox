@@ -19,7 +19,7 @@ public class ClassInfo {
         targetPackageName = className.substring(0, className.lastIndexOf('.'));
         targetClassName = className.substring(className.lastIndexOf('.')+1);
         } else {
-            targetPackageName = null;
+            targetPackageName = "";
             targetClassName = className;
         }
         boundBoxClassName = "BoundBoxOf"+targetClassName;
