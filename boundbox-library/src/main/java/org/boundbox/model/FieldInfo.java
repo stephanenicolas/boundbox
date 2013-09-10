@@ -7,6 +7,7 @@ public class FieldInfo implements Inheritable {
     private String fieldName;
     private TypeMirror fieldType;
     private int inheritanceLevel;
+    private int effectiveInheritanceLevel;
     
     public FieldInfo( VariableElement e ) {
         fieldName = e.getSimpleName().toString();
@@ -30,6 +31,7 @@ public class FieldInfo implements Inheritable {
     
     public void setInheritanceLevel(int inheritanceLevel) {
         this.inheritanceLevel = inheritanceLevel;
+        this.effectiveInheritanceLevel = inheritanceLevel;
     }
     
     /* (non-Javadoc)
@@ -38,6 +40,14 @@ public class FieldInfo implements Inheritable {
     @Override
     public int getInheritanceLevel() {
         return inheritanceLevel;
+    }
+    
+    public void setEffectiveInheritanceLevel(int effectiveInheritanceLevel) {
+        this.effectiveInheritanceLevel = effectiveInheritanceLevel;
+    }
+    
+    public int getEffectiveInheritanceLevel() {
+        return effectiveInheritanceLevel;
     }
     
     /* (non-Javadoc)
@@ -82,4 +92,6 @@ public class FieldInfo implements Inheritable {
     public String toString() {
         return "FieldInfo [fieldName=" + fieldName + ", fieldType=" + fieldType + "]";
     }
+
+
 }

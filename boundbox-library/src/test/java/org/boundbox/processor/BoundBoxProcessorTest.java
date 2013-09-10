@@ -254,7 +254,8 @@ public class BoundBoxProcessorTest {
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(0);
+        fakeFieldInfo.setInheritanceLevel(1);
+        fakeFieldInfo.setEffectiveInheritanceLevel(0);
         assertContains(listFieldInfos, fakeFieldInfo);
     }
     
@@ -352,6 +353,7 @@ public class BoundBoxProcessorTest {
         assertNotNull(fieldInfo2);
         assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldTypeName());
         assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
+        assertEquals(fakeFieldInfo.getEffectiveInheritanceLevel(), fieldInfo2.getEffectiveInheritanceLevel());
     }
 
     private void assertContains(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {

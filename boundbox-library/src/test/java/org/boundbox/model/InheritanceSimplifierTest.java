@@ -34,8 +34,8 @@ public class InheritanceSimplifierTest {
         
         //then
         assertFalse( listFieldInfos.isEmpty() );
-        assertEquals(0, listFieldInfos.get(0).getInheritanceLevel());
-        assertEquals(2, listFieldInfos.get(1).getInheritanceLevel());
+        assertEquals(0, listFieldInfos.get(0).getEffectiveInheritanceLevel());
+        assertEquals(2, listFieldInfos.get(1).getEffectiveInheritanceLevel());
     }
 
 }

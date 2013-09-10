@@ -22,7 +22,7 @@ public class InheritanceSimplifier {
         
         //and replace it to 0
         for( FieldInfo minFields : mapFieldNameToMinFieldInfo.values() ) {
-            minFields.setInheritanceLevel(0);
+            minFields.setEffectiveInheritanceLevel(0);
         }
     }
     

@@ -257,7 +257,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
                     public Void visitDeclared(DeclaredType t, Void p) {
-                        listSuperClassNames.add(t.toString());
+                        listSuperClassNames.add(t.asElement().getSimpleName().toString());
                         t.asElement().accept(BoundClassVisitor.this, inheritanceLevel + 1);
                         System.out.println("super declared type ->" + t.toString());
                         return super.visitDeclared(t, p);

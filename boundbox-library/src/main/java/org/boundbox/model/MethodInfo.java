@@ -13,6 +13,7 @@ public class MethodInfo implements Inheritable {
     protected List<FieldInfo> parameterTypes;
     protected List<? extends TypeMirror> thrownTypes;
     private int inheritanceLevel;
+    private int effectiveInheritanceLevel;
 
     public MethodInfo( ExecutableElement element ) {
         methodName = element.getSimpleName().toString();
@@ -66,10 +67,19 @@ public class MethodInfo implements Inheritable {
 
     public void setInheritanceLevel(int inheritanceLevel) {
         this.inheritanceLevel = inheritanceLevel;
+        this.effectiveInheritanceLevel = inheritanceLevel;
     }
 
     public int getInheritanceLevel() {
         return inheritanceLevel;
+    }
+    
+    public void setEffectiveInheritanceLevel(int effectiveInheritanceLevel) {
+        this.effectiveInheritanceLevel = effectiveInheritanceLevel;
+    }
+    
+    public int getEffectiveInheritanceLevel() {
+        return effectiveInheritanceLevel;
     }
 
     public boolean isInherited() {
