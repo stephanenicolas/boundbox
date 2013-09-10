@@ -254,7 +254,7 @@ public class BoundBoxProcessorTest {
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(1);
+        fakeFieldInfo.setInheritanceLevel(0);
         assertContains(listFieldInfos, fakeFieldInfo);
     }
     

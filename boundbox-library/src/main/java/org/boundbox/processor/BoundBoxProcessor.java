@@ -50,6 +50,7 @@ import javax.tools.Diagnostic.Kind;
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.InheritanceSimplifier;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
@@ -208,6 +209,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public ClassInfo scan( TypeElement boundClass ) {
             listSuperClassNames.add(boundClass.toString());
             boundClass.accept(this, 0);
+            InheritanceSimplifier simplifier = new InheritanceSimplifier();
+            simplifier.simplifyInheritance(listFieldInfos);
             ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
             classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
             classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
