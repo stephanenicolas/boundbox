@@ -68,9 +68,9 @@ public class BoundboxWriter implements IBoundboxWriter {
 
             writeCodeDecoration(writer,"Direct access to fields");
             for( FieldInfo fieldInfo: classInfo.getListFieldInfos()) {
-                createDirectGetter(writer, fieldInfo);
+                createDirectGetter(writer, fieldInfo, classInfo.getListSuperClassNames());
                 writer.emitEmptyLine();
-                createDirectSetter(writer, fieldInfo);
+                createDirectSetter(writer, fieldInfo, classInfo.getListSuperClassNames());
             }
 
             writeCodeDecoration(writer,"Access to methods");
@@ -95,12 +95,12 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.emitEmptyLine();
     }
 
-    private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
+    private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo, List<String> listSuperClassNames) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String setterName = "boundBox_set" + fieldNameCamelCase;
+        String setterName = createSignatureSetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         writer.beginMethod("void", setterName, newHashSet(Modifier.PUBLIC), fieldType, fieldName);
         writer.beginControlFlow("try");
         String superClassChain = getSuperClassChain(fieldInfo);
@@ -112,12 +112,12 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endMethod();
     }
 
-    private void createDirectGetter(JavaWriter writer, FieldInfo fieldInfo) throws IOException {
+    private void createDirectGetter(JavaWriter writer, FieldInfo fieldInfo, List<String> listSuperClassNames) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String getterName = "boundBox_get" + fieldNameCamelCase;
+        String getterName = createSignatureGetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         writer.beginMethod(fieldType, getterName, newHashSet(Modifier.PUBLIC));
         writer.beginControlFlow("try");
         String superClassChain = getSuperClassChain(fieldInfo);
@@ -127,6 +127,28 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, Exception.class);
         writer.endMethod();
+    }
+
+    private String createSignatureGetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+        String getterName;
+        if( fieldInfo.getInheritanceLevel() == 0 ) {
+            getterName = "boundBox_get" + fieldNameCamelCase;
+        } else {
+            String superClassName = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
+            getterName = "boundBox_super_"+superClassName+"_get"+fieldNameCamelCase;
+        }
+        return getterName;
+    }
+
+    private String createSignatureSetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+        String getterName;
+        if( fieldInfo.getInheritanceLevel() == 0 ) {
+            getterName = "boundBox_set" + fieldNameCamelCase;
+        } else {
+            String superClassName = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
+            getterName = "boundBox_super_"+superClassName+"_set"+fieldNameCamelCase;
+        }
+        return getterName;
     }
 
     private void createMethodWrapper(JavaWriter writer, MethodInfo methodInfo, String targetClassName) throws IOException {

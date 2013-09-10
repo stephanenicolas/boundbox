@@ -212,6 +212,28 @@ public class BoundBoxProcessorTest {
     }
     
     // ----------------------------------
+    //  INHERITANCE 
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_inherited_field_for_inheritance() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedField.java", "TestClassWithSingleField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<String> listSuperClassNames = classInfo.getListSuperClassNames();
+        assertFalse(listSuperClassNames.isEmpty());
+        assertEquals("TestClassWithInheritedField", listSuperClassNames.get(0));
+        assertEquals("TestClassWithSingleField", listSuperClassNames.get(1));
+    }
+    // ----------------------------------
     //  INHERITANCE OF FIELDS
     // ----------------------------------
     @Test

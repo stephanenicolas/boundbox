@@ -203,17 +203,21 @@ public class BoundBoxProcessor extends AbstractProcessor {
         private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
         private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
+        protected List<String> listSuperClassNames = new ArrayList<String>();
 
         public ClassInfo scan( TypeElement boundClass ) {
+            listSuperClassNames.add(boundClass.toString());
             boundClass.accept(this, 0);
             ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
             classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
             classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
             classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
+            classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
             listClassInfo.add(classInfo);
             listConstructorInfos.clear();
             listMethodInfos.clear();
             listFieldInfos.clear();
+            listSuperClassNames.clear();
             maxSuperClassName = Object.class.getName();
             return classInfo;
         }
@@ -250,6 +254,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
                     @Override
                     public Void visitDeclared(DeclaredType t, Void p) {
+                        listSuperClassNames.add(t.toString());
                         t.asElement().accept(BoundClassVisitor.this, inheritanceLevel + 1);
                         System.out.println("super declared type ->" + t.toString());
                         return super.visitDeclared(t, p);

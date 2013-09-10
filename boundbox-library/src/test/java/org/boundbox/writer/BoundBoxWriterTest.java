@@ -304,6 +304,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField","TestClassWithSingleField"));
 
         Writer out = createWriterInSandbox(classInfo);
 
@@ -316,9 +317,9 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(classInfo);
-        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
+        Method method = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_getFoo");
         assertNotNull(method);
-        Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
+        Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_setFoo", String.class);
         assertNotNull(method2);
     }
 
@@ -336,9 +337,11 @@ public class BoundBoxWriterTest {
         listFieldInfos.add(fakeFieldInfo);
         FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("foo", "java.lang.String");
         fakeFieldInfo2.setInheritanceLevel(1);
+        listFieldInfos.add(fakeFieldInfo2);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField","TestClassWithSingleField"));
 
         Writer out = createWriterInSandbox(classInfo);
 
@@ -353,8 +356,8 @@ public class BoundBoxWriterTest {
         Class<?> clazz = loadBoundBoxClass(classInfo);
         assertNotNull(clazz.getDeclaredMethod("boundBox_getFoo"));
         assertNotNull(clazz.getDeclaredMethod("boundBox_setFoo", String.class));
-        assertNotNull(clazz.getDeclaredMethod("boundBox_TestClassWithSingleField_getFoo"));
-        assertNotNull(clazz.getDeclaredMethod("boundBox_TestClassWithSingleField_setFoo", String.class));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_getFoo"));
+        assertNotNull(clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_setFoo", String.class));
 
     }
     // ----------------------------------
