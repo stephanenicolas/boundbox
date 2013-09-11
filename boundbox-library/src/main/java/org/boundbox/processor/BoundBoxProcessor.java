@@ -50,7 +50,6 @@ import javax.tools.Diagnostic.Kind;
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
-import org.boundbox.model.InheritanceSimplifier;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
@@ -81,6 +80,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Filer filer;
     private Messager messager;
     private IBoundboxWriter boundboxWriter = new BoundboxWriter();
+    private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
 
@@ -143,6 +143,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
             listClassInfo.add(classInfo);
 
+            //perform some computations on meta model
+            inheritanceComputer.computeInheritanceAndHiding(classInfo.getListFieldInfos());
+            inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos());
+            
+            //write meta model to java class file
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
@@ -151,6 +156,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 
+                
                 boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -198,7 +204,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     }
 
-    public final class BoundClassVisitor extends ElementKindVisitor6<Void, Integer> {
+    public final static class BoundClassVisitor extends ElementKindVisitor6<Void, Integer> {
 
         private String maxSuperClassName = Object.class.getName();
         private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
@@ -209,14 +215,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public ClassInfo scan( TypeElement boundClass ) {
             listSuperClassNames.add(boundClass.toString());
             boundClass.accept(this, 0);
-            InheritanceSimplifier simplifier = new InheritanceSimplifier();
-            simplifier.simplifyInheritance(listFieldInfos);
             ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
             classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
             classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
             classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
             classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
-            listClassInfo.add(classInfo);
             listConstructorInfos.clear();
             listMethodInfos.clear();
             listFieldInfos.clear();

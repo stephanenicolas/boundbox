@@ -30,7 +30,7 @@ public class FooTest {
 
     @Test
     public void test_access_to_inherited_field() {
-        assertEquals( "bar", boundBoxFoo.boundBox_super_MotherOfFoo_getMotherBar());
+        assertEquals( "bar", boundBoxFoo.boundBox_getMotherBar());
     }
     
     @Test

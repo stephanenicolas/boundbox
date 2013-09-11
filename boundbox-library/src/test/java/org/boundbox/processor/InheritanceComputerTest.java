@@ -1,4 +1,4 @@
-package org.boundbox.model;
+package org.boundbox.processor;
 
 import static org.junit.Assert.*;
 
@@ -6,16 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.boundbox.FakeFieldInfo;
+import org.boundbox.model.FieldInfo;
+import org.boundbox.processor.InheritanceComputer;
 import org.junit.Before;
 import org.junit.Test;
 
-public class InheritanceSimplifierTest {
+public class InheritanceComputerTest {
 
-    private InheritanceSimplifier simplifier;
+    private InheritanceComputer simplifier;
     
     @Before
     public void setup() {
-        simplifier = new InheritanceSimplifier();
+        simplifier = new InheritanceComputer();
     }
     
     @Test
@@ -30,7 +32,7 @@ public class InheritanceSimplifierTest {
         listFieldInfos.add(fieldInfo2);
         
         //when
-        simplifier.simplifyInheritance(listFieldInfos);
+        simplifier.computeInheritanceAndHiding(listFieldInfos);
         
         //then
         assertFalse( listFieldInfos.isEmpty() );

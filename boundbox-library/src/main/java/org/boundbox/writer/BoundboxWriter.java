@@ -131,10 +131,10 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private String createSignatureGetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
         String getterName;
-        if( fieldInfo.getInheritanceLevel() == 0 ) {
+        if( fieldInfo.getEffectiveInheritanceLevel() == 0 ) {
             getterName = "boundBox_get" + fieldNameCamelCase;
         } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
+            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
             getterName = "boundBox_super_"+superClassName+"_get"+fieldNameCamelCase;
         }
         return getterName;
@@ -142,10 +142,10 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private String createSignatureSetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
         String getterName;
-        if( fieldInfo.getInheritanceLevel() == 0 ) {
+        if( fieldInfo.getEffectiveInheritanceLevel() == 0 ) {
             getterName = "boundBox_set" + fieldNameCamelCase;
         } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
+            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
             getterName = "boundBox_super_"+superClassName+"_set"+fieldNameCamelCase;
         }
         return getterName;
