@@ -14,8 +14,11 @@ public class MethodInfo implements Inheritable {
     protected List<? extends TypeMirror> thrownTypes;
     private int inheritanceLevel;
     private int effectiveInheritanceLevel;
+    private ExecutableElement element;
+    private boolean overriden;
 
     public MethodInfo( ExecutableElement element ) {
+        this.element = element;
         methodName = element.getSimpleName().toString();
         returnType = element.getReturnType();
         parameterTypes = new ArrayList<FieldInfo>();
@@ -85,6 +88,10 @@ public class MethodInfo implements Inheritable {
     public boolean isInherited() {
         return inheritanceLevel != 0;
     }
+    
+    public ExecutableElement getElement() {
+        return element;
+    }
 
     @Override
     public int hashCode() {
@@ -114,6 +121,8 @@ public class MethodInfo implements Inheritable {
                 return false;
         } else if (!parameterTypes.equals(other.parameterTypes))
             return false;
+        if (inheritanceLevel != other.inheritanceLevel)
+            return false;
         return true;
     }
 
@@ -121,6 +130,14 @@ public class MethodInfo implements Inheritable {
     public String toString() {
         return "MethodInfo [methodName=" + methodName + ", returnType=" + returnType + ", parameterTypes=" + parameterTypes
                 + ", thrownTypes=" + thrownTypes + "]";
+    }
+
+    public void setOverriden(boolean overriden) {
+        this.overriden = overriden;
+    }
+    
+    public boolean isOverriden() {
+        return overriden;
     }
 
 

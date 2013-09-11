@@ -1,7 +1,6 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -287,7 +286,7 @@ public class BoundBoxWriterTest {
     }
 
     // ----------------------------------
-    // FIELDS
+    // INHERITANCE OF FIELDS
     // ----------------------------------
     @Test
     public void testProcess_class_with_inherited_field() throws Exception {
@@ -358,7 +357,124 @@ public class BoundBoxWriterTest {
         assertNotNull(clazz.getDeclaredMethod("boundBox_setFoo", String.class));
         assertNotNull(clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_getFoo"));
         assertNotNull(clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_setFoo", String.class));
+    }
 
+    // ----------------------------------
+    // INHERITANCE OF METHODS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_inherited_method() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithInheritedMethod";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithSingleMethod");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(fakeMethodInfo);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("foo");
+        assertNotNull(method);
+
+        Method method2 = null;
+        try {
+            method2 = clazz.getDeclaredMethod("boundbox_TestClassWithSingleMethod_foo");
+            assertFalse(true);
+        } catch( Exception ex ) {
+            assertNull(method2);
+        }
+    }
+
+    @Test
+    public void testProcess_class_with_overriding_method() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithOverridingMethod";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithSingleMethod");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        listMethodInfos.add(fakeMethodInfo);
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo2.setInheritanceLevel(1);
+        fakeMethodInfo2.setOverriden(true);
+        listMethodInfos.add(fakeMethodInfo2);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("foo");
+        assertNotNull(method);
+
+        Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleMethod_foo");
+        assertNotNull(method2);
+    }
+    
+    @Test
+    public void testProcess_class_with_inherited_overriding_method() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithInheritedOverridingMethod";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithOverridingMethod");
+        neededClasses.add("TestClassWithSingleMethod");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        listMethodInfos.add(fakeMethodInfo);
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo2.setInheritanceLevel(2);
+        listMethodInfos.add(fakeMethodInfo2);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("foo");
+        assertNotNull(method);
+
+        Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleMethod_foo");
+        assertNotNull(method2);
     }
     // ----------------------------------
     // PRIVATE METHODS

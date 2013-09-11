@@ -41,5 +41,12 @@ public class FooTest {
         assertEquals( 42, boundBoxFoo.motherFoo(1));
     }
 
+    @Test
+    public void test_access_to_inherited_method2() throws Exception {
+        for( Method method : Foo.class.getDeclaredMethods() ) {
+            System.out.println( method );
+        }
+        assertEquals( 42, boundBoxFoo.motherFoo());
+    }
 
 }

@@ -312,6 +312,61 @@ public class BoundBoxProcessorTest {
         assertContains(listMethodInfos, fakeMethodInfo);
     }
     
+    @Test
+    public void testProcess_class_with_overriding_method() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithOverridingMethod.java", "TestClassWithSingleMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+        
+        // when
+        // Perform the compilation task.
+        task.call();
+        
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setInheritanceLevel(1);
+        assertContains(listMethodInfos, fakeMethodInfo);
+        
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo2.setInheritanceLevel(0);
+        assertContains(listMethodInfos, fakeMethodInfo2);
+
+    }
+    
+    @Test
+    public void testProcess_class_with_inherited_overriding_method() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedOverridingMethod.java", "TestClassWithOverridingMethod.java", "TestClassWithSingleMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+        
+        // when
+        // Perform the compilation task.
+        task.call();
+        
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setInheritanceLevel(2);
+        assertContains(listMethodInfos, fakeMethodInfo);
+        
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo2.setInheritanceLevel(1);
+        fakeMethodInfo2.setEffectiveInheritanceLevel(0);
+        assertContains(listMethodInfos, fakeMethodInfo2);
+
+    }
+    
     // ----------------------------------
     //  PRIVATE METHODS
     // ----------------------------------

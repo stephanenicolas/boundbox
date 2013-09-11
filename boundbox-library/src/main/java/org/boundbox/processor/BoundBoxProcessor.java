@@ -41,11 +41,12 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
+import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.SimpleTypeVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
-import javax.tools.JavaFileObject;
 import javax.tools.Diagnostic.Kind;
+import javax.tools.JavaFileObject;
 
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
@@ -79,6 +80,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Messager messager;
+    private Elements elements;
     private IBoundboxWriter boundboxWriter = new BoundboxWriter();
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
@@ -88,6 +90,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     public void init(ProcessingEnvironment env) {
         filer = env.getFiler();
         messager = env.getMessager();
+        elements = env.getElementUtils();
     }
 
     public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
@@ -145,8 +148,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             //perform some computations on meta model
             inheritanceComputer.computeInheritanceAndHiding(classInfo.getListFieldInfos());
-            inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos());
-            
+            inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos(), boundClass, elements);
+
             //write meta model to java class file
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
@@ -156,7 +159,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 
-                
+
                 boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -281,12 +284,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             } else {
                 methodInfo.setInheritanceLevel( inheritanceLevel );
                 //prevents methods overriden in subclass to be re-added in super class. 
-                if( !listMethodInfos.contains( listMethodInfos ) ) {
-                    listMethodInfos.add( methodInfo);
-                    System.out.println("method ->" + methodInfo.getMethodName() + " added." );
-                } else {
-                    System.out.println("method ->" + methodInfo.getMethodName() + " already added.");
-                }
+                listMethodInfos.add( methodInfo);
             }
             return super.visitExecutable(e, inheritanceLevel);
         }
