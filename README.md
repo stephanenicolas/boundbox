@@ -66,3 +66,12 @@ public class ATest {
  }
 }
 ````
+
+As soon as you type : `@BoundBox(boundClass=A.class)`, the BoundBox annotation processor will generate the class `BoundBoxOfA` that you can use to access all inner fields, constructors and methods of A.
+
+BoundBox API is quite simple. Indeed in has no API at all, just a set of conventions to access the inner structure of an Object.
+
+BoundBox offers the following advantages over alternative technologies : 
+# don't pollute your API under tests. Just code clean, don't change anything for testing even not a visibility modifier.
+# objects under tests will be accessed using reflection, and this access will be checked at compile time (unlike using pure reflection or WhiteBox from PowerMock).
+# all fields, constructors and methods, even those defined in super classes are accessible. For instance, it allows to access `foo.super.super.a`.
