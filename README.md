@@ -4,12 +4,14 @@ BoundBox
 BoundBox provides an easy way to test an object by accessing **all** its fields, constructor and methods, public or not. 
 BoundBox breaks encapsulation.
 
+For more information, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
+
 Sample
 ------
 
 Let's say we have a class A like :
 
-````java
+```java
 public class A {
  private String foo;
  
@@ -25,11 +27,11 @@ public class A {
    return "The value of foo is " + foo;
  }
 }
-````
+```
 
 With BoundBox, you can write a test that accesses all fields and methods of A :
 
-````java
+```java
 public class ATest {
  @BoundBox( boundClass = A.class )
  private BoundBoxOfA boundBoxOfA;
@@ -65,7 +67,7 @@ public class ATest {
    assertEquals( "The value of foo is bb", boundBoxOfA.getFoo();
  }
 }
-````
+```
 
 As soon as you type : `@BoundBox(boundClass=A.class)`, the BoundBox annotation processor will generate the class `BoundBoxOfA` that you can use to access all inner fields, constructors and methods of A.
 
