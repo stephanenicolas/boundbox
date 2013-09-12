@@ -29,7 +29,10 @@ public class A {
 }
 ```
 
-With BoundBox, you can write a test that accesses all fields and methods of A :
+With BoundBox, you can write a test that accesses all fields and methods of `A`. 
+When you write the statement : `@BoundBox(boundClass=A.class)`, the BoundBox annotation 
+processor will generate the class `BoundBoxOfA` that you can use to access all inner fields, constructors and methods of `A`.
+
 
 ```java
 public class ATest {
@@ -68,8 +71,6 @@ public class ATest {
  }
 }
 ```
-
-As soon as you type : `@BoundBox(boundClass=A.class)`, the BoundBox annotation processor will generate the class `BoundBoxOfA` that you can use to access all inner fields, constructors and methods of A.
 
 Summary
 -------
