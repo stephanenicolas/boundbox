@@ -1,8 +1,6 @@
 package org.boundbox.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -209,6 +207,30 @@ public class BoundBoxProcessorTest {
 
         FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listMethodInfos, fakeMethodInfo9);
+    }
+    
+    // ----------------------------------
+    // STATIC METHODS
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_static_method() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        assertEquals( 1, listMethodInfos.size());
+        assertTrue( listMethodInfos.get(0).isStaticMethod());
     }
     
     // ----------------------------------

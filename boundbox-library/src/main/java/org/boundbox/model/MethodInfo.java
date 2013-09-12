@@ -16,6 +16,7 @@ public class MethodInfo implements Inheritable {
     private int effectiveInheritanceLevel;
     private ExecutableElement element;
     private boolean overriden;
+    private boolean staticMethod;
 
     public MethodInfo( ExecutableElement element ) {
         this.element = element;
@@ -91,6 +92,14 @@ public class MethodInfo implements Inheritable {
     
     public ExecutableElement getElement() {
         return element;
+    }
+    
+    public boolean isStaticMethod() {
+        return staticMethod;
+    }
+    
+    public void setStaticMethod(boolean staticMethod) {
+        this.staticMethod = staticMethod;
     }
 
     @Override

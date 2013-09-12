@@ -42,22 +42,23 @@ public class BoundboxWriter implements IBoundboxWriter {
         try {
             JavaWriter writer = new JavaWriter(out);
             writer.emitPackage(targetPackageName)//
-                    .emitEmptyLine()//
-                    .emitImports(Field.class.getName())//
-                    .emitImports(Method.class.getName())//
-                    .emitImports(Constructor.class.getName())//
-                    .emitImports(InvocationTargetException.class.getName())//
-                    .emitImports(BoundBoxException.class.getName())//
-                    .emitEmptyLine();
+            .emitEmptyLine()//
+            .emitImports(Field.class.getName())//
+            .emitImports(Method.class.getName())//
+            .emitImports(Constructor.class.getName())//
+            .emitImports(InvocationTargetException.class.getName())//
+            .emitImports(BoundBoxException.class.getName())//
+            .emitEmptyLine();
 
             writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null) //
-                    .emitEmptyLine()//
-                    .emitField(targetClassName, "boundObject", newHashSet(Modifier.PRIVATE))//
-                    .emitEmptyLine()//
-                    .beginMethod(null, boundBoxClassName, newHashSet(Modifier.PUBLIC), targetClassName, "boundObject")//
-                    .emitStatement("this.boundObject = boundObject")//
-                    .endMethod()//
-                    .emitEmptyLine();
+            .emitEmptyLine()//
+            .emitField(targetClassName, "boundObject", newHashSet(Modifier.PRIVATE))//
+            .emitField("Class<"+targetClassName+">", "boundClass", newHashSet(Modifier.PRIVATE, Modifier.STATIC), targetClassName+".class")//
+            .emitEmptyLine()//
+            .beginMethod(null, boundBoxClassName, newHashSet(Modifier.PUBLIC), targetClassName, "boundObject")//
+            .emitStatement("this.boundObject = boundObject")//
+            .endMethod()//
+            .emitEmptyLine();
 
             writeCodeDecoration(writer, "Access to constructors");
             for (MethodInfo methodInfo : classInfo.getListConstructorInfos()) {
@@ -182,7 +183,11 @@ public class BoundboxWriter implements IBoundboxWriter {
             signature = createSignatureMethod(methodInfo, listSuperClassNames);
         }
 
-        writer.beginMethod(returnType, signature, newHashSet(Modifier.PUBLIC), parameters, thrownTypesCommaSeparated);
+        Set<Modifier> modifiers = newHashSet(Modifier.PUBLIC);
+        if( methodInfo.isStaticMethod() || methodInfo.isConstructor() ) {
+            modifiers.add(Modifier.STATIC);
+        }
+        writer.beginMethod(returnType, signature, modifiers, parameters, thrownTypesCommaSeparated);
 
         writer.beginControlFlow("try");
 
@@ -192,16 +197,22 @@ public class BoundboxWriter implements IBoundboxWriter {
         String superClassChain = getSuperClassChain(methodInfo);
         if (parameterTypeList.isEmpty()) {
             if (isConstructor) {
-                writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor()",
+                writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor()",
                         targetClassName);
+            } else if( methodInfo.isStaticMethod() ){
+                writer.emitStatement("Method method = boundClass" + superClassChain + ".getDeclaredMethod(%s)",
+                        JavaWriter.stringLiteral(methodName));
             } else {
                 writer.emitStatement("Method method = boundObject.getClass()" + superClassChain + ".getDeclaredMethod(%s)",
                         JavaWriter.stringLiteral(methodName));
             }
         } else {
             if (isConstructor) {
-                writer.emitStatement("Constructor<? extends %s> method = boundObject.getClass().getDeclaredConstructor(%s)",
+                writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor(%s)",
                         targetClassName, parametersTypesCommaSeparated);
+            } else if( methodInfo.isStaticMethod() ){
+                writer.emitStatement("Method method = boundClass" + superClassChain + ".getDeclaredMethod(%s,%s)",
+                        JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             } else {
                 writer.emitStatement("Method method = boundObject.getClass()" + superClassChain + ".getDeclaredMethod(%s,%s)",
                         JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
@@ -222,12 +233,16 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (parameterTypeList.isEmpty()) {
             if (isConstructor) {
                 writer.emitStatement(returnString + "method.newInstance()");
+            } else if( methodInfo.isStaticMethod() ){
+                writer.emitStatement(returnString + "method.invoke(null)");
             } else {
                 writer.emitStatement(returnString + "method.invoke(boundObject)");
             }
         } else {
             if (isConstructor) {
                 writer.emitStatement(returnString + "method.newInstance(%s)", parametersNamesCommaSeparated);
+            } else if( methodInfo.isStaticMethod() ){
+                writer.emitStatement(returnString + "method.invoke(null, %s)", parametersNamesCommaSeparated);
             } else {
                 writer.emitStatement(returnString + "method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
             }
@@ -265,35 +280,35 @@ public class BoundboxWriter implements IBoundboxWriter {
             castReturnTypeString = "(Integer)";
         } else
 
-        if ("long".equals(returnType)) {
-            castReturnTypeString = "(Long)";
-        } else 
+            if ("long".equals(returnType)) {
+                castReturnTypeString = "(Long)";
+            } else 
 
-        if ("byte".equals(returnType)) {
-            castReturnTypeString = "(Byte)";
-        } else 
+                if ("byte".equals(returnType)) {
+                    castReturnTypeString = "(Byte)";
+                } else 
 
-        if ("short".equals(returnType)) {
-            castReturnTypeString = "(Short)";
-        } else 
+                    if ("short".equals(returnType)) {
+                        castReturnTypeString = "(Short)";
+                    } else 
 
-        if ("boolean".equals(returnType)) {
-            castReturnTypeString = "(Boolean)";
-        } else 
+                        if ("boolean".equals(returnType)) {
+                            castReturnTypeString = "(Boolean)";
+                        } else 
 
-        if ("double".equals(returnType)) {
-            castReturnTypeString = "(Double)";
-        } else 
+                            if ("double".equals(returnType)) {
+                                castReturnTypeString = "(Double)";
+                            } else 
 
-        if ("float".equals(returnType)) {
-            castReturnTypeString = "(Float)";
-        } else 
+                                if ("float".equals(returnType)) {
+                                    castReturnTypeString = "(Float)";
+                                } else 
 
-        if ("char".equals(returnType)) {
-            castReturnTypeString = "(Character)";
-        } else {
-            castReturnTypeString = "("+returnType+")";
-        }
+                                    if ("char".equals(returnType)) {
+                                        castReturnTypeString = "(Character)";
+                                    } else {
+                                        castReturnTypeString = "("+returnType+")";
+                                    }
 
         if (!castReturnTypeString.isEmpty()) {
             castReturnTypeString += " ";

@@ -15,7 +15,7 @@ public class FooTest {
 
     @Before
     public void setup() {
-        boundBoxFoo = new BoundBoxOfFoo( new Foo());
+        boundBoxFoo = new BoundBoxOfFoo( BoundBoxOfFoo.boundBox_new() );
     }
     
     @Test

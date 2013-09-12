@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,6 +121,8 @@ public class BoundBoxWriterTest {
         Class<?> clazz = loadBoundBoxClass(classInfo);
         Method method = clazz.getDeclaredMethod("boundBox_new");
         assertNotNull(method);
+        assertTrue((method.getModifiers() & Modifier.STATIC) != 0 );
+
     }
 
     @Test
@@ -156,15 +159,29 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(classInfo);
-        assertNotNull(clazz.getDeclaredMethod("boundBox_new"));
-        assertNotNull(clazz.getDeclaredMethod("boundBox_new",int.class));
-        assertNotNull(clazz.getDeclaredMethod("boundBox_new",Object.class));
-        assertNotNull(clazz.getDeclaredMethod("boundBox_new",int.class, Object.class));
-        Method declaredMethod = clazz.getDeclaredMethod("boundBox_new",int.class, Object.class, Object.class);
-        assertNotNull(declaredMethod);
+        Method declaredMethod1 = clazz.getDeclaredMethod("boundBox_new");
+        assertNotNull(declaredMethod1);
+        assertTrue((declaredMethod1.getModifiers() & Modifier.STATIC) != 0 );
+        
+        Method declaredMethod2 = clazz.getDeclaredMethod("boundBox_new",int.class);
+        assertNotNull(declaredMethod2);
+        assertTrue((declaredMethod2.getModifiers() & Modifier.STATIC) != 0 );
+
+        Method declaredMethod3 = clazz.getDeclaredMethod("boundBox_new",Object.class);
+        assertNotNull(declaredMethod3);
+        assertTrue((declaredMethod3.getModifiers() & Modifier.STATIC) != 0 );
+
+        Method declaredMethod4 = clazz.getDeclaredMethod("boundBox_new",int.class, Object.class);
+        assertNotNull(declaredMethod4);
+        assertTrue((declaredMethod4.getModifiers() & Modifier.STATIC) != 0 );
+
+        Method declaredMethod5 = clazz.getDeclaredMethod("boundBox_new",int.class, Object.class, Object.class);
+        assertNotNull(declaredMethod5);
+        assertTrue((declaredMethod5.getModifiers() & Modifier.STATIC) != 0 );
+
         boolean containsIOException = false;
         boolean containsRuntimeException = false;
-        for( Class<?> exceptionClass : declaredMethod.getExceptionTypes() ) {
+        for( Class<?> exceptionClass : declaredMethod5.getExceptionTypes() ) {
             if( exceptionClass.equals(IOException.class) ) {
                 containsIOException = true;
             }
@@ -284,6 +301,41 @@ public class BoundBoxWriterTest {
 
 
     }
+
+    // ----------------------------------
+    //  STATIC METHODS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_static_method() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithStaticMethod";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setStaticMethod(true);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(fakeMethodInfo);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("foo");
+        assertNotNull(method);
+        assertTrue((method.getModifiers() & Modifier.STATIC) != 0 );
+    }
+
 
     // ----------------------------------
     // INHERITANCE OF FIELDS
@@ -438,7 +490,7 @@ public class BoundBoxWriterTest {
         Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleMethod_foo");
         assertNotNull(method2);
     }
-    
+
     @Test
     public void testProcess_class_with_inherited_overriding_method() throws Exception {
         // given
