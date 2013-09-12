@@ -56,6 +56,10 @@ import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
+import com.sun.source.tree.ImportTree;
+import com.sun.source.util.TreePath;
+import com.sun.source.util.Trees;
+
 /**
  * Annotation processor
  * @author <a href=\"mailto:christoffer@christoffer.me\">Christoffer Pettersson</a>
@@ -86,23 +90,27 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
+    private Trees tree;
 
     @Override
     public void init(ProcessingEnvironment env) {
         filer = env.getFiler();
         messager = env.getMessager();
         elements = env.getElementUtils();
-    }
-
-    public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
-        this.boundboxWriter = boundboxWriter;
+        tree = Trees.instance(env);
     }
 
     @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnvironment) {
+        for( Element rootElement : roundEnvironment.getRootElements() ) {
+            TreePath path = tree.getPath(rootElement);
+            System.out.println( "root element imports "+rootElement.toString() +" "+path.getCompilationUnit().getImports().size() );
+            for( ImportTree importTree : path.getCompilationUnit().getImports() ) {
+                System.out.println("import "+importTree.toString());
+            }
+        }
         // Get all classes that has the annotation
         Set<? extends Element> classElements = roundEnvironment.getElementsAnnotatedWith(BoundBox.class);
-
         // For each class that has the annotation
         for (final Element classElement : classElements) {
 
@@ -170,6 +178,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
         return true;
     }
+    
+    public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
+        this.boundboxWriter = boundboxWriter;
+    }
+
 
 
     private TypeElement getBoundClassAsTypeElement(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
@@ -273,7 +286,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
             return super.visitTypeAsClass(e, inheritanceLevel);
         }
-
+        
         @Override
         public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
             System.out.println("executable ->" + e.getSimpleName());
