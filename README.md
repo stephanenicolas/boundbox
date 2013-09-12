@@ -81,7 +81,7 @@ BoundBox offers the following advantages over alternative technologies :
 * objects under tests will be accessed using reflection, and this access will be checked at compile time (unlike using pure reflection or WhiteBox from PowerMock).
 * all fields, constructors and methods, even those defined in super classes are accessible. For instance, it allows to access `foo.super.super.a`.
 
-BoundBox has been designed for systems that are hard to tests. For instance, you will find a sample that shows of to test an Android activity pretty easily.
+BoundBox has been designed for systems that are hard to tests. For instance, you will find a sample that shows how to test an Android activity pretty easily.
 
 License
 -------
