@@ -11,7 +11,7 @@ public class ClassInfo {
     private String targetPackageName;
     private String targetClassName;
     private String boundBoxClassName;
-
+    private List<String> listImports;
 
     public ClassInfo(String className) {
         this.className = className;
@@ -65,4 +65,11 @@ public class ClassInfo {
     public void setListSuperClassNames(List<String> listSuperClassNames) {
         this.listSuperClassNames = listSuperClassNames;
     }
+    public List<String> getListImports() {
+        return this.listImports;
+    }
+    public void setListImports(List<String> listImports) {
+        this.listImports = listImports;
+    }
+    
 }

@@ -90,7 +90,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
-    private List<String> listImports = new ArrayList<String>();
     private Trees tree;
 
     @Override
@@ -103,15 +102,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnvironment) {
-        for( Element rootElement : roundEnvironment.getRootElements() ) {
-            TreePath path = tree.getPath(rootElement);
-            System.out.println( "root element imports "+rootElement.toString() +" "+path.getCompilationUnit().getImports().size() );
-            for( ImportTree importTree : path.getCompilationUnit().getImports() ) {
-                System.out.println("import "+importTree.toString());
-                listImports.add(importTree.toString());
-            }
-        }
-
         // Get all classes that has the annotation
         Set<? extends Element> classElements = roundEnvironment.getElementsAnnotatedWith(BoundBox.class);
         // For each class that has the annotation
@@ -155,7 +145,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
 
-            ClassInfo classInfo = boundClassVisitor.scan(boundClass);
+            ClassInfo classInfo = boundClassVisitor.scan(boundClass, tree);
             listClassInfo.add(classInfo);
 
             //perform some computations on meta model
@@ -172,7 +162,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 Writer out = sourceFile.openWriter();
 
 
-                boundboxWriter.writeBoundBox(classInfo, listImports, out);
+                boundboxWriter.writeBoundBox(classInfo, classInfo.getListImports(), out);
             } catch (IOException e) {
                 e.printStackTrace();
                 error(classElement, e.getMessage() );
@@ -231,8 +221,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
         private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
         protected List<String> listSuperClassNames = new ArrayList<String>();
+        private List<String> listImports = new ArrayList<String>();
+        private Trees tree;
 
-        public ClassInfo scan( TypeElement boundClass ) {
+        public ClassInfo scan( TypeElement boundClass, Trees tree ) {
+            this.tree = tree;
             listSuperClassNames.add(boundClass.toString());
             boundClass.accept(this, 0);
             ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
@@ -240,6 +233,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
             classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
             classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
+            classInfo.setListImports(new ArrayList<String>(listImports));
             listConstructorInfos.clear();
             listMethodInfos.clear();
             listFieldInfos.clear();
@@ -268,6 +262,16 @@ public class BoundBoxProcessor extends AbstractProcessor {
             if( isInnerClass ) {
                 return super.visitTypeAsClass(e, inheritanceLevel);
             }
+
+            TreePath path = tree.getPath(e);
+            if( path != null && path.getCompilationUnit() != null ) {
+                for( ImportTree importTree : path.getCompilationUnit().getImports() ) {
+                    System.out.println("import "+importTree.toString());
+                    listImports.add(importTree.toString());
+                }
+            }
+
+
             //http://stackoverflow.com/q/7738171/693752
             for (Element enclosedElement : e.getEnclosedElements()) {
                 enclosedElement.accept(this, inheritanceLevel);
