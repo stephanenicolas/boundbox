@@ -31,7 +31,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     // public void writeBoundBox(ClassInfo boundClassInfo, Writer writer) throws IOException {
 
     @Override
-    public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
+    public void writeBoundBox(ClassInfo classInfo, List<String> listImports, Writer out) throws IOException {
         String boundClassName = classInfo.getClassName();
         System.out.println("BoundClassName is " + boundClassName);
 
@@ -49,6 +49,10 @@ public class BoundboxWriter implements IBoundboxWriter {
             .emitImports(InvocationTargetException.class.getName())//
             .emitImports(BoundBoxException.class.getName())//
             .emitEmptyLine();
+            
+            for( String importStatement : listImports ) {
+                out.append(importStatement);
+            }
 
             writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null) //
             .emitEmptyLine()//

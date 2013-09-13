@@ -90,6 +90,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
+    private List<String> listImports = new ArrayList<String>();
     private Trees tree;
 
     @Override
@@ -107,8 +108,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
             System.out.println( "root element imports "+rootElement.toString() +" "+path.getCompilationUnit().getImports().size() );
             for( ImportTree importTree : path.getCompilationUnit().getImports() ) {
                 System.out.println("import "+importTree.toString());
+                listImports.add(importTree.toString());
             }
         }
+
         // Get all classes that has the annotation
         Set<? extends Element> classElements = roundEnvironment.getElementsAnnotatedWith(BoundBox.class);
         // For each class that has the annotation
@@ -169,7 +172,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 Writer out = sourceFile.openWriter();
 
 
-                boundboxWriter.writeBoundBox(classInfo, out);
+                boundboxWriter.writeBoundBox(classInfo, listImports, out);
             } catch (IOException e) {
                 e.printStackTrace();
                 error(classElement, e.getMessage() );
@@ -178,7 +181,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
         return true;
     }
-    
+
     public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
         this.boundboxWriter = boundboxWriter;
     }
@@ -286,7 +289,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
             return super.visitTypeAsClass(e, inheritanceLevel);
         }
-        
+
         @Override
         public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
             System.out.println("executable ->" + e.getSimpleName());

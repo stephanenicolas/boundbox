@@ -39,6 +39,7 @@ public class BoundBoxWriterTest {
 
     private BoundboxWriter writer;
     private File sandBoxDir;
+    private static final List<String> LIST_IMPORTS = new ArrayList<String>();
 
     @Before
     public void setup() throws IOException {
@@ -77,7 +78,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -111,7 +112,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -151,7 +152,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -213,7 +214,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -254,7 +255,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -323,7 +324,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -360,7 +361,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -397,7 +398,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -433,7 +434,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -476,7 +477,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -514,7 +515,7 @@ public class BoundBoxWriterTest {
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, out);
+        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
