@@ -20,6 +20,7 @@ package org.boundbox.processor;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.Elements;
@@ -56,10 +58,6 @@ import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
-import com.sun.source.tree.ImportTree;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.Trees;
-
 /**
  * Annotation processor
  * @author <a href=\"mailto:christoffer@christoffer.me\">Christoffer Pettersson</a>
@@ -68,10 +66,7 @@ import com.sun.source.util.Trees;
  *         https://forums.oracle.com/thread/1184190
  */
 /*
- * TODO handle inheritance of bounded class
- * TODO handle imports inside boundbox class
- * TODO static methods
- * TODO static initializers
+ * TODO static initializers and instance initializers. Done ? 
  * TODO handle inner classes as bounded class ?
  * @author SNI
  *
@@ -90,14 +85,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
-    private Trees tree;
 
     @Override
     public void init(ProcessingEnvironment env) {
         filer = env.getFiler();
         messager = env.getMessager();
         elements = env.getElementUtils();
-        tree = Trees.instance(env);
     }
 
     @Override
@@ -145,7 +138,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
 
-            ClassInfo classInfo = boundClassVisitor.scan(boundClass, tree);
+            ClassInfo classInfo = boundClassVisitor.scan(boundClass);
             listClassInfo.add(classInfo);
 
             //perform some computations on meta model
@@ -162,7 +155,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 Writer out = sourceFile.openWriter();
 
 
-                boundboxWriter.writeBoundBox(classInfo, classInfo.getListImports(), out);
+                boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
                 error(classElement, e.getMessage() );
@@ -221,11 +214,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
         private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
         protected List<String> listSuperClassNames = new ArrayList<String>();
-        private List<String> listImports = new ArrayList<String>();
-        private Trees tree;
+        private Set<String> listImports = new HashSet<String>();
 
-        public ClassInfo scan( TypeElement boundClass, Trees tree ) {
-            this.tree = tree;
+        public ClassInfo scan( TypeElement boundClass ) {
             listSuperClassNames.add(boundClass.toString());
             boundClass.accept(this, 0);
             ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
@@ -263,12 +254,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 return super.visitTypeAsClass(e, inheritanceLevel);
             }
 
-            TreePath path = tree.getPath(e);
-            if( path != null && path.getCompilationUnit() != null ) {
-                for( ImportTree importTree : path.getCompilationUnit().getImports() ) {
-                    System.out.println("import "+importTree.toString());
-                    listImports.add(importTree.toString());
-                }
+            if( inheritanceLevel == 0 ) {
+                listImports.add(e.getQualifiedName().toString());
             }
 
 
@@ -308,6 +295,20 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 //prevents methods overriden in subclass to be re-added in super class. 
                 listMethodInfos.add( methodInfo);
             }
+            if(e.getReturnType().getKind() == TypeKind.DECLARED) {
+                listImports.add(e.getReturnType().toString());
+            }
+            for( VariableElement param : e.getParameters()) {
+                if(param.asType().getKind() == TypeKind.DECLARED) {
+                    listImports.add(param.asType().toString());
+                }
+            }
+            for( TypeMirror thrownType : e.getThrownTypes()) {
+                if(thrownType.getKind() == TypeKind.DECLARED) {
+                    listImports.add(thrownType.toString());
+                }
+            }
+
             return super.visitExecutable(e, inheritanceLevel);
         }
 
@@ -315,8 +316,14 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public Void visitVariableAsField(VariableElement e, Integer inheritanceLevel) {
             FieldInfo fieldInfo = new FieldInfo(e);
             fieldInfo.setInheritanceLevel( inheritanceLevel );
+            fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
             listFieldInfos.add( fieldInfo);
             System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
+
+            if(e.asType().getKind() == TypeKind.DECLARED) {
+                listImports.add(e.asType().toString());
+            }
+
             return super.visitVariableAsField(e, inheritanceLevel);
         }
 

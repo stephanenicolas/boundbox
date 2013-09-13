@@ -39,7 +39,6 @@ public class BoundBoxWriterTest {
 
     private BoundboxWriter writer;
     private File sandBoxDir;
-    private static final List<String> LIST_IMPORTS = new ArrayList<String>();
 
     @Before
     public void setup() throws IOException {
@@ -54,7 +53,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            //FileUtils.deleteDirectory(sandBoxDir);
+            FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -74,11 +73,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -90,6 +90,44 @@ public class BoundBoxWriterTest {
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
+    }
+    
+    // ----------------------------------
+    // STATIC FIELDS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_static_field() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithStaticField";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setStaticField(true);
+        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        listFieldInfos.add(fakeFieldInfo);
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new ArrayList<String>());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
+        assertNotNull(method);
+        assertTrue( (method.getModifiers() & Modifier.STATIC) != 0);
+        Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
+        assertNotNull(method2);
+        assertTrue( (method2.getModifiers() & Modifier.STATIC) != 0);
     }
 
     // ----------------------------------
@@ -108,11 +146,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -148,11 +187,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -210,11 +250,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -251,11 +292,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -320,11 +362,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -357,11 +400,12 @@ public class BoundBoxWriterTest {
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField","TestClassWithSingleField"));
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -394,11 +438,12 @@ public class BoundBoxWriterTest {
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField","TestClassWithSingleField"));
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -430,11 +475,12 @@ public class BoundBoxWriterTest {
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -473,11 +519,12 @@ public class BoundBoxWriterTest {
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -511,11 +558,12 @@ public class BoundBoxWriterTest {
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod","TestClassWithSingleMethod"));
+        classInfo.setListImports(new ArrayList<String>());
 
         Writer out = createWriterInSandbox(classInfo);
 
         // when
-        writer.writeBoundBox(classInfo, LIST_IMPORTS, out);
+        writer.writeBoundBox(classInfo, out);
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);

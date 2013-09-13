@@ -64,6 +64,14 @@ public class MethodInfo implements Inheritable {
     public boolean isConstructor() {
         return "<init>".equals( methodName );
     }
+    
+    public boolean isInstanceInitializer() {
+        return "".equals( methodName );
+    }
+
+    public boolean isStaticInitializer() {
+        return "<clinit>".equals( methodName );
+    }
 
     public boolean hasReturnType() {
         return returnType != null && !"void".equalsIgnoreCase(returnType.toString());

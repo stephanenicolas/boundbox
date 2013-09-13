@@ -8,6 +8,7 @@ public class FieldInfo implements Inheritable {
     private TypeMirror fieldType;
     private int inheritanceLevel;
     private int effectiveInheritanceLevel;
+    private boolean staticField;
     
     public FieldInfo( VariableElement e ) {
         fieldName = e.getSimpleName().toString();
@@ -50,14 +51,19 @@ public class FieldInfo implements Inheritable {
         return effectiveInheritanceLevel;
     }
     
-    /* (non-Javadoc)
-     * @see org.boundbox.Inheritable#isInherited()
-     */
     @Override
     public boolean isInherited() {
         return inheritanceLevel != 0;
     }
 
+    public boolean isStaticField() {
+        return staticField;
+    }
+    
+    public void setStaticField(boolean staticField) {
+        this.staticField = staticField;
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;

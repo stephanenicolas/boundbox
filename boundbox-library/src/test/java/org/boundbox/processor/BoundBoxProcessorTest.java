@@ -79,6 +79,31 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
+    //  STATIC FIELDS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_static_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+
+    
+    // ----------------------------------
     //  CONSTRUCTOR
     // ----------------------------------
     @Test
@@ -430,6 +455,7 @@ public class BoundBoxProcessorTest {
         assertNotNull(fieldInfo2);
         assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldTypeName());
         assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
+        assertEquals(fakeFieldInfo.isStaticField(), fieldInfo2.isStaticField());
         assertEquals(fakeFieldInfo.getEffectiveInheritanceLevel(), fieldInfo2.getEffectiveInheritanceLevel());
     }
 
@@ -438,6 +464,8 @@ public class BoundBoxProcessorTest {
         assertNotNull(methodInfo2);
         assertEquals(fakeMethodInfo.getReturnTypeName(), methodInfo2.getReturnType().toString());
         assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
+        assertEquals(fakeMethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
+
         for( int indexThrownType =0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType ++ ) {
             TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
             assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
