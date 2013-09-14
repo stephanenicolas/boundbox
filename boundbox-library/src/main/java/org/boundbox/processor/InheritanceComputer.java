@@ -9,9 +9,12 @@ import java.util.Map;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
+import lombok.extern.java.Log;
+
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
 
+@Log
 public class InheritanceComputer {
 
     public void computeInheritanceAndHiding( List<FieldInfo> listFieldInfos) {
@@ -56,10 +59,10 @@ public class InheritanceComputer {
                     if( left.getInheritanceLevel() != right.getInheritanceLevel() ) {
                         if( elements.overrides(left.getElement(), right.getElement(), typeElement)) {
                             right.setOverriden( true );
-                            System.out.println( left.getMethodName() +" overrides "+right.getMethodName());
+                            log.info( left.getMethodName() +" overrides "+right.getMethodName());
                         } else if( elements.overrides(right.getElement(), left.getElement(), typeElement)) {
                             left.setOverriden( true );
-                            System.out.println( right.getMethodName() +" overrides "+left.getMethodName());
+                            log.info( right.getMethodName() +" overrides "+left.getMethodName());
                         }
                     }
                 }

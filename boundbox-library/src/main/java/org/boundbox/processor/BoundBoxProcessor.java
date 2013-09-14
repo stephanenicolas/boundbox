@@ -42,6 +42,8 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
+import lombok.extern.java.Log;
+
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.writer.BoundboxWriter;
@@ -61,6 +63,7 @@ import org.boundbox.writer.IBoundboxWriter;
  */
 @SupportedAnnotationTypes("org.boundbox.BoundBox")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
+@Log
 public class BoundBoxProcessor extends AbstractProcessor {
 
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS = "boundClass";
@@ -101,7 +104,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             String message = "";
             for( AnnotationMirror annotationMirror : listAnnotationMirrors ) {
-                System.out.println( "mirror " + annotationMirror.getAnnotationType() );
+                log.info("mirror " + annotationMirror.getAnnotationType() );
                 Map<? extends ExecutableElement, ? extends AnnotationValue > map = annotationMirror.getElementValues();
                 for( Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
                     message += entry.getKey().getSimpleName().toString()+"\n";

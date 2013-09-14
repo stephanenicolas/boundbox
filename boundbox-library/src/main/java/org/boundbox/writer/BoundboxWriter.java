@@ -13,6 +13,8 @@ import java.util.Set;
 
 import javax.lang.model.element.Modifier;
 
+import lombok.extern.java.Log;
+
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBoxException;
 import org.boundbox.model.ClassInfo;
@@ -22,6 +24,7 @@ import org.boundbox.model.MethodInfo;
 
 import com.squareup.javawriter.JavaWriter;
 
+@Log
 public class BoundboxWriter implements IBoundboxWriter {
 
     private static final String SUPPRESS_WARNINGS_ALL = "SuppressWarnings(\"all\")";
@@ -31,7 +34,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     @Override
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
         String boundClassName = classInfo.getClassName();
-        System.out.println("BoundClassName is " + boundClassName);
+        log.info("BoundClassName is " + boundClassName);
 
         String targetPackageName = classInfo.getTargetPackageName();
         String targetClassName = classInfo.getTargetClassName();

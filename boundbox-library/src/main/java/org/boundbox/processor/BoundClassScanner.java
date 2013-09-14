@@ -15,10 +15,13 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 
+import lombok.extern.java.Log;
+
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
 
+@Log
 public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
     private String maxSuperClassName = Object.class.getName();
@@ -59,9 +62,9 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
     @Override
     public Void visitTypeAsClass(TypeElement e, final Integer inheritanceLevel) {
-        System.out.println("class ->" + e.getSimpleName());
+        log.info("class ->" + e.getSimpleName());
         boolean isInnerClass = e.getNestingKind().isNested();
-        System.out.println("nested ->" + isInnerClass);
+        log.info("nested ->" + isInnerClass);
         if( isInnerClass ) {
             return super.visitTypeAsClass(e, inheritanceLevel);
         }
@@ -74,7 +77,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
             enclosedElement.accept(this, inheritanceLevel);
         }
 
-        System.out.println("super class ->" + e.getSuperclass().toString());
+        log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
         if( !maxSuperClassName.equals(superclassOfBoundClass.toString()) ) {
             if( superclassOfBoundClass.getKind() == TypeKind.DECLARED ) {
@@ -89,7 +92,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
     @Override
     public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
-        System.out.println("executable ->" + e.getSimpleName());
+        log.info("executable ->" + e.getSimpleName());
         MethodInfo methodInfo = new MethodInfo(e);
         if( methodInfo.isConstructor() ) {
             if( inheritanceLevel ==0 ) {
@@ -118,7 +121,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         fieldInfo.setInheritanceLevel( inheritanceLevel );
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
         listFieldInfos.add( fieldInfo);
-        System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
+        log.info("field ->" + fieldInfo.getFieldName() + " added." );
 
         addTypeToImport(e.asType());
 
@@ -126,7 +129,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     }
 
     private void addTypeToImport( DeclaredType declaredType) {
-        System.out.println("Adding to imports "+declaredType.toString().replaceAll("<.*>",""));
+        log.info("Adding to imports "+declaredType.toString().replaceAll("<.*>",""));
         //removes parameters from type if it has some
         listImports.add(declaredType.toString().replaceAll("<.*>",""));
         for( TypeMirror typeArgument : declaredType.getTypeArguments() ) {

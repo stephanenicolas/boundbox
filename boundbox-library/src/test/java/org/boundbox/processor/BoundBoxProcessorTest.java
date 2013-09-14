@@ -410,6 +410,7 @@ public class BoundBoxProcessorTest {
 
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         fakeMethodInfo.setInheritanceLevel(1);
+        fakeMethodInfo.setOverriden(true);
         assertContains(listMethodInfos, fakeMethodInfo);
 
         FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
@@ -437,6 +438,7 @@ public class BoundBoxProcessorTest {
 
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         fakeMethodInfo.setInheritanceLevel(2);
+        fakeMethodInfo.setOverriden(true);
         assertContains(listMethodInfos, fakeMethodInfo);
 
         FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
