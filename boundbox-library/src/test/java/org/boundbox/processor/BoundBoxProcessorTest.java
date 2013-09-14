@@ -102,6 +102,13 @@ public class BoundBoxProcessorTest {
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, fakeFieldInfo);
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
+        assertContains(listFieldInfos, fakeFieldInfo2);
+        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
+        assertContains(listFieldInfos, fakeFieldInfo3);
+        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
+        assertContains(listFieldInfos, fakeFieldInfo4);
+
     }
 
     // ----------------------------------
