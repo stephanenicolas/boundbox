@@ -58,7 +58,7 @@ public class ATest {
  public void testBar() {
    //GIVEN
    //WHEN
-   boundBoxOfA.bar("cc");
+   boundBoxOfA.bar("bbcc");
    
    //THEN
    assertEquals( "cc", boundBoxOfA.boundBox_getFoo();
