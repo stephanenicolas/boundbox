@@ -39,6 +39,12 @@
 			<version>3.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>findbugs</groupId>
+			<artifactId>annotations</artifactId>
+			<version>1.0.0</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -34,6 +34,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     public ClassInfo scan(TypeElement boundClass) {
         listSuperClassNames.add(boundClass.toString());
         boundClass.accept(this, 0);
+        listImports.remove(boundClass.toString());
         ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
         classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
         classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
@@ -78,13 +79,11 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
-        if (!maxSuperClassName.equals(superclassOfBoundClass.toString())) {
-            if (superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
-                DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
-                Element superClassElement = superClassDeclaredType.asElement();
-                listSuperClassNames.add(superClassElement.getSimpleName().toString());
-                superClassElement.accept(BoundClassScanner.this, inheritanceLevel + 1);
-            }
+        if (!maxSuperClassName.equals(superclassOfBoundClass.toString()) && superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
+            DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
+            Element superClassElement = superClassDeclaredType.asElement();
+            listSuperClassNames.add(superClassElement.getSimpleName().toString());
+            superClassElement.accept(BoundClassScanner.this, inheritanceLevel + 1);
         }
         return super.visitTypeAsClass(e, inheritanceLevel);
     }

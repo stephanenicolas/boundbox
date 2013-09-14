@@ -7,6 +7,6 @@ import org.boundbox.model.ClassInfo;
 
 public interface IBoundboxWriter {
 
-    public abstract void writeBoundBox(ClassInfo classInfo, Writer writer) throws IOException;
+    void writeBoundBox(ClassInfo classInfo, Writer writer) throws IOException;
 
 }

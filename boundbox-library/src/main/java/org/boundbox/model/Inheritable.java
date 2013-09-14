@@ -2,10 +2,10 @@ package org.boundbox.model;
 
 public interface Inheritable {
 
-    public abstract int getInheritanceLevel();
+    int getInheritanceLevel();
 
-    public abstract int getEffectiveInheritanceLevel();
+    int getEffectiveInheritanceLevel();
 
-    public abstract boolean isInherited();
+    boolean isInherited();
 
 }

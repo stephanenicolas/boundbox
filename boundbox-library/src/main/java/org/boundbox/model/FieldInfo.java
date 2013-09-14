@@ -10,18 +10,19 @@ import lombok.ToString;
 
 @EqualsAndHashCode(exclude = { "effectiveInheritanceLevel", "fieldType" })
 @ToString
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class FieldInfo implements Inheritable {
-    private @Getter
-    String fieldName;
+    @Getter
+    private String fieldName;
     private TypeMirror fieldType;
-    private @Getter
-    int inheritanceLevel;
-    private @Getter
+    @Getter
+    private int inheritanceLevel;
+    @Getter
     @Setter
-    int effectiveInheritanceLevel;
-    private @Getter
+    private int effectiveInheritanceLevel;
+    @Getter
     @Setter
-    boolean staticField;
+    private boolean staticField;
 
     public FieldInfo(VariableElement e) {
         fieldName = e.getSimpleName().toString();

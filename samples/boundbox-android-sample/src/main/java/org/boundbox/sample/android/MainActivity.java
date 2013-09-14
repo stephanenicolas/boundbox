@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
 
         @Override
         public void onClick(View v) {
-            int result = 42;
+            final int result = 42;
             textViewMain.setText(String.valueOf(result));
         }
     }

@@ -98,13 +98,14 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 return true;
             }
 
-            String message = "";
+            StringBuilder message = new StringBuilder();
             for (AnnotationMirror annotationMirror : listAnnotationMirrors) {
                 log.info("mirror " + annotationMirror.getAnnotationType());
                 Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotationMirror.getElementValues();
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
-                    message += entry.getKey().getSimpleName().toString() + "\n";
-                    message += entry.getValue().toString();
+                    message.append(entry.getKey().getSimpleName().toString());
+                    message.append("\n");
+                    message.append(entry.getValue().toString());
                     if (BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS.equals(entry.getKey().getSimpleName().toString())) {
                         boundClass = getAnnotationValueAsTypeElement(entry.getValue());
                     }
@@ -135,8 +136,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
 
-                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "."
-                        + boundBoxClassName;
+                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "." + boundBoxClassName;
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 

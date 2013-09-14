@@ -18,32 +18,33 @@ import lombok.ToString;
 // for testing
 @EqualsAndHashCode(exclude = { "returnType", "thrownTypes", "effectiveInheritanceLevel", "element" })
 @ToString
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class MethodInfo implements Inheritable {
     // ----------------------------------
     // ATTRIBUTES
     // ----------------------------------
-    protected @Getter
-    String methodName;
-    protected @Getter
+    @Getter
+    protected String methodName;
+    @Getter
     @Setter
-    TypeMirror returnType;
-    protected @Getter
-    List<FieldInfo> parameterTypes;
-    protected @Getter
-    List<? extends TypeMirror> thrownTypes;
-    private @Getter
-    int inheritanceLevel;
-    private @Getter
+    protected TypeMirror returnType;
+    @Getter
+    protected List<FieldInfo> parameterTypes;
+    @Getter
+    protected List<? extends TypeMirror> thrownTypes;
+    @Getter
+    private int inheritanceLevel;
     @Setter
-    int effectiveInheritanceLevel;
-    private @Getter
-    ExecutableElement element;
-    private @Getter
+    @Getter
+    private int effectiveInheritanceLevel;
+    @Getter
+    private ExecutableElement element;
     @Setter
-    boolean overriden;
-    private @Getter
+    @Getter
+    private boolean overriden;
     @Setter
-    boolean staticMethod;
+    @Getter
+    private boolean staticMethod;
 
     // ----------------------------------
     // CONSTRUCTOR

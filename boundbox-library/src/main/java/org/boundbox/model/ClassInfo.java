@@ -8,32 +8,34 @@ import lombok.Setter;
 
 import org.apache.commons.lang3.StringUtils;
 
+//CHECKSTYLE:OFF HideUtilityClassConstructorCheck
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class ClassInfo {
     public static final String DEFAULT_BOUND_BOX_OF_CLASS_PREFIX = "BoundBoxOf";
 
-    private @Getter
-    String className;
-    private @Getter
+    @Getter
+    private String className;
     @Setter
-    List<FieldInfo> listFieldInfos;
-    private @Getter
+    @Getter
+    private List<FieldInfo> listFieldInfos;
     @Setter
-    List<MethodInfo> listMethodInfos;
-    private @Getter
+    @Getter
+    private List<MethodInfo> listMethodInfos;
     @Setter
-    List<MethodInfo> listConstructorInfos;
-    private @Getter
+    @Getter
+    private List<MethodInfo> listConstructorInfos;
     @Setter
-    List<String> listSuperClassNames;
-    private @Getter
-    String targetPackageName;
-    private @Getter
-    String targetClassName;
-    private @Getter
-    String boundBoxClassName;
-    private @Getter
+    @Getter
+    private List<String> listSuperClassNames;
+    @Getter
+    private String targetPackageName;
+    @Getter
+    private String targetClassName;
+    @Getter
+    private String boundBoxClassName;
     @Setter
-    List<String> listImports;
+    @Getter
+    private List<String> listImports;
 
     public ClassInfo(String className) {
         this.className = className;
@@ -50,3 +52,4 @@ public class ClassInfo {
     }
 
 }
+//CHECKSTYLE:ON 

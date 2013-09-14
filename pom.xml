@@ -53,6 +53,16 @@
 		<module>samples/boundbox-android-sample-tests</module>
 	</modules>
 
+	<properties>
+		<!-- Plugins -->
+		<maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
+		<android-maven-plugin.version>3.6.1</android-maven-plugin.version>
+		<maven-pmd-plugin.version>2.7.1</maven-pmd-plugin.version>
+		<findbugs-maven-plugin.version>2.5.2</findbugs-maven-plugin.version>
+		<maven-checkstyle-plugin.version>2.9.1</maven-checkstyle-plugin.version>
+		<lint-maven-plugin.version>0.0.6</lint-maven-plugin.version>
+		<eclipse-lifecycle-plugin.version>1.0.0</eclipse-lifecycle-plugin.version>
+	</properties>
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -76,10 +86,37 @@
 										<ignore />
 									</action>
 								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.lewisd</groupId>
+										<artifactId>lint-maven-plugin</artifactId>
+										<versionRange>[${lint-maven-plugin.version},)</versionRange>
+										<goals>
+											<goal>check</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-checkstyle-plugin</artifactId>
+										<versionRange>[${maven-checkstyle-plugin.version},)</versionRange>
+										<goals>
+											<goal>check</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
@@ -88,7 +125,93 @@
 						<autoversionsubmodules>true</autoversionsubmodules>
 					</configuration>
 				</plugin>
+				<!-- Quality Analysis Tools -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>${maven-checkstyle-plugin.version}</version>
+					<configuration>
+						<configLocation>config/quality/checkstyle/checkstyle.xml</configLocation>
+						<enableRulesSummary>false</enableRulesSummary>
+					</configuration>
+					<executions>
+						<execution>
+							<id>checkstyle-check</id>
+							<phase>process-sources</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>findbugs-maven-plugin</artifactId>
+					<version>${findbugs-maven-plugin.version}</version>
+					<configuration>
+						<excludeFilterFile>config/quality/findbugs/findbugs-filter.xml</excludeFilterFile>
+					</configuration>
+					<executions>
+						<execution>
+							<id>findbugs-check</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>${maven-pmd-plugin.version}</version>
+					<configuration>
+						<targetJdk>1.5</targetJdk>
+					</configuration>
+					<executions>
+						<execution>
+							<id>pmd-check</id>
+							<goals>
+								<goal>check</goal>
+								<goal>cpd-check</goal>
+							</goals>
+							<configuration>
+								<rulesets>
+									<ruleset>config/quality/pmd/pmd-ruleset.xml</ruleset>
+								</rulesets>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>com.lewisd</groupId>
+					<artifactId>lint-maven-plugin</artifactId>
+					<version>${lint-maven-plugin.version}</version>
+					<executions>
+						<execution>
+							<phase>validate</phase>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<!-- Quality analysis tools -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+			</plugin>
+		</plugins>
 	</build>
 </project>

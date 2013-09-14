@@ -475,7 +475,7 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        assertTrue(classInfo.getListImports().contains("foo.TestClassWithImports"));
+        assertFalse(classInfo.getListImports().contains("foo.TestClassWithImports"));
         assertTrue(classInfo.getListImports().contains(IOException.class.getName()));
         assertTrue(classInfo.getListImports().contains(File.class.getName()));
         assertTrue(classInfo.getListImports().contains(CountDownLatch.class.getName()));
@@ -495,7 +495,7 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        assertTrue(classInfo.getListImports().contains("foo.TestClassWithParametrizedImports"));
+        assertFalse(classInfo.getListImports().contains("foo.TestClassWithParametrizedImports"));
         assertTrue(classInfo.getListImports().contains(IOException.class.getName()));
         assertTrue(classInfo.getListImports().contains(File.class.getName()));
         assertTrue(classInfo.getListImports().contains(CountDownLatch.class.getName()));
