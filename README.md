@@ -6,6 +6,8 @@ BoundBox breaks encapsulation.
 
 For more information, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
 
+[![Build Status](https://travis-ci.org/stephanenicolas/boundbox.png?branch=master)](https://travis-ci.org/stephanenicolas/boundbox)
+
 Sample
 ------
 
