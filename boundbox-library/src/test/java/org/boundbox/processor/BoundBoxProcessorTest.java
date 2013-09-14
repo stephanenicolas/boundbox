@@ -7,14 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -26,7 +24,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
-import org.boundbox.BoundBoxException;
 import org.boundbox.FakeFieldInfo;
 import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
@@ -69,6 +66,27 @@ public class BoundBoxProcessorTest {
     public void testProcess_class_with_single_field() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithSingleField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+    
+    @Test
+    public void testProcess_class_with_many_fields() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithManyFields.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
@@ -420,8 +438,9 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    //  INHERITANCE OF METHODS
+    //  IMPORTS
     // ----------------------------------
+    
     @Test
     public void testProcess_class_with_imports() throws URISyntaxException {
         // given
@@ -440,6 +459,28 @@ public class BoundBoxProcessorTest {
         assertTrue( classInfo.getListImports().contains(IOException.class.getName()));
         assertTrue( classInfo.getListImports().contains(File.class.getName()));
         assertTrue( classInfo.getListImports().contains(CountDownLatch.class.getName()));
+    }
+    
+    @Test
+    public void testProcess_class_with_parametrized_imports() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "foo/TestClassWithParametrizedImports.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        assertTrue( classInfo.getListImports().contains("foo.TestClassWithParametrizedImports"));
+        assertTrue( classInfo.getListImports().contains(IOException.class.getName()));
+        assertTrue( classInfo.getListImports().contains(File.class.getName()));
+        assertTrue( classInfo.getListImports().contains(CountDownLatch.class.getName()));
+        assertTrue( classInfo.getListImports().contains(Set.class.getName()));
+        assertTrue( classInfo.getListImports().contains(List.class.getName()));
     }
 
     // ----------------------------------

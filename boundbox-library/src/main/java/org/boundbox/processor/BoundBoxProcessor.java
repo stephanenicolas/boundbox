@@ -295,18 +295,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 //prevents methods overriden in subclass to be re-added in super class. 
                 listMethodInfos.add( methodInfo);
             }
-            if(e.getReturnType().getKind() == TypeKind.DECLARED) {
-                listImports.add(e.getReturnType().toString());
-            }
+            addTypeToImport(e.getReturnType());
             for( VariableElement param : e.getParameters()) {
-                if(param.asType().getKind() == TypeKind.DECLARED) {
-                    listImports.add(param.asType().toString());
-                }
+                addTypeToImport(param.asType());
             }
             for( TypeMirror thrownType : e.getThrownTypes()) {
-                if(thrownType.getKind() == TypeKind.DECLARED) {
-                    listImports.add(thrownType.toString());
-                }
+                addTypeToImport(thrownType);
             }
 
             return super.visitExecutable(e, inheritanceLevel);
@@ -320,15 +314,27 @@ public class BoundBoxProcessor extends AbstractProcessor {
             listFieldInfos.add( fieldInfo);
             System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
 
-            if(e.asType().getKind() == TypeKind.DECLARED) {
-                listImports.add(e.asType().toString());
-            }
+            addTypeToImport(e.asType());
 
             return super.visitVariableAsField(e, inheritanceLevel);
         }
 
-    }
+        private void addTypeToImport( DeclaredType declaredType) {
+            System.out.println("Adding to imports"+declaredType.toString().replaceAll("<*>",""));
+            //removes parameters from type if it has some
+            listImports.add(declaredType.toString().replaceAll("<.*>",""));
+            for( TypeMirror typeArgument : declaredType.getTypeArguments() ) {
+                addTypeToImport(typeArgument);
+            }
+        }
 
+        private void addTypeToImport( TypeMirror typeMirror) {
+            if( typeMirror.getKind() == TypeKind.DECLARED ) {
+                addTypeToImport(((DeclaredType) typeMirror));
+            }
+        }
+    }
+    
     public List<ClassInfo> getListClassInfo() {
         return listClassInfo;
     }
