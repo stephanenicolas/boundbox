@@ -45,9 +45,6 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.Elements;
-import javax.lang.model.util.SimpleAnnotationValueVisitor6;
-import javax.lang.model.util.SimpleTypeVisitor6;
-import javax.lang.model.util.TypeKindVisitor6;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
@@ -60,7 +57,6 @@ import org.boundbox.writer.IBoundboxWriter;
 
 /**
  * Annotation processor
- * @author <a href=\"mailto:christoffer@christoffer.me\">Christoffer Pettersson</a>
  *         http://blog.retep
  *         .org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
  *         https://forums.oracle.com/thread/1184190
@@ -169,10 +165,18 @@ public class BoundBoxProcessor extends AbstractProcessor {
         this.boundboxWriter = boundboxWriter;
     }
 
-
+    public List<ClassInfo> getListClassInfo() {
+        return listClassInfo;
+    }
+    
+    // ----------------------------------
+    //  PRIVATE METHODS
+    // ----------------------------------
 
     private TypeElement getBoundClassAsTypeElement(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
-        return entry.getValue().accept(new TypeNameExtractorAnnotationValueVisitor(), null);
+        AnnotationValue annotationValue = entry.getValue();
+        DeclaredType declaredType = (DeclaredType) annotationValue.getValue();
+        return (TypeElement) declaredType.asElement();
     }
 
     private void error(final Element element, final String message) {
@@ -182,31 +186,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
     // ----------------------------------
     // INNER CLASS
     // ----------------------------------
-    private final class TypeNameExtractorAnnotationValueVisitor extends SimpleAnnotationValueVisitor6<TypeElement, Void> {
-        @Override
-        public TypeElement visitType(TypeMirror t, Void p) {
-            TypeElement typeElement = t.accept(new SimpleTypeVisitor6<TypeElement, Void>() {
-
-                @Override
-                public TypeElement visitDeclared(DeclaredType declaredType, Void p) {
-                    TypeElement typeElement = declaredType.asElement().accept(new ElementKindVisitor6<TypeElement, Void>() {
-                        @Override
-                        public TypeElement visitTypeAsClass(TypeElement e, Void p) {
-                            for (Element enclosedElement : e.getEnclosedElements()) {
-                                enclosedElement.accept(this, null);
-                            }
-                            return e;
-                        }
-                    }, null);
-                    return typeElement;
-                }
-
-            }, null);
-            return typeElement;
-        }
-
-    }
-
     public final static class BoundClassVisitor extends ElementKindVisitor6<Void, Integer> {
 
         private String maxSuperClassName = Object.class.getName();
@@ -244,7 +223,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
         public String getMaxSuperClass() {
             return maxSuperClassName;
         }
-
+        
         @Override
         public Void visitTypeAsClass(TypeElement e, final Integer inheritanceLevel) {
             System.out.println("class ->" + e.getSimpleName());
@@ -266,17 +245,13 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             System.out.println("super class ->" + e.getSuperclass().toString());
             TypeMirror superclassOfBoundClass = e.getSuperclass();
-            //TODO should be not needed to visit : http://stackoverflow.com/a/7739269/693752
             if( !maxSuperClassName.equals(superclassOfBoundClass.toString()) ) {
-                superclassOfBoundClass.accept(new TypeKindVisitor6<Void, Void>() {
-                    @Override
-                    public Void visitDeclared(DeclaredType t, Void p) {
-                        listSuperClassNames.add(t.asElement().getSimpleName().toString());
-                        t.asElement().accept(BoundClassVisitor.this, inheritanceLevel + 1);
-                        System.out.println("super declared type ->" + t.toString());
-                        return super.visitDeclared(t, p);
-                    }
-                }, null);
+                if( superclassOfBoundClass.getKind() == TypeKind.DECLARED ) {
+                    DeclaredType superClassDeclaredType = (DeclaredType)superclassOfBoundClass;
+                    Element superClassElement = superClassDeclaredType.asElement();
+                    listSuperClassNames.add(superClassElement.getSimpleName().toString());
+                    superClassElement.accept(BoundClassVisitor.this, inheritanceLevel + 1);
+                }
             }
             return super.visitTypeAsClass(e, inheritanceLevel);
         }
@@ -333,9 +308,5 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 addTypeToImport(((DeclaredType) typeMirror));
             }
         }
-    }
-    
-    public List<ClassInfo> getListClassInfo() {
-        return listClassInfo;
     }
 }

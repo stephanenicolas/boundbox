@@ -51,6 +51,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             classInfo.getListImports().add(BoundBoxException.class.getName());
             writer.emitImports(classInfo.getListImports());
 
+            writer.emitAnnotation("SuppressWarnings(\"all\")");
             writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null)
             //
             .emitEmptyLine()
