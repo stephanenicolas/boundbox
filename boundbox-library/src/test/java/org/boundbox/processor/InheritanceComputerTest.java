@@ -14,28 +14,28 @@ import org.junit.Test;
 public class InheritanceComputerTest {
 
     private InheritanceComputer simplifier;
-    
+
     @Before
     public void setup() {
         simplifier = new InheritanceComputer();
     }
-    
+
     @Test
     public void testSimplifyInheritance() {
-        //given
+        // given
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        FieldInfo fieldInfo = new FakeFieldInfo("foo","bar");
+        FieldInfo fieldInfo = new FakeFieldInfo("foo", "bar");
         fieldInfo.setInheritanceLevel(1);
-        FieldInfo fieldInfo2 = new FakeFieldInfo("foo","bar");
+        FieldInfo fieldInfo2 = new FakeFieldInfo("foo", "bar");
         fieldInfo2.setInheritanceLevel(2);
         listFieldInfos.add(fieldInfo);
         listFieldInfos.add(fieldInfo2);
-        
-        //when
+
+        // when
         simplifier.computeInheritanceAndHiding(listFieldInfos);
-        
-        //then
-        assertFalse( listFieldInfos.isEmpty() );
+
+        // then
+        assertFalse(listFieldInfos.isEmpty());
         assertEquals(0, listFieldInfos.get(0).getEffectiveInheritanceLevel());
         assertEquals(2, listFieldInfos.get(1).getEffectiveInheritanceLevel());
     }

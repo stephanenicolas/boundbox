@@ -31,7 +31,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     protected List<String> listSuperClassNames = new ArrayList<String>();
     private Set<String> listImports = new HashSet<String>();
 
-    public ClassInfo scan( TypeElement boundClass ) {
+    public ClassInfo scan(TypeElement boundClass) {
         listSuperClassNames.add(boundClass.toString());
         boundClass.accept(this, 0);
         ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
@@ -52,7 +52,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         this.maxSuperClassName = maxSuperClass.getName();
     }
 
-    public void setMaxSuperClass(String className ) {
+    public void setMaxSuperClass(String className) {
         this.maxSuperClassName = className;
     }
 
@@ -65,23 +65,22 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         log.info("class ->" + e.getSimpleName());
         boolean isInnerClass = e.getNestingKind().isNested();
         log.info("nested ->" + isInnerClass);
-        if( isInnerClass ) {
+        if (isInnerClass) {
             return super.visitTypeAsClass(e, inheritanceLevel);
         }
 
         addTypeToImport(e.asType());
 
-
-        //http://stackoverflow.com/q/7738171/693752
+        // http://stackoverflow.com/q/7738171/693752
         for (Element enclosedElement : e.getEnclosedElements()) {
             enclosedElement.accept(this, inheritanceLevel);
         }
 
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
-        if( !maxSuperClassName.equals(superclassOfBoundClass.toString()) ) {
-            if( superclassOfBoundClass.getKind() == TypeKind.DECLARED ) {
-                DeclaredType superClassDeclaredType = (DeclaredType)superclassOfBoundClass;
+        if (!maxSuperClassName.equals(superclassOfBoundClass.toString())) {
+            if (superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
+                DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
                 Element superClassElement = superClassDeclaredType.asElement();
                 listSuperClassNames.add(superClassElement.getSimpleName().toString());
                 superClassElement.accept(BoundClassScanner.this, inheritanceLevel + 1);
@@ -94,21 +93,21 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
         log.info("executable ->" + e.getSimpleName());
         MethodInfo methodInfo = new MethodInfo(e);
-        if( methodInfo.isConstructor() ) {
-            if( inheritanceLevel ==0 ) {
+        if (methodInfo.isConstructor()) {
+            if (inheritanceLevel == 0) {
                 listConstructorInfos.add(methodInfo);
             }
         } else {
             methodInfo.setStaticMethod(e.getModifiers().contains(Modifier.STATIC));
-            methodInfo.setInheritanceLevel( inheritanceLevel );
-            //prevents methods overriden in subclass to be re-added in super class. 
-            listMethodInfos.add( methodInfo);
+            methodInfo.setInheritanceLevel(inheritanceLevel);
+            // prevents methods overriden in subclass to be re-added in super class.
+            listMethodInfos.add(methodInfo);
         }
         addTypeToImport(e.getReturnType());
-        for( VariableElement param : e.getParameters()) {
+        for (VariableElement param : e.getParameters()) {
             addTypeToImport(param.asType());
         }
-        for( TypeMirror thrownType : e.getThrownTypes()) {
+        for (TypeMirror thrownType : e.getThrownTypes()) {
             addTypeToImport(thrownType);
         }
 
@@ -118,28 +117,28 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     @Override
     public Void visitVariableAsField(VariableElement e, Integer inheritanceLevel) {
         FieldInfo fieldInfo = new FieldInfo(e);
-        fieldInfo.setInheritanceLevel( inheritanceLevel );
+        fieldInfo.setInheritanceLevel(inheritanceLevel);
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
-        listFieldInfos.add( fieldInfo);
-        log.info("field ->" + fieldInfo.getFieldName() + " added." );
+        listFieldInfos.add(fieldInfo);
+        log.info("field ->" + fieldInfo.getFieldName() + " added.");
 
         addTypeToImport(e.asType());
 
         return super.visitVariableAsField(e, inheritanceLevel);
     }
 
-    private void addTypeToImport( DeclaredType declaredType) {
-        log.info("Adding to imports "+declaredType.toString().replaceAll("<.*>",""));
-        //removes parameters from type if it has some
-        listImports.add(declaredType.toString().replaceAll("<.*>",""));
-        for( TypeMirror typeArgument : declaredType.getTypeArguments() ) {
+    private void addTypeToImport(DeclaredType declaredType) {
+        log.info("Adding to imports " + declaredType.toString().replaceAll("<.*>", ""));
+        // removes parameters from type if it has some
+        listImports.add(declaredType.toString().replaceAll("<.*>", ""));
+        for (TypeMirror typeArgument : declaredType.getTypeArguments()) {
             addTypeToImport(typeArgument);
         }
     }
 
-    private void addTypeToImport( TypeMirror typeMirror) {
-        if(  typeMirror.getKind() == TypeKind.DECLARED) {
+    private void addTypeToImport(TypeMirror typeMirror) {
+        if (typeMirror.getKind() == TypeKind.DECLARED) {
             addTypeToImport(((DeclaredType) typeMirror));
-        } 
+        }
     }
 }

@@ -50,16 +50,14 @@ import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
 /**
- * Annotation processor
- *         http://blog.retep
- *         .org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
- *         https://forums.oracle.com/thread/1184190
+ * Annotation processor http://blog.retep
+ * .org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
+ * https://forums.oracle.com/thread/1184190
  */
 /*
- * TODO static initializers and instance initializers. Done ? 
- * TODO handle inner classes as bounded class ?
+ * TODO static initializers and instance initializers. Done ? TODO handle inner classes as bounded
+ * class ?
  * @author SNI
- *
  */
 @SupportedAnnotationTypes("org.boundbox.BoundBox")
 @SupportedSourceVersion(SourceVersion.RELEASE_6)
@@ -95,60 +93,57 @@ public class BoundBoxProcessor extends AbstractProcessor {
             TypeElement boundClass = null;
             String maxSuperClass = null;
             List<? extends AnnotationMirror> listAnnotationMirrors = classElement.getAnnotationMirrors();
-            if( listAnnotationMirrors ==  null ) {
-                messager.printMessage(Kind.WARNING,
-                        "listAnnotationMirrors is null",
-                        classElement);
+            if (listAnnotationMirrors == null) {
+                messager.printMessage(Kind.WARNING, "listAnnotationMirrors is null", classElement);
                 return true;
             }
 
             String message = "";
-            for( AnnotationMirror annotationMirror : listAnnotationMirrors ) {
-                log.info("mirror " + annotationMirror.getAnnotationType() );
-                Map<? extends ExecutableElement, ? extends AnnotationValue > map = annotationMirror.getElementValues();
-                for( Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
-                    message += entry.getKey().getSimpleName().toString()+"\n";
+            for (AnnotationMirror annotationMirror : listAnnotationMirrors) {
+                log.info("mirror " + annotationMirror.getAnnotationType());
+                Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotationMirror.getElementValues();
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
+                    message += entry.getKey().getSimpleName().toString() + "\n";
                     message += entry.getValue().toString();
-                    if( BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS.equals(entry.getKey().getSimpleName().toString())) {
+                    if (BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS.equals(entry.getKey().getSimpleName().toString())) {
                         boundClass = getAnnotationValueAsTypeElement(entry.getValue());
                     }
-                    if( BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS.equals(entry.getKey().getSimpleName().toString())) {
+                    if (BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS.equals(entry.getKey().getSimpleName().toString())) {
                         maxSuperClass = getAnnotationValueAsTypeElement(entry.getValue()).asType().toString();
                     }
                 }
             }
 
-            if( boundClass ==  null ) {
-                messager.printMessage(Kind.WARNING,
-                        "BoundClass is null : " + message,
-                        classElement);
+            if (boundClass == null) {
+                messager.printMessage(Kind.WARNING, "BoundClass is null : " + message, classElement);
                 return true;
             }
 
-            if( maxSuperClass != null ) {
+            if (maxSuperClass != null) {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
 
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
             listClassInfo.add(classInfo);
 
-            //perform some computations on meta model
+            // perform some computations on meta model
             inheritanceComputer.computeInheritanceAndHiding(classInfo.getListFieldInfos());
             inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos(), boundClass, elements);
 
-            //write meta model to java class file
+            // write meta model to java class file
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
 
-                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName+"."+boundBoxClassName; 
+                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "."
+                        + boundBoxClassName;
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 
                 boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
-                error(classElement, e.getMessage() );
+                error(classElement, e.getMessage());
             }
         }
 
@@ -162,12 +157,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     public List<ClassInfo> getListClassInfo() {
         return listClassInfo;
     }
-    
+
     // ----------------------------------
-    //  PRIVATE METHODS
+    // PRIVATE METHODS
     // ----------------------------------
 
-    private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue ) {
+    private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue) {
         DeclaredType declaredType = (DeclaredType) annotationValue.getValue();
         return (TypeElement) declaredType.asElement();
     }

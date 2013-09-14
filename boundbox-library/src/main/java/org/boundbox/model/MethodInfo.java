@@ -14,41 +14,54 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
-@NoArgsConstructor(access=AccessLevel.PROTECTED) //for testing
-@EqualsAndHashCode(exclude={"returnType", "thrownTypes","effectiveInheritanceLevel","element"})
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+// for testing
+@EqualsAndHashCode(exclude = { "returnType", "thrownTypes", "effectiveInheritanceLevel", "element" })
 @ToString
 public class MethodInfo implements Inheritable {
     // ----------------------------------
-    //  ATTRIBUTES
+    // ATTRIBUTES
     // ----------------------------------
-    protected @Getter String methodName;
-    protected @Getter @Setter TypeMirror returnType;
-    protected @Getter List<FieldInfo> parameterTypes;
-    protected @Getter List<? extends TypeMirror> thrownTypes;
-    private @Getter int inheritanceLevel;
-    private @Getter @Setter int effectiveInheritanceLevel;
-    private @Getter ExecutableElement element;
-    private @Getter @Setter boolean overriden;
-    private @Getter @Setter boolean staticMethod;
+    protected @Getter
+    String methodName;
+    protected @Getter
+    @Setter
+    TypeMirror returnType;
+    protected @Getter
+    List<FieldInfo> parameterTypes;
+    protected @Getter
+    List<? extends TypeMirror> thrownTypes;
+    private @Getter
+    int inheritanceLevel;
+    private @Getter
+    @Setter
+    int effectiveInheritanceLevel;
+    private @Getter
+    ExecutableElement element;
+    private @Getter
+    @Setter
+    boolean overriden;
+    private @Getter
+    @Setter
+    boolean staticMethod;
 
     // ----------------------------------
-    //  CONSTRUCTOR
+    // CONSTRUCTOR
     // ----------------------------------
 
-    public MethodInfo( ExecutableElement element ) {
+    public MethodInfo(ExecutableElement element) {
         this.element = element;
         methodName = element.getSimpleName().toString();
         returnType = element.getReturnType();
         parameterTypes = new ArrayList<FieldInfo>();
         for (VariableElement variableElement : element.getParameters()) {
-            parameterTypes.add( new FieldInfo(variableElement));
-        }      
+            parameterTypes.add(new FieldInfo(variableElement));
+        }
         thrownTypes = element.getThrownTypes();
     }
 
     // ----------------------------------
-    //  PUBLIC METHODS
+    // PUBLIC METHODS
     // ----------------------------------
     public String getReturnTypeName() {
         return returnType.toString();
@@ -63,15 +76,15 @@ public class MethodInfo implements Inheritable {
     }
 
     public boolean isConstructor() {
-        return "<init>".equals( methodName );
+        return "<init>".equals(methodName);
     }
 
     public boolean isInstanceInitializer() {
-        return "".equals( methodName );
+        return "".equals(methodName);
     }
 
     public boolean isStaticInitializer() {
-        return "<clinit>".equals( methodName );
+        return "<clinit>".equals(methodName);
     }
 
     public boolean hasReturnType() {

@@ -17,52 +17,53 @@ import org.boundbox.model.MethodInfo;
 @Log
 public class InheritanceComputer {
 
-    public void computeInheritanceAndHiding( List<FieldInfo> listFieldInfos) {
-        //get min inheritance level of Field.
+    public void computeInheritanceAndHiding(List<FieldInfo> listFieldInfos) {
+        // get min inheritance level of Field.
         Map<String, FieldInfo> mapFieldNameToMinFieldInfo = new HashMap<String, FieldInfo>();
-        for( FieldInfo fieldInfo : listFieldInfos ) {
-            if( ! mapFieldNameToMinFieldInfo.containsKey(fieldInfo.getFieldName())) {
-                mapFieldNameToMinFieldInfo.put( fieldInfo.getFieldName(), fieldInfo);
+        for (FieldInfo fieldInfo : listFieldInfos) {
+            if (!mapFieldNameToMinFieldInfo.containsKey(fieldInfo.getFieldName())) {
+                mapFieldNameToMinFieldInfo.put(fieldInfo.getFieldName(), fieldInfo);
             } else {
                 FieldInfo minFieldInfo = mapFieldNameToMinFieldInfo.get(fieldInfo.getFieldName());
-                if( minFieldInfo.getInheritanceLevel() > fieldInfo.getInheritanceLevel() ) {
-                    mapFieldNameToMinFieldInfo.put( fieldInfo.getFieldName(), fieldInfo);
+                if (minFieldInfo.getInheritanceLevel() > fieldInfo.getInheritanceLevel()) {
+                    mapFieldNameToMinFieldInfo.put(fieldInfo.getFieldName(), fieldInfo);
                 }
             }
         }
 
-        //and replace it to 0
-        for( FieldInfo minFields : mapFieldNameToMinFieldInfo.values() ) {
+        // and replace it to 0
+        for (FieldInfo minFields : mapFieldNameToMinFieldInfo.values()) {
             minFields.setEffectiveInheritanceLevel(0);
         }
     }
 
     public void computeInheritanceAndOverriding(List<MethodInfo> listMethodInfos, TypeElement typeElement, Elements elements) {
-        //put all methods with same name in a list
+        // put all methods with same name in a list
         Map<String, List<MethodInfo>> mapMethodSignatureNameToListMethodInfo = new HashMap<String, List<MethodInfo>>();
-        for( MethodInfo methodInfo : listMethodInfos ) {
-            if( ! mapMethodSignatureNameToListMethodInfo.containsKey(methodInfo.getMethodName())) {
-                mapMethodSignatureNameToListMethodInfo.put( methodInfo.getMethodName(), new ArrayList<MethodInfo>(Arrays.asList(methodInfo)));
+        for (MethodInfo methodInfo : listMethodInfos) {
+            if (!mapMethodSignatureNameToListMethodInfo.containsKey(methodInfo.getMethodName())) {
+                mapMethodSignatureNameToListMethodInfo.put(methodInfo.getMethodName(),
+                        new ArrayList<MethodInfo>(Arrays.asList(methodInfo)));
             } else {
                 List<MethodInfo> methodInfoList = mapMethodSignatureNameToListMethodInfo.get(methodInfo.getMethodName());
                 methodInfoList.add(methodInfo);
             }
         }
 
-        //identify overrides
-        for( Map.Entry<String, List<MethodInfo>> entry : mapMethodSignatureNameToListMethodInfo.entrySet() ) {
+        // identify overrides
+        for (Map.Entry<String, List<MethodInfo>> entry : mapMethodSignatureNameToListMethodInfo.entrySet()) {
             List<MethodInfo> listMethodInfosForName = entry.getValue();
-            for( int i=0;i < listMethodInfosForName.size(); i ++ ) {
-                for( int j=0;j < listMethodInfos.size() && j!=i; j ++ ) {
+            for (int i = 0; i < listMethodInfosForName.size(); i++) {
+                for (int j = 0; j < listMethodInfos.size() && j != i; j++) {
                     MethodInfo left = listMethodInfos.get(i);
                     MethodInfo right = listMethodInfos.get(j);
-                    if( left.getInheritanceLevel() != right.getInheritanceLevel() ) {
-                        if( elements.overrides(left.getElement(), right.getElement(), typeElement)) {
-                            right.setOverriden( true );
-                            log.info( left.getMethodName() +" overrides "+right.getMethodName());
-                        } else if( elements.overrides(right.getElement(), left.getElement(), typeElement)) {
-                            left.setOverriden( true );
-                            log.info( right.getMethodName() +" overrides "+left.getMethodName());
+                    if (left.getInheritanceLevel() != right.getInheritanceLevel()) {
+                        if (elements.overrides(left.getElement(), right.getElement(), typeElement)) {
+                            right.setOverriden(true);
+                            log.info(left.getMethodName() + " overrides " + right.getMethodName());
+                        } else if (elements.overrides(right.getElement(), left.getElement(), typeElement)) {
+                            left.setOverriden(true);
+                            log.info(right.getMethodName() + " overrides " + left.getMethodName());
                         }
                     }
                 }
@@ -70,27 +71,27 @@ public class InheritanceComputer {
             }
         }
 
-        //get min inheritance method
+        // get min inheritance method
         Map<String, MethodInfo> mapMethodNameToMinMethodInfo = new HashMap<String, MethodInfo>();
-        for( Map.Entry<String, List<MethodInfo>> entry : mapMethodSignatureNameToListMethodInfo.entrySet() ) {
+        for (Map.Entry<String, List<MethodInfo>> entry : mapMethodSignatureNameToListMethodInfo.entrySet()) {
             List<MethodInfo> listMethodInfosForName = entry.getValue();
-            for( MethodInfo methodInfo : listMethodInfosForName ) {
+            for (MethodInfo methodInfo : listMethodInfosForName) {
                 String methodName = entry.getKey();
-                if(  !mapMethodNameToMinMethodInfo.containsKey( methodName )) {
-                    mapMethodNameToMinMethodInfo.put( methodName, methodInfo );   
+                if (!mapMethodNameToMinMethodInfo.containsKey(methodName)) {
+                    mapMethodNameToMinMethodInfo.put(methodName, methodInfo);
                 } else {
-                    if( mapMethodNameToMinMethodInfo.get(methodName).getInheritanceLevel() > methodInfo.getInheritanceLevel() ) {
-                        mapMethodNameToMinMethodInfo.put( methodName, methodInfo );   
+                    if (mapMethodNameToMinMethodInfo.get(methodName).getInheritanceLevel() > methodInfo.getInheritanceLevel()) {
+                        mapMethodNameToMinMethodInfo.put(methodName, methodInfo);
                     }
                 }
 
             }
         }
 
-        //and replace it to 0
-        for( Map.Entry<String, MethodInfo> entry : mapMethodNameToMinMethodInfo.entrySet() ) {
-            for( MethodInfo methodInfo : mapMethodSignatureNameToListMethodInfo.get(entry.getKey())) {
-                if( methodInfo.getInheritanceLevel() == entry.getValue().getInheritanceLevel() ) {
+        // and replace it to 0
+        for (Map.Entry<String, MethodInfo> entry : mapMethodNameToMinMethodInfo.entrySet()) {
+            for (MethodInfo methodInfo : mapMethodSignatureNameToListMethodInfo.get(entry.getKey())) {
+                if (methodInfo.getInheritanceLevel() == entry.getValue().getInheritanceLevel()) {
                     methodInfo.setEffectiveInheritanceLevel(0);
                 }
             }

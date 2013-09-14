@@ -17,14 +17,14 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
     @UiThreadTest
     public void testCompute() {
-        //given
-        boundBoxOfMainActivity = new BoundBoxOfMainActivity( getActivity() );
-        
-        //when
+        // given
+        boundBoxOfMainActivity = new BoundBoxOfMainActivity(getActivity());
+
+        // when
         boundBoxOfMainActivity.boundBox_getButtonMain().performClick();
-        
-        //then
-        assertEquals( "42", boundBoxOfMainActivity.boundBox_getTextViewMain().getText() );
+
+        // then
+        assertEquals("42", boundBoxOfMainActivity.boundBox_getTextViewMain().getText());
     }
 
 }

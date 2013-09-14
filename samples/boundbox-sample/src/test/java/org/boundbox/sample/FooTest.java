@@ -8,45 +8,45 @@ import org.boundbox.BoundBox;
 import org.junit.Before;
 import org.junit.Test;
 
-@BoundBox(boundClass=Foo.class)
+@BoundBox(boundClass = Foo.class)
 public class FooTest {
 
     private static BoundBoxOfFoo boundBoxFoo;
 
     @Before
     public void setup() {
-        boundBoxFoo = new BoundBoxOfFoo( BoundBoxOfFoo.boundBox_new() );
+        boundBoxFoo = new BoundBoxOfFoo(BoundBoxOfFoo.boundBox_new());
     }
-    
+
     @Test
     public void test_access_to_field() {
-        assertEquals( "bar", boundBoxFoo.boundBox_getBar());
+        assertEquals("bar", boundBoxFoo.boundBox_getBar());
     }
-    
+
     @Test
     public void test_access_to_method() {
-        assertEquals( 42, boundBoxFoo.foo());
+        assertEquals(42, boundBoxFoo.foo());
     }
 
     @Test
     public void test_access_to_inherited_field() {
-        assertEquals( "bar", boundBoxFoo.boundBox_getMotherBar());
+        assertEquals("bar", boundBoxFoo.boundBox_getMotherBar());
     }
-    
+
     @Test
     public void test_access_to_inherited_method() throws Exception {
-        for( Method method : Foo.class.getDeclaredMethods() ) {
-            System.out.println( method );
+        for (Method method : Foo.class.getDeclaredMethods()) {
+            System.out.println(method);
         }
-        assertEquals( 42, boundBoxFoo.motherFoo(1));
+        assertEquals(42, boundBoxFoo.motherFoo(1));
     }
 
     @Test
     public void test_access_to_inherited_method2() throws Exception {
-        for( Method method : Foo.class.getDeclaredMethods() ) {
-            System.out.println( method );
+        for (Method method : Foo.class.getDeclaredMethods()) {
+            System.out.println(method);
         }
-        assertEquals( 42, boundBoxFoo.motherFoo());
+        assertEquals(42, boundBoxFoo.motherFoo());
     }
 
 }

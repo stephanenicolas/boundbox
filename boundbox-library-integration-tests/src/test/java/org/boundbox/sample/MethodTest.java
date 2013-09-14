@@ -10,17 +10,17 @@ public class MethodTest {
 
     private MethodTestClassB methodTestClassB;
     private MethodTestClassC methodTestClassC;
-    @BoundBox(boundClass=MethodTestClassB.class)
+    @BoundBox(boundClass = MethodTestClassB.class)
     private BoundBoxOfMethodTestClassB boundBoxOfB;
-    @BoundBox(boundClass=MethodTestClassC.class)
+    @BoundBox(boundClass = MethodTestClassC.class)
     private BoundBoxOfMethodTestClassC boundBoxOfC;
 
     @Before
     public void setup() {
         methodTestClassB = new MethodTestClassB();
         methodTestClassC = new MethodTestClassC();
-        boundBoxOfB = new BoundBoxOfMethodTestClassB( methodTestClassB);
-        boundBoxOfC = new BoundBoxOfMethodTestClassC( methodTestClassC);
+        boundBoxOfB = new BoundBoxOfMethodTestClassB(methodTestClassB);
+        boundBoxOfC = new BoundBoxOfMethodTestClassC(methodTestClassC);
     }
 
     @Test

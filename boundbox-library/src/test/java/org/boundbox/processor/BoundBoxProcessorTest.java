@@ -45,9 +45,9 @@ public class BoundBoxProcessorTest {
     @Before
     public void setup() throws IOException {
         boundBoxProcessor = new BoundBoxProcessor();
-        boundBoxProcessor.setBoundboxWriter( EasyMock.createNiceMock(IBoundboxWriter.class));
+        boundBoxProcessor.setBoundboxWriter(EasyMock.createNiceMock(IBoundboxWriter.class));
         sandBoxDir = new File("target/sandbox");
-        if( sandBoxDir.exists() ) {
+        if (sandBoxDir.exists()) {
             FileUtils.deleteDirectory(sandBoxDir);
         }
         sandBoxDir.mkdirs();
@@ -55,13 +55,13 @@ public class BoundBoxProcessorTest {
 
     @After
     public void tearDown() throws IOException {
-        if( sandBoxDir.exists() ) {
-            //FileUtils.deleteDirectory(sandBoxDir);
+        if (sandBoxDir.exists()) {
+            // FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
     // ----------------------------------
-    //  FIELDS
+    // FIELDS
     // ----------------------------------
     @Test
     public void testProcess_class_with_single_field() throws URISyntaxException {
@@ -83,7 +83,7 @@ public class BoundBoxProcessorTest {
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, fakeFieldInfo);
     }
-    
+
     @Test
     public void testProcess_class_with_many_fields() throws URISyntaxException {
         // given
@@ -113,7 +113,7 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    //  STATIC FIELDS
+    // STATIC FIELDS
     // ----------------------------------
     @Test
     public void testProcess_class_with_static_field() throws URISyntaxException {
@@ -136,9 +136,8 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo);
     }
 
-
     // ----------------------------------
-    //  CONSTRUCTOR
+    // CONSTRUCTOR
     // ----------------------------------
     @Test
     public void testProcess_class_with_single_constructor() throws URISyntaxException {
@@ -156,7 +155,7 @@ public class BoundBoxProcessorTest {
 
         List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
-        assertEquals( 1, listConstructorInfos.size());
+        assertEquals(1, listConstructorInfos.size());
     }
 
     @Test
@@ -188,17 +187,19 @@ public class BoundBoxProcessorTest {
         assertContains(listConstructorInfos, fakeMethodInfo3);
 
         FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt,paramObject2), null);
+        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2), null);
         assertContains(listConstructorInfos, fakeMethodInfo4);
 
         FieldInfo paramObject3 = new FakeFieldInfo("c", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt,paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("<init>", "void",
+                Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(),
+                        RuntimeException.class.getName()));
         assertContains(listConstructorInfos, fakeMethodInfo5);
 
     }
 
     // ----------------------------------
-    //  METHODS
+    // METHODS
     // ----------------------------------
 
     @Test
@@ -217,7 +218,7 @@ public class BoundBoxProcessorTest {
 
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
-        assertEquals( 1, listMethodInfos.size());
+        assertEquals(1, listMethodInfos.size());
     }
 
     @Test
@@ -249,22 +250,28 @@ public class BoundBoxProcessorTest {
         assertContains(listMethodInfos, fakeMethodInfo3);
 
         FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("withManyArguments", "void", Arrays.asList(paramInt,paramObject2), null);
+        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("withManyArguments", "void", Arrays.asList(paramInt, paramObject2),
+                null);
         assertContains(listMethodInfos, fakeMethodInfo4);
 
-        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("withPrimitiveIntReturnType", int.class.getName(), new ArrayList<FieldInfo>(), null);
+        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("withPrimitiveIntReturnType", int.class.getName(),
+                new ArrayList<FieldInfo>(), null);
         assertContains(listMethodInfos, fakeMethodInfo5);
 
-        FakeMethodInfo fakeMethodInfo6 = new FakeMethodInfo("withPrimitiveDoubleReturnType", double.class.getName(), new ArrayList<FieldInfo>(), null);
+        FakeMethodInfo fakeMethodInfo6 = new FakeMethodInfo("withPrimitiveDoubleReturnType", double.class.getName(),
+                new ArrayList<FieldInfo>(), null);
         assertContains(listMethodInfos, fakeMethodInfo6);
 
-        FakeMethodInfo fakeMethodInfo7 = new FakeMethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(), new ArrayList<FieldInfo>(), null);
+        FakeMethodInfo fakeMethodInfo7 = new FakeMethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(),
+                new ArrayList<FieldInfo>(), null);
         assertContains(listMethodInfos, fakeMethodInfo7);
 
-        FakeMethodInfo fakeMethodInfo8= new FakeMethodInfo("withSingleThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName()));
+        FakeMethodInfo fakeMethodInfo8 = new FakeMethodInfo("withSingleThrownType", "void", new ArrayList<FieldInfo>(),
+                Arrays.asList(IOException.class.getName()));
         assertContains(listMethodInfos, fakeMethodInfo8);
 
-        FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(),
+                Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listMethodInfos, fakeMethodInfo9);
     }
 
@@ -288,12 +295,12 @@ public class BoundBoxProcessorTest {
 
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
-        assertEquals( 1, listMethodInfos.size());
-        assertTrue( listMethodInfos.get(0).isStaticMethod());
+        assertEquals(1, listMethodInfos.size());
+        assertTrue(listMethodInfos.get(0).isStaticMethod());
     }
 
     // ----------------------------------
-    //  INHERITANCE 
+    // INHERITANCE
     // ----------------------------------
     @Test
     public void testProcess_class_with_inherited_field_for_inheritance() throws URISyntaxException {
@@ -314,8 +321,9 @@ public class BoundBoxProcessorTest {
         assertEquals("TestClassWithInheritedField", listSuperClassNames.get(0));
         assertEquals("TestClassWithSingleField", listSuperClassNames.get(1));
     }
+
     // ----------------------------------
-    //  INHERITANCE OF FIELDS
+    // INHERITANCE OF FIELDS
     // ----------------------------------
     @Test
     public void testProcess_class_with_inherited_field() throws URISyntaxException {
@@ -343,7 +351,8 @@ public class BoundBoxProcessorTest {
     @Test
     public void testProcess_class_with_inherited_and_conflicting_field() throws URISyntaxException {
         // given
-        String[] testSourceFileNames = new String[] { "TestClassWithInheritedAndHidingField.java", "TestClassWithSingleField.java" };
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedAndHidingField.java",
+                "TestClassWithSingleField.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
@@ -367,7 +376,7 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    //  INHERITANCE OF METHODS
+    // INHERITANCE OF METHODS
     // ----------------------------------
     @Test
     public void testProcess_class_with_inherited_method() throws URISyntaxException {
@@ -422,7 +431,8 @@ public class BoundBoxProcessorTest {
     @Test
     public void testProcess_class_with_inherited_overriding_method() throws URISyntaxException {
         // given
-        String[] testSourceFileNames = new String[] { "TestClassWithInheritedOverridingMethod.java", "TestClassWithOverridingMethod.java", "TestClassWithSingleMethod.java" };
+        String[] testSourceFileNames = new String[] { "TestClassWithInheritedOverridingMethod.java",
+                "TestClassWithOverridingMethod.java", "TestClassWithSingleMethod.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
@@ -448,9 +458,9 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    //  IMPORTS
+    // IMPORTS
     // ----------------------------------
-    
+
     @Test
     public void testProcess_class_with_imports() throws URISyntaxException {
         // given
@@ -465,12 +475,12 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        assertTrue( classInfo.getListImports().contains("foo.TestClassWithImports"));
-        assertTrue( classInfo.getListImports().contains(IOException.class.getName()));
-        assertTrue( classInfo.getListImports().contains(File.class.getName()));
-        assertTrue( classInfo.getListImports().contains(CountDownLatch.class.getName()));
+        assertTrue(classInfo.getListImports().contains("foo.TestClassWithImports"));
+        assertTrue(classInfo.getListImports().contains(IOException.class.getName()));
+        assertTrue(classInfo.getListImports().contains(File.class.getName()));
+        assertTrue(classInfo.getListImports().contains(CountDownLatch.class.getName()));
     }
-    
+
     @Test
     public void testProcess_class_with_parametrized_imports() throws URISyntaxException {
         // given
@@ -485,17 +495,17 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        assertTrue( classInfo.getListImports().contains("foo.TestClassWithParametrizedImports"));
-        assertTrue( classInfo.getListImports().contains(IOException.class.getName()));
-        assertTrue( classInfo.getListImports().contains(File.class.getName()));
-        assertTrue( classInfo.getListImports().contains(CountDownLatch.class.getName()));
-        assertTrue( classInfo.getListImports().contains(Set.class.getName()));
-        assertTrue( classInfo.getListImports().contains(List.class.getName()));
-        assertTrue( classInfo.getListImports().contains(HashMap.class.getName()));
+        assertTrue(classInfo.getListImports().contains("foo.TestClassWithParametrizedImports"));
+        assertTrue(classInfo.getListImports().contains(IOException.class.getName()));
+        assertTrue(classInfo.getListImports().contains(File.class.getName()));
+        assertTrue(classInfo.getListImports().contains(CountDownLatch.class.getName()));
+        assertTrue(classInfo.getListImports().contains(Set.class.getName()));
+        assertTrue(classInfo.getListImports().contains(List.class.getName()));
+        assertTrue(classInfo.getListImports().contains(HashMap.class.getName()));
     }
 
     // ----------------------------------
-    //  PRIVATE METHODS
+    // PRIVATE METHODS
     // ----------------------------------
 
     private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor)
@@ -546,7 +556,7 @@ public class BoundBoxProcessorTest {
         assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
         assertEquals(fakeMethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
 
-        for( int indexThrownType =0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType ++ ) {
+        for (int indexThrownType = 0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType++) {
             TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
             assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
         }
@@ -569,6 +579,5 @@ public class BoundBoxProcessorTest {
         }
         return null;
     }
-
 
 }

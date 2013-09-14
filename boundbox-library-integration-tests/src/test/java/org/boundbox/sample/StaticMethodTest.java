@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.boundbox.BoundBox;
 import org.junit.Test;
 
-@BoundBox(boundClass=StaticMethodTestClass.class)
+@BoundBox(boundClass = StaticMethodTestClass.class)
 public class StaticMethodTest {
 
     @Test
