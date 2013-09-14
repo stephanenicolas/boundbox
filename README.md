@@ -61,7 +61,7 @@ public class ATest {
    boundBoxOfA.bar("cc");
    
    //THEN
-   assertEquals( "bbcc", boundBoxOfA.boundBox_getFoo();
+   assertEquals( "cc", boundBoxOfA.boundBox_getFoo();
  }
  
  @Test
