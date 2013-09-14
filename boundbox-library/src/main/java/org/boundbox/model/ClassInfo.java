@@ -3,7 +3,11 @@ package org.boundbox.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ClassInfo {
+    public static final String DEFAULT_BOUND_BOX_OF_CLASS_PREFIX = "BoundBoxOf";
+    
     private String className;
     private List<FieldInfo> listFieldInfos;
     private List<MethodInfo> listMethodInfos;
@@ -17,13 +21,13 @@ public class ClassInfo {
     public ClassInfo(String className) {
         this.className = className;
         if( className.contains(".")) {
-            targetPackageName = className.substring(0, className.lastIndexOf('.'));
-            targetClassName = className.substring(className.lastIndexOf('.')+1);
+            targetPackageName = StringUtils.substringBeforeLast(className, ".");
+            targetClassName = StringUtils.substringAfterLast(className, ".");
         } else {
-            targetPackageName = "";
+            targetPackageName = StringUtils.EMPTY;
             targetClassName = className;
         }
-        boundBoxClassName = "BoundBoxOf"+targetClassName;
+        boundBoxClassName = DEFAULT_BOUND_BOX_OF_CLASS_PREFIX+targetClassName;
         listSuperClassNames = new ArrayList<String>();
         listSuperClassNames.add(className);
     }

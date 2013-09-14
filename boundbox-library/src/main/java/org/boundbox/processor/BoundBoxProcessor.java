@@ -20,7 +20,6 @@ package org.boundbox.processor;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,21 +36,14 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
-import org.boundbox.model.FieldInfo;
-import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
@@ -79,7 +71,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Elements elements;
     private IBoundboxWriter boundboxWriter = new BoundboxWriter();
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
-    private BoundClassVisitor boundClassVisitor = new BoundClassVisitor();
+    private BoundClassScanner boundClassVisitor = new BoundClassScanner();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
 
     @Override
@@ -115,10 +107,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     message += entry.getKey().getSimpleName().toString()+"\n";
                     message += entry.getValue().toString();
                     if( BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS.equals(entry.getKey().getSimpleName().toString())) {
-                        boundClass = getBoundClassAsTypeElement(entry);
+                        boundClass = getAnnotationValueAsTypeElement(entry.getValue());
                     }
                     if( BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS.equals(entry.getKey().getSimpleName().toString())) {
-                        maxSuperClass = getBoundClassAsTypeElement(entry).asType().toString();
+                        maxSuperClass = getAnnotationValueAsTypeElement(entry.getValue()).asType().toString();
                     }
                 }
             }
@@ -150,7 +142,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
                 Writer out = sourceFile.openWriter();
 
-
                 boundboxWriter.writeBoundBox(classInfo, out);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -173,140 +164,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     //  PRIVATE METHODS
     // ----------------------------------
 
-    private TypeElement getBoundClassAsTypeElement(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
-        AnnotationValue annotationValue = entry.getValue();
+    private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue ) {
         DeclaredType declaredType = (DeclaredType) annotationValue.getValue();
         return (TypeElement) declaredType.asElement();
     }
 
     private void error(final Element element, final String message) {
         messager.printMessage(Kind.ERROR, message, element);
-    }
-
-    // ----------------------------------
-    // INNER CLASS
-    // ----------------------------------
-    public final static class BoundClassVisitor extends ElementKindVisitor6<Void, Integer> {
-
-        private String maxSuperClassName = Object.class.getName();
-        private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
-        protected List<String> listSuperClassNames = new ArrayList<String>();
-        private Set<String> listImports = new HashSet<String>();
-
-        public ClassInfo scan( TypeElement boundClass ) {
-            listSuperClassNames.add(boundClass.toString());
-            boundClass.accept(this, 0);
-            ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
-            classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
-            classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
-            classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
-            classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
-            classInfo.setListImports(new ArrayList<String>(listImports));
-            listConstructorInfos.clear();
-            listMethodInfos.clear();
-            listFieldInfos.clear();
-            listSuperClassNames.clear();
-            maxSuperClassName = Object.class.getName();
-            return classInfo;
-        }
-
-        public void setMaxSuperClass(Class<?> maxSuperClass) {
-            this.maxSuperClassName = maxSuperClass.getName();
-        }
-
-        public void setMaxSuperClass(String className ) {
-            this.maxSuperClassName = className;
-        }
-
-        public String getMaxSuperClass() {
-            return maxSuperClassName;
-        }
-        
-        @Override
-        public Void visitTypeAsClass(TypeElement e, final Integer inheritanceLevel) {
-            System.out.println("class ->" + e.getSimpleName());
-            boolean isInnerClass = e.getNestingKind().isNested();
-            System.out.println("nested ->" + isInnerClass);
-            if( isInnerClass ) {
-                return super.visitTypeAsClass(e, inheritanceLevel);
-            }
-
-            if( inheritanceLevel == 0 ) {
-                listImports.add(e.getQualifiedName().toString());
-            }
-
-
-            //http://stackoverflow.com/q/7738171/693752
-            for (Element enclosedElement : e.getEnclosedElements()) {
-                enclosedElement.accept(this, inheritanceLevel);
-            }
-
-            System.out.println("super class ->" + e.getSuperclass().toString());
-            TypeMirror superclassOfBoundClass = e.getSuperclass();
-            if( !maxSuperClassName.equals(superclassOfBoundClass.toString()) ) {
-                if( superclassOfBoundClass.getKind() == TypeKind.DECLARED ) {
-                    DeclaredType superClassDeclaredType = (DeclaredType)superclassOfBoundClass;
-                    Element superClassElement = superClassDeclaredType.asElement();
-                    listSuperClassNames.add(superClassElement.getSimpleName().toString());
-                    superClassElement.accept(BoundClassVisitor.this, inheritanceLevel + 1);
-                }
-            }
-            return super.visitTypeAsClass(e, inheritanceLevel);
-        }
-
-        @Override
-        public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
-            System.out.println("executable ->" + e.getSimpleName());
-            MethodInfo methodInfo = new MethodInfo(e);
-            if( methodInfo.isConstructor() ) {
-                if( inheritanceLevel ==0 ) {
-                    listConstructorInfos.add(methodInfo);
-                }
-            } else {
-                methodInfo.setStaticMethod(e.getModifiers().contains(Modifier.STATIC));
-                methodInfo.setInheritanceLevel( inheritanceLevel );
-                //prevents methods overriden in subclass to be re-added in super class. 
-                listMethodInfos.add( methodInfo);
-            }
-            addTypeToImport(e.getReturnType());
-            for( VariableElement param : e.getParameters()) {
-                addTypeToImport(param.asType());
-            }
-            for( TypeMirror thrownType : e.getThrownTypes()) {
-                addTypeToImport(thrownType);
-            }
-
-            return super.visitExecutable(e, inheritanceLevel);
-        }
-
-        @Override
-        public Void visitVariableAsField(VariableElement e, Integer inheritanceLevel) {
-            FieldInfo fieldInfo = new FieldInfo(e);
-            fieldInfo.setInheritanceLevel( inheritanceLevel );
-            fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
-            listFieldInfos.add( fieldInfo);
-            System.out.println("field ->" + fieldInfo.getFieldName() + " added." );
-
-            addTypeToImport(e.asType());
-
-            return super.visitVariableAsField(e, inheritanceLevel);
-        }
-
-        private void addTypeToImport( DeclaredType declaredType) {
-            System.out.println("Adding to imports"+declaredType.toString().replaceAll("<*>",""));
-            //removes parameters from type if it has some
-            listImports.add(declaredType.toString().replaceAll("<.*>",""));
-            for( TypeMirror typeArgument : declaredType.getTypeArguments() ) {
-                addTypeToImport(typeArgument);
-            }
-        }
-
-        private void addTypeToImport( TypeMirror typeMirror) {
-            if( typeMirror.getKind() == TypeKind.DECLARED ) {
-                addTypeToImport(((DeclaredType) typeMirror));
-            }
-        }
     }
 }
