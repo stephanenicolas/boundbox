@@ -1,5 +1,6 @@
 package org.boundbox.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClassInfo {
@@ -23,6 +24,8 @@ public class ClassInfo {
             targetClassName = className;
         }
         boundBoxClassName = "BoundBoxOf"+targetClassName;
+        listSuperClassNames = new ArrayList<String>();
+        listSuperClassNames.add(className);
     }
 
     public String getClassName() {

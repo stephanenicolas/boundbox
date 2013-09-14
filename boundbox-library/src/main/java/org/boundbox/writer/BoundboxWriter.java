@@ -24,11 +24,9 @@ import com.squareup.javawriter.JavaWriter;
 
 public class BoundboxWriter implements IBoundboxWriter {
 
+    private static final String SUPPRESS_WARNINGS_ALL = "SuppressWarnings(\"all\")";
     private static final String CODE_DECORATOR_TITLE_PREFIX = "\t";
     private static final String CODE_DECORATOR = "******************************";
-
-    // TODO : refactor as
-    // public void writeBoundBox(ClassInfo boundClassInfo, Writer writer) throws IOException {
 
     @Override
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
@@ -51,7 +49,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             classInfo.getListImports().add(BoundBoxException.class.getName());
             writer.emitImports(classInfo.getListImports());
 
-            writer.emitAnnotation("SuppressWarnings(\"all\")");
+            writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
             writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null)
             //
             .emitEmptyLine()
@@ -84,6 +82,8 @@ public class BoundboxWriter implements IBoundboxWriter {
                 writer.emitEmptyLine();
                 createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
             }
+            
+            //TODO process inner classes
 
             writer.endType();
             writer.close();
@@ -113,12 +113,12 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
         writer.beginMethod("void", setterName, modifiers, fieldType, fieldName);
         writer.beginControlFlow("try");
-        String superClassChain = getSuperClassChain(fieldInfo);
+        String superClassChain = getSuperClassChain(fieldInfo, listSuperClassNames);
         if (fieldInfo.isStaticField()) {
-            writer.emitStatement("Field field = boundClass" + superClassChain + ".getDeclaredField(%s)",
+            writer.emitStatement("Field field = " + superClassChain + ".getDeclaredField(%s)",
                     JavaWriter.stringLiteral(fieldName));
         } else {
-            writer.emitStatement("Field field = boundObject.getClass()" + superClassChain + ".getDeclaredField(%s)",
+            writer.emitStatement("Field field = " + superClassChain + ".getDeclaredField(%s)",
                     JavaWriter.stringLiteral(fieldName));
         }
         writer.emitStatement("field.setAccessible(true)");
@@ -144,12 +144,12 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
         writer.beginMethod(fieldType, getterName, modifiers);
         writer.beginControlFlow("try");
-        String superClassChain = getSuperClassChain(fieldInfo);
+        String superClassChain = getSuperClassChain(fieldInfo, listSuperClassNames);
         if (fieldInfo.isStaticField()) {
-            writer.emitStatement("Field field = boundClass" + superClassChain + ".getDeclaredField(%s)",
+            writer.emitStatement("Field field = " + superClassChain + ".getDeclaredField(%s)",
                     JavaWriter.stringLiteral(fieldName));
         } else {
-            writer.emitStatement("Field field = boundObject.getClass()" + superClassChain + ".getDeclaredField(%s)",
+            writer.emitStatement("Field field = " + superClassChain + ".getDeclaredField(%s)",
                     JavaWriter.stringLiteral(fieldName));
         }
         writer.emitStatement("field.setAccessible(true)");
@@ -163,38 +163,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endMethod();
     }
 
-    private String createSignatureGetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
-        String getterName;
-        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_get" + fieldNameCamelCase;
-        } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
-            getterName = "boundBox_super_" + superClassName + "_get" + fieldNameCamelCase;
-        }
-        return getterName;
-    }
-
-    private String createSignatureSetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
-        String getterName;
-        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_set" + fieldNameCamelCase;
-        } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
-            getterName = "boundBox_super_" + superClassName + "_set" + fieldNameCamelCase;
-        }
-        return getterName;
-    }
-
-    private String createSignatureMethod(MethodInfo methodInfo, List<String> listSuperClassNames) {
-        String getterName;
-        if (methodInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = methodInfo.getMethodName();
-        } else {
-            String superClassName = listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel());
-            getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
-        }
-        return getterName;
-    }
 
     private void createMethodWrapper(JavaWriter writer, MethodInfo methodInfo, String targetClassName,
             List<String> listSuperClassNames) throws IOException {
@@ -232,15 +200,15 @@ public class BoundboxWriter implements IBoundboxWriter {
         // emit method retrieval
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
-        String superClassChain = getSuperClassChain(methodInfo);
+        String superClassChain = getSuperClassChain(methodInfo, listSuperClassNames);
         if (parameterTypeList.isEmpty()) {
             if (isConstructor || methodInfo.isInstanceInitializer() ) {
                 writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor()", targetClassName);
             } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement("Method method = boundClass" + superClassChain + ".getDeclaredMethod(%s)",
+                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s)",
                         JavaWriter.stringLiteral(methodName));
             } else {
-                writer.emitStatement("Method method = boundObject.getClass()" + superClassChain + ".getDeclaredMethod(%s)",
+                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s)",
                         JavaWriter.stringLiteral(methodName));
             }
         } else {
@@ -248,10 +216,10 @@ public class BoundboxWriter implements IBoundboxWriter {
                 writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor(%s)", targetClassName,
                         parametersTypesCommaSeparated);
             } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement("Method method = boundClass" + superClassChain + ".getDeclaredMethod(%s,%s)",
+                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s,%s)",
                         JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             } else {
-                writer.emitStatement("Method method = boundObject.getClass()" + superClassChain + ".getDeclaredMethod(%s,%s)",
+                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s,%s)",
                         JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             }
         }
@@ -295,12 +263,41 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endMethod();
     }
 
-    private String getSuperClassChain(Inheritable inheritable) {
-        String superClassChain = "";
-        for (int inheritanceLevel = 0; inheritanceLevel < inheritable.getInheritanceLevel(); inheritanceLevel++) {
-            superClassChain += ".getSuperclass()";
+    private String createSignatureGetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+        String getterName;
+        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
+            getterName = "boundBox_get" + fieldNameCamelCase;
+        } else {
+            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
+            getterName = "boundBox_super_" + superClassName + "_get" + fieldNameCamelCase;
         }
-        return superClassChain;
+        return getterName;
+    }
+
+    private String createSignatureSetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+        String getterName;
+        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
+            getterName = "boundBox_set" + fieldNameCamelCase;
+        } else {
+            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
+            getterName = "boundBox_super_" + superClassName + "_set" + fieldNameCamelCase;
+        }
+        return getterName;
+    }
+
+    private String createSignatureMethod(MethodInfo methodInfo, List<String> listSuperClassNames) {
+        String getterName;
+        if (methodInfo.getEffectiveInheritanceLevel() == 0) {
+            getterName = methodInfo.getMethodName();
+        } else {
+            String superClassName = listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel());
+            getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
+        }
+        return getterName;
+    }
+    
+    private String getSuperClassChain(Inheritable inheritable, List<String> listSuperClassNames) {
+        return listSuperClassNames.get(inheritable.getInheritanceLevel())+".class";
     }
 
     private void addReflectionExceptionCatchClause(JavaWriter writer, Class<? extends Exception> exceptionClass)
