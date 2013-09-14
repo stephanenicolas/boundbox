@@ -32,6 +32,9 @@ before_install:
   # Create and start emulator
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
+  - git clone git://github.com/mosabua/maven-android-sdk-deployer.git
+  - cd /home/travis/build/stephanenicolas/boundbox/maven-android-sdk-deployer/platforms/android-17
+  - mvn install -N --quiet
   
 # We will run findbugs and checkstyle in the script phase
 install: mvn install --quiet -DskipTests=true -Dmaven.javadoc.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
