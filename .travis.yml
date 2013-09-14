@@ -1,0 +1,21 @@
+#Thanks to https://raw.github.com/embarkmobile/android-maven-example/master/.travis.yml
+
+branches:
+  only:
+    - master
+
+language: java
+jdk: oraclejdk6
+
+before_install:
+  # check the travis file
+  - gem install travis-lint
+  - travis-lint
+  # Install base Android SDK
+  - sudo apt-get update -qq
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq -o Dpkg::Options::="--force-confold" --force-yes --yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null ; fi
+
+# We will run findbugs and checkstyle in the script phase
+install: mvn install --quiet -DskipTests=true -Dmaven.javadoc.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
+
+script: mvn install -Dandroid.device=test -Dmaven.javadoc.skip=true
