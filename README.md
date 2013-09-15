@@ -11,7 +11,7 @@ For more information, have a look at [BoundBox's Wiki](https://github.com/stepha
 Sample
 ------
 
-Let's say we have a class A like :
+Let's say we have a class A with private fields, constructors and methods like :
 
 ```java
 public class A {
@@ -32,7 +32,8 @@ public class A {
 ```
 
 With BoundBox, you can write a test that accesses all fields and methods of `A`. 
-When you write the statement : `@BoundBox(boundClass=A.class)`, the BoundBox annotation 
+
+Below, as soon as you write the statement : `@BoundBox(boundClass=A.class)`, the BoundBox annotation 
 processor will generate the class `BoundBoxOfA` that you can use to access all inner fields, constructors and methods of `A`.
 
 
