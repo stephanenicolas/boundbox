@@ -87,6 +87,12 @@ BoundBox offers the following advantages over alternative technologies :
 
 BoundBox has been designed for systems that are hard to tests. For instance, you will find a sample that shows how to test an Android activity pretty easily.
 
+Quality of code 
+---------------
+
+BoundBox is heavily tested to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
+It also integrates checkstyle, findbugs, PMD to increase its robustness.
+
 License
 -------
 
