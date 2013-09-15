@@ -1,7 +1,7 @@
 BoundBox
 ========
 
-BoundBox provides an easy way to test an object by accessing **all** its fields, constructor and methods, public or not. 
+BoundBox provides an easy way to test an object by accessing **all** its fields, constructors and methods, public or not. 
 BoundBox breaks encapsulation.
 
 For more information, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
@@ -77,7 +77,7 @@ public class ATest {
 Summary
 -------
 
-BoundBox API is quite simple. Indeed in has no API at all, just a set of conventions to access the inner structure of an Object.
+BoundBox API is quite simple. Indeed in has no API at all, just a set of conventions to access the inner structure of an `Object`.
 
 BoundBox offers the following advantages over alternative technologies : 
 * don't pollute your API under tests. Just code clean, don't change anything for testing even not a visibility modifier.
