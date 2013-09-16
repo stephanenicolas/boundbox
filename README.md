@@ -4,12 +4,86 @@ BoundBox
 BoundBox provides an easy way to test an object by accessing **all** its fields, constructors and methods, public or not. 
 BoundBox breaks encapsulation.
 
-For more information, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
+BoundBox has been designed with Android in mind. But it will work for pure Java projects as well (J2SE and JEE), for instance to test legacy code.
 
-[![Build Status](https://travis-ci.org/stephanenicolas/boundbox.png?branch=master)](https://travis-ci.org/stephanenicolas/boundbox)
+Here below are two samples : one for Android, and one for pure Java. 
 
-Sample
-------
+To get started, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
+
+BoundBox is under CI on Travis : [![Build Status](https://travis-ci.org/stephanenicolas/boundbox.png?branch=master)](https://travis-ci.org/stephanenicolas/boundbox)
+
+Android Sample
+--------------
+
+On Android, such a class would be very hard to test. 
+All logic is completely intricated into an activity life cycle method and all fields are private.
+
+```java
+public class MainActivity extends Activity {
+
+    // -------------------------------
+    // ATTRIBUTES
+    // -------------------------------
+
+    private Button buttonMain;
+    private TextView textViewMain;
+
+    // -------------------------------
+    // LIFECYCLE
+    // -------------------------------
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        buttonMain = (Button) findViewById(R.id.button_main);
+        textViewMain = (TextView) findViewById(R.id.textview_main);
+        buttonMain.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final int result = 42;
+                textViewMain.setText(String.valueOf(result));
+            }
+        });
+    }
+}
+```
+
+***
+
+With BoundBox, without changing anynthing to your activity's code, you can access its private fields, or methods.
+Below, as soon as you write the statement : `@BoundBox(boundClass=MainActivity.class)`, the BoundBox annotation 
+processor will generate the class `BoundBoxOfMainActivity` that you can use to access all inner fields, constructors and methods of `MainActivity`.
+
+An Android test is then as easy as : 
+
+```java
+@BoundBox(boundClass = MainActivity.class, maxSuperClass = Activity.class)
+public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
+
+    BoundBoxOfMainActivity boundBoxOfMainActivity;
+
+    public MainActivityTest() {
+        super(MainActivity.class);
+    }
+
+    @UiThreadTest
+    public void testCompute() {
+        // given
+        boundBoxOfMainActivity = new BoundBoxOfMainActivity(getActivity());
+
+        // when
+        boundBoxOfMainActivity.boundBox_getButtonMain().performClick();
+
+        // then
+        assertEquals("42", boundBoxOfMainActivity.boundBox_getTextViewMain().getText());
+    }
+
+}
+```
+
+Pure Java Sample
+----------------
 
 Let's say we have a class A with private fields, constructors and methods like :
 
@@ -78,20 +152,18 @@ public class ATest {
 Summary
 -------
 
-BoundBox API is quite simple. Indeed in has no API at all, just a set of conventions to access the inner structure of an `Object`.
+BoundBox's API is quite simple. Indeed in has no API at all, just a set of conventions to access the inner structure of an `Object`.
 
 BoundBox offers the following advantages over alternative technologies : 
-* don't pollute your API under tests. Just code clean, don't change anything for testing even not a visibility modifier.
+* it doesn't pollute your API under tests. Just code clean, don't change anything for testing even not a visibility modifier.
 * objects under tests will be accessed using reflection, and this access will be checked at compile time (unlike using pure reflection or WhiteBox from PowerMock).
 * all fields, constructors and methods, even those defined in super classes are accessible. For instance, it allows to access `foo.super.super.a`.
-
-BoundBox has been designed for systems that are hard to tests. For instance, you will find a sample that shows how to test an Android activity pretty easily.
 
 Quality of code 
 ---------------
 
 BoundBox is heavily tested to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
-It also integrates checkstyle, findbugs, PMD to increase its robustness.
+It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease th amount of code.
 
 License
 -------
