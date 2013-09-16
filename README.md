@@ -15,8 +15,8 @@ BoundBox is under CI on Travis : [![Build Status](https://travis-ci.org/stephane
 Android Sample
 --------------
 
-On Android, such a class would be very hard to test. 
-All logic is completely intricated into an activity life cycle method and all fields are private.
+On Android, the class below would be very hard to test. 
+All logic is completely imbricated into an activity life cycle method and all fields are private.
 
 ```java
 public class MainActivity extends Activity {
@@ -51,11 +51,12 @@ public class MainActivity extends Activity {
 
 ***
 
-With BoundBox, without changing anynthing to your activity's code, you can access its private fields, or methods.
-Below, as soon as you write the statement : `@BoundBox(boundClass=MainActivity.class)`, the BoundBox annotation 
+With BoundBox, without changing anything to your activity's code, you can access its private fields, or methods.
+
+In the test below, as soon as you write the statement : `@BoundBox(boundClass=MainActivity.class)`, the BoundBox annotation 
 processor will generate the class `BoundBoxOfMainActivity` that you can use to access all inner fields, constructors and methods of `MainActivity`.
 
-An Android test is then as easy as : 
+An Android test becomes as easy as : 
 
 ```java
 @BoundBox(boundClass = MainActivity.class, maxSuperClass = Activity.class)
@@ -81,6 +82,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
 
 }
 ```
+
+Note that, using [FEST-Android](http://square.github.io/fest-android/) can make things even simpler.
 
 Pure Java Sample
 ----------------
@@ -163,7 +166,7 @@ Quality of code
 ---------------
 
 BoundBox is heavily tested to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
-It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease th amount of code.
+It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease the amount of code to write and maintain.
 
 License
 -------
