@@ -14,8 +14,8 @@ before_install:
   # Install base Android SDK
   - sudo apt-get update -qq
   - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq -o Dpkg::Options::="--force-confold" --force-yes --yes libgd2-xpm ia32-libs ia32-libs-multiarch > /dev/null ; fi
-  - wget http://dl.google.com/android/android-sdk_r22.0.1-linux.tgz
-  - tar xzf android-sdk_r22.0.1-linux.tgz
+  - wget http://dl.google.com/android/android-sdk_r22.0.5-linux.tgz
+  - tar xzf android-sdk_r22.0.5-linux.tgz
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 
@@ -49,7 +49,7 @@ before_install:
   - mkdir target
   - git clone git://github.com/mosabua/maven-android-sdk-deployer.git target/maven-android-sdk-deployer
   - cd /home/travis/build/stephanenicolas/boundbox/target/maven-android-sdk-deployer/platforms/android-18
-  - mvn install 
+  - mvn clean install -N 
   - cd -
   
 # We will run findbugs and checkstyle in the script phase
