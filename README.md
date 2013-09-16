@@ -4,13 +4,9 @@ BoundBox
 BoundBox provides an easy way to test an object by accessing **all** its fields, constructors and methods, public or not. 
 BoundBox breaks encapsulation.
 
-BoundBox has been designed with Android in mind. But it will work for pure Java projects as well (J2SE and JEE), for instance to test legacy code.
-
-Here below are two samples : one for Android, and one for pure Java. 
+BoundBox has been designed with *Android* in mind. But it will work for *pure Java* projects as well (J2SE and JEE), for instance to test legacy code.
 
 To get started, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
-
-BoundBox is under CI on Travis <br/><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/>
 
 Android Sample
 --------------
@@ -167,6 +163,9 @@ Quality of code
 
 BoundBox is heavily tested to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
 It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease the amount of code to write and maintain.
+
+
+BoundBox is under CI on Travis <br/><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/>
 
 License
 -------
