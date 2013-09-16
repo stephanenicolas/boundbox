@@ -1,3 +1,5 @@
+<img src="https://raw.github.com/stephanenicolas/boundbox/master/assets/boundbox-logo.png" width=100px/>
+
 BoundBox
 ========
 
