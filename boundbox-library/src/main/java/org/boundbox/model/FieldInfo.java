@@ -5,6 +5,7 @@ import javax.lang.model.type.TypeMirror;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -24,12 +25,12 @@ public class FieldInfo implements Inheritable {
     @Setter
     private boolean staticField;
 
-    public FieldInfo(VariableElement e) {
+    public FieldInfo(@NonNull VariableElement e) {
         fieldName = e.getSimpleName().toString();
         fieldType = e.asType();
     }
 
-    public FieldInfo(String fieldName, TypeMirror fieldType) {
+    public FieldInfo(@NonNull String fieldName, TypeMirror fieldType) {
         this.fieldName = fieldName;
         this.fieldType = fieldType;
     }

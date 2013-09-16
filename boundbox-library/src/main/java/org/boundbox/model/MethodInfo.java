@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -50,7 +51,7 @@ public class MethodInfo implements Inheritable {
     // CONSTRUCTOR
     // ----------------------------------
 
-    public MethodInfo(ExecutableElement element) {
+    public MethodInfo(@NonNull ExecutableElement element) {
         this.element = element;
         methodName = element.getSimpleName().toString();
         returnType = element.getReturnType();
