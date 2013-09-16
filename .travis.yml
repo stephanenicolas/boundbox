@@ -44,8 +44,11 @@ before_install:
   # Create and start emulator
   - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
   - emulator -avd test -no-skin -no-audio -no-window &
-  - git clone git://github.com/mosabua/maven-android-sdk-deployer.git
-  - cd /home/travis/build/stephanenicolas/boundbox/maven-android-sdk-deployer/platforms/android-18
+  
+  # Install latest android sdk as local maven jars using sdk deployer
+  - mkdir target
+  - git clone git://github.com/mosabua/maven-android-sdk-deployer.git target/maven-android-sdk-deployer
+  - cd /home/travis/build/stephanenicolas/boundbox/target/maven-android-sdk-deployer/platforms/android-18
   - mvn install 
   - cd -
   
