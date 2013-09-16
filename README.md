@@ -10,7 +10,7 @@ Here below are two samples : one for Android, and one for pure Java.
 
 To get started, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki).
 
-BoundBox is under CI on Travis <img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/>
+BoundBox is under CI on Travis <br/><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/>
 
 Android Sample
 --------------
