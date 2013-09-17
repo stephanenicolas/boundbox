@@ -1,4 +1,4 @@
-<img src="https://raw.github.com/stephanenicolas/boundbox/master/assets/boundbox-logo.png" width=100px/>
+<img src="https://raw.github.com/stephanenicolas/boundbox/master/assets/boundbox-logo.png" width="100px" align="left" />
 
 BoundBox
 ========
