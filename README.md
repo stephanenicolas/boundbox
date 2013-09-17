@@ -134,10 +134,10 @@ public class ATest {
  public void testBar() {
    //GIVEN
    //WHEN
-   boundBoxOfA.bar("bbcc");
+   boundBoxOfA.bar("cc");
    
    //THEN
-   assertEquals( "cc", boundBoxOfA.boundBox_getFoo();
+   assertEquals( "bbcc", boundBoxOfA.boundBox_getFoo();
  }
  
  @Test
@@ -163,7 +163,7 @@ BoundBox offers the following advantages over alternative technologies :
 Quality of code 
 ---------------
 
-BoundBox is heavily tested to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
+BoundBox is [heavily tested](https://github.com/stephanenicolas/boundbox/wiki/Contributors'-corner-:-testing) to ensure its quality. It uses both unit and integration tests and it is placed under continuous integration.
 It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease the amount of code to write and maintain.
 
 
