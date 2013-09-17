@@ -158,7 +158,7 @@ BoundBox's API is quite simple. Indeed in has no API at all, just a set of conve
 BoundBox offers the following advantages over alternative technologies : 
 * it doesn't pollute your API under tests. Just code clean, don't change anything for testing even not a visibility modifier.
 * objects under tests will be accessed using reflection, and this access will be checked at compile time (unlike using pure reflection or WhiteBox from PowerMock).
-* all fields, constructors and methods, even those defined in super classes are accessible. For instance, it allows to access `foo.super.super.a`.
+* all fields, constructors and methods, even those defined in super classes are accessible. For instance, it allows to access `foo.super.super.a` (that is not syntactically possible in Java).
 
 Quality of code 
 ---------------
