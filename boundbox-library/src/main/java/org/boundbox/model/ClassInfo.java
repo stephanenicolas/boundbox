@@ -2,6 +2,7 @@ package org.boundbox.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,7 +38,7 @@ public class ClassInfo {
     private String boundBoxClassName;
     @Setter
     @Getter
-    private List<String> listImports;
+    private Set<String> listImports;
 
     public ClassInfo(String className) {
         this.className = className;

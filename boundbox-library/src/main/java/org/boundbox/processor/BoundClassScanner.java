@@ -40,7 +40,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
         classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
         classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
-        classInfo.setListImports(new ArrayList<String>(listImports));
+        classInfo.setListImports(new HashSet<String>(listImports));
         listConstructorInfos.clear();
         listMethodInfos.clear();
         listFieldInfos.clear();

@@ -56,7 +56,7 @@ public class BoundBoxProcessorTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            FileUtils.deleteDirectory(sandBoxDir);
+            //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -462,7 +462,6 @@ public class BoundBoxProcessorTest {
         assertContains(listMethodInfos, fakeMethodInfo2);
     }
 
-
     // ----------------------------------
     // GENERICS
     // ----------------------------------
@@ -488,6 +487,35 @@ public class BoundBoxProcessorTest {
         FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<java.lang.String>");
         listParameters.add(fakeParameterInfo );
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        assertContains(listMethodInfos, fakeMethodInfo);
+    }
+    
+    // ----------------------------------
+    // INNER CLASSES
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
+        assertContains(listFieldInfos, fakeFieldInfo);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), new ArrayList<String>());
         assertContains(listMethodInfos, fakeMethodInfo);
     }
 
