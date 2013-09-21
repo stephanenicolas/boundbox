@@ -352,7 +352,7 @@ public class BoundBoxProcessorTest {
     public void testProcess_class_with_inherited_and_conflicting_field() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInheritedAndHidingField.java",
-                "TestClassWithSingleField.java" };
+        "TestClassWithSingleField.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
@@ -457,6 +457,35 @@ public class BoundBoxProcessorTest {
         assertContains(listMethodInfos, fakeMethodInfo2);
     }
 
+
+    // ----------------------------------
+    // GENERICS
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_generics() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithGenerics.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+
+        ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
+        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<java.lang.String>");
+        listParameters.add(fakeParameterInfo );
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        assertContains(listMethodInfos, fakeMethodInfo);
+    }
+
     // ----------------------------------
     // IMPORTS
     // ----------------------------------
@@ -556,6 +585,12 @@ public class BoundBoxProcessorTest {
         assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
         assertEquals(fakeMethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
 
+        for (int indexParameter = 0; indexParameter < methodInfo2.getParameterTypes().size(); indexParameter++) {
+            FieldInfo fieldInfo = methodInfo2.getParameterTypes().get(indexParameter);
+            assertEquals(fakeMethodInfo.getParameterTypes().get(indexParameter).getFieldName(), fieldInfo.getFieldName());
+            assertEquals(fakeMethodInfo.getParameterTypes().get(indexParameter).getFieldTypeName(), fieldInfo.getFieldTypeName());
+        }
+
         for (int indexThrownType = 0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType++) {
             TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
             assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
@@ -574,7 +609,17 @@ public class BoundBoxProcessorTest {
     private MethodInfo retrieveMethodInfo(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
         for (MethodInfo methodInfo : listMethodInfos) {
             if (methodInfo.equals(fakeMethodInfo)) {
-                return methodInfo;
+                boolean haveSameParams = true;
+                for(int indexParam = 0; indexParam < methodInfo.getParameterTypes().size() && haveSameParams ; indexParam ++) {
+                    FieldInfo paramInfo = methodInfo.getParameterTypes().get(indexParam);
+                    FieldInfo fakeParamInfo = fakeMethodInfo.getParameterTypes().get(indexParam);
+                    if( !paramInfo.getFieldName().equals(fakeParamInfo.getFieldName()) || !paramInfo.getFieldTypeName().equals(fakeParamInfo.getFieldTypeName()) ) {
+                        haveSameParams = false;
+                    }
+                }
+                if( haveSameParams ) {
+                    return methodInfo;
+                }
             }
         }
         return null;
