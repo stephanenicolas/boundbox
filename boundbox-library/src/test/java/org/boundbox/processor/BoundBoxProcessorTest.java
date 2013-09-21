@@ -56,7 +56,7 @@ public class BoundBoxProcessorTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            // FileUtils.deleteDirectory(sandBoxDir);
+            FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -134,6 +134,9 @@ public class BoundBoxProcessorTest {
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, fakeFieldInfo);
+
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
+        assertContains(listFieldInfos, fakeFieldInfo2);
     }
 
     // ----------------------------------

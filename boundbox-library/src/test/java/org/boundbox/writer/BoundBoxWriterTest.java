@@ -53,7 +53,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            // FileUtils.deleteDirectory(sandBoxDir);
+            //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -104,8 +104,11 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         fakeFieldInfo.setStaticField(true);
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
+        fakeFieldInfo2.setStaticField(true);
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
         listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(fakeFieldInfo2);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
@@ -128,6 +131,14 @@ public class BoundBoxWriterTest {
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
         assertTrue((method2.getModifiers() & Modifier.STATIC) != 0);
+        
+        Method method3 = clazz.getDeclaredMethod("boundBox_getA");
+        assertNotNull(method3);
+        assertTrue((method3.getModifiers() & Modifier.STATIC) != 0);
+        Method method4 = clazz.getDeclaredMethod("boundBox_setA", int.class);
+        assertNotNull(method4);
+        assertTrue((method4.getModifiers() & Modifier.STATIC) != 0);
+
     }
 
     // ----------------------------------
