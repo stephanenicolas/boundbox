@@ -53,7 +53,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            FileUtils.deleteDirectory(sandBoxDir);
+            // FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -289,7 +289,7 @@ public class BoundBoxWriterTest {
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos
-                .add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
+        .add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays
                 .asList("java.io.IOException")));
         listConstructorInfos.add(new FakeMethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList(
@@ -581,6 +581,80 @@ public class BoundBoxWriterTest {
 
         Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleMethod_foo");
         assertNotNull(method2);
+    }
+
+    // ----------------------------------
+    // GENERICS
+    // ----------------------------------
+
+    // part of TDD for https://github.com/stephanenicolas/boundbox/issues/1
+    // proposed by Flavien Laurent
+    @Test
+    public void testProcess_class_with_generics_parameters_have_raw_types() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithGenerics";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
+        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List");
+        listParameters.add(fakeParameterInfo );
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(fakeMethodInfo);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListImports(new ArrayList<String>());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("doIt", List.class);
+        assertNotNull(method);
+    }
+
+    // part of TDD for https://github.com/stephanenicolas/boundbox/issues/1
+    // proposed by Flavien Laurent
+    @Test
+    public void testProcess_class_with_generics_parameters_have_generic_types() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithGenerics";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
+        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<String>");
+        listParameters.add(fakeParameterInfo );
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(fakeMethodInfo);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListImports(new ArrayList<String>());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        Method method = clazz.getDeclaredMethod("doIt", List.class);
+        assertNotNull(method);
     }
 
     // ----------------------------------
