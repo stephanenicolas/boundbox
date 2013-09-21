@@ -317,9 +317,13 @@ public class BoundboxWriter implements IBoundboxWriter {
     private String createListOfParametersTypesCommaSeparated(List<FieldInfo> parameterTypeList) {
         List<String> listParameters = new ArrayList<String>();
         for (FieldInfo fieldInfo : parameterTypeList) {
-            listParameters.add(fieldInfo.getFieldTypeName() + ".class");
+            listParameters.add(extractRawType(fieldInfo.getFieldTypeName()) + ".class");
         }
         return StringUtils.join(listParameters, ", ");
+    }
+
+    private String extractRawType(String fieldTypeName) {
+        return fieldTypeName.replaceAll("<.*>", "");
     }
 
     private String createListOfParametersNamesCommaSeparated(List<FieldInfo> parameterTypeList) {
