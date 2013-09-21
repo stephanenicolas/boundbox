@@ -143,10 +143,12 @@ public class BoundboxWriter implements IBoundboxWriter {
         String superClassChain = getSuperClassChain(fieldInfo, listSuperClassNames);
         writer.emitStatement("Field field = " + superClassChain + ".getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
+        String castReturnType = createCastReturnTypeString(fieldType);
+
         if (fieldInfo.isStaticField()) {
-            writer.emitStatement("return (%s) field.get(null)", fieldType);
+            writer.emitStatement("return %s field.get(null)", castReturnType);
         } else {
-            writer.emitStatement("return (%s) field.get(boundObject)", fieldType);
+            writer.emitStatement("return %s field.get(boundObject)", castReturnType);
         }
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, Exception.class);

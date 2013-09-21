@@ -133,9 +133,11 @@ public class BoundBoxProcessorTest {
         assertFalse(listFieldInfos.isEmpty());
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setStaticField(true);
         assertContains(listFieldInfos, fakeFieldInfo);
 
         FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
+        fakeFieldInfo2.setStaticField(true);
         assertContains(listFieldInfos, fakeFieldInfo2);
     }
 
