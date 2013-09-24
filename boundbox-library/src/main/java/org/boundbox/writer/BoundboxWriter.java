@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -53,15 +53,15 @@ public class BoundboxWriter implements IBoundboxWriter {
             writer.emitImports(classInfo.getListImports());
 
             writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
-            writer.beginType(boundBoxClassName, "class", newHashSet(Modifier.PUBLIC, Modifier.FINAL), null)
+            writer.beginType(boundBoxClassName, "class", EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), null)
             //
             .emitEmptyLine()
             //
-            .emitField(targetClassName, "boundObject", newHashSet(Modifier.PRIVATE))
+            .emitField(targetClassName, "boundObject", EnumSet.of(Modifier.PRIVATE))
             //
-            .emitField("Class<" + targetClassName + ">", "boundClass", newHashSet(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
+            .emitField("Class<" + targetClassName + ">", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
             .emitEmptyLine()//
-            .beginMethod(null, boundBoxClassName, newHashSet(Modifier.PUBLIC), targetClassName, "boundObject")//
+            .beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), targetClassName, "boundObject")//
             .emitStatement("this.boundObject = boundObject")//
             .endMethod()//
             .emitEmptyLine();
@@ -109,7 +109,7 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String setterName = createSignatureSetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
-        Set<Modifier> modifiers = newHashSet(Modifier.PUBLIC);
+        Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
         }
@@ -134,7 +134,7 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
         String getterName = createSignatureGetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
-        Set<Modifier> modifiers = newHashSet(Modifier.PUBLIC);
+        Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
         }
@@ -179,7 +179,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             signature = createSignatureMethod(methodInfo, listSuperClassNames);
         }
 
-        Set<Modifier> modifiers = newHashSet(Modifier.PUBLIC);
+        Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (methodInfo.isStaticMethod() || methodInfo.isConstructor()) {
             modifiers.add(Modifier.STATIC);
         }
@@ -347,15 +347,6 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private String computeCamelCaseNameStartUpperCase(String fieldName) {
         return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-    }
-
-    // from http://stackoverflow.com/q/2041778/693752
-    public static <T> Set<T> newHashSet(T... objs) {
-        Set<T> set = new HashSet<T>();
-        for (T o : objs) {
-            set.add(o);
-        }
-        return set;
     }
 
 }
