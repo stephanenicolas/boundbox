@@ -72,55 +72,69 @@ public class BoundboxWriter implements IBoundboxWriter {
             classInfo.getListImports().add(InvocationTargetException.class.getName());
             classInfo.getListImports().add(BoundBoxException.class.getName());
             writer.emitImports(classInfo.getListImports());
+            
+            //TODO search the inner class tree for imports
 
             writer.emitEmptyLine();
             writeJavadocForBoundBoxClass(writer, classInfo);
             writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
-            writer.beginType(boundBoxClassName, "class", EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), null)
-            //
-            .emitEmptyLine()
-            //
-            .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
-            //
-            .emitField("Class<" + targetClassName + ">", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
-            .emitEmptyLine();//
-            
-            writeJavadocForBoundBoxConstructor(writer, classInfo);
-            writer.beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), targetClassName, "boundObject")//
-            .emitStatement("this.boundObject = boundObject")//
-            .endMethod()//
-            .emitEmptyLine();
-
-            writeCodeDecoration(writer, "Access to constructors");
-            for (MethodInfo methodInfo : classInfo.getListConstructorInfos()) {
-                writer.emitEmptyLine();
-                writeJavadocForBoundConstructor(writer, classInfo, methodInfo);
-                createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
-            }
-
-            writeCodeDecoration(writer, "Direct access to fields");
-            for (FieldInfo fieldInfo : classInfo.getListFieldInfos()) {
-                writeJavadocForBoundGetter(writer, fieldInfo, classInfo);
-                createDirectGetter(writer, fieldInfo, classInfo.getListSuperClassNames());
-                writer.emitEmptyLine();
-                writeJavadocForBoundSetter(writer, fieldInfo, classInfo);
-                createDirectSetter(writer, fieldInfo, classInfo.getListSuperClassNames());
-            }
-
-            writeCodeDecoration(writer, "Access to methods");
-            for (MethodInfo methodInfo : classInfo.getListMethodInfos()) {
-                writer.emitEmptyLine();
-                writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-                createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
-            }
-
-            // TODO process inner classes
+            createClassWrapper(writer, classInfo, targetClassName, boundBoxClassName);
 
             writer.endType();
         } finally {
             if (writer != null) {
                 writer.close();
             }
+        }
+    }
+
+    private void createClassWrapper(JavaWriter writer, ClassInfo classInfo, String targetClassName, String boundBoxClassName) throws IOException {
+        writer.beginType(boundBoxClassName, "class", EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), null)
+        //
+        .emitEmptyLine()
+        //
+        .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
+        //
+        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
+        .emitEmptyLine();//
+        
+        writeJavadocForBoundBoxConstructor(writer, classInfo);
+        writer.beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), Object.class.getName(), "boundObject")//
+        .emitStatement("this.boundObject = boundObject")//
+        .endMethod()//
+        .emitEmptyLine();
+
+        writeCodeDecoration(writer, "Access to constructors");
+        for (MethodInfo methodInfo : classInfo.getListConstructorInfos()) {
+            writer.emitEmptyLine();
+            writeJavadocForBoundConstructor(writer, classInfo, methodInfo);
+            createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
+        }
+
+        writeCodeDecoration(writer, "Direct access to fields");
+        for (FieldInfo fieldInfo : classInfo.getListFieldInfos()) {
+            writeJavadocForBoundGetter(writer, fieldInfo, classInfo);
+            createDirectGetter(writer, fieldInfo, classInfo.getListSuperClassNames());
+            writer.emitEmptyLine();
+            writeJavadocForBoundSetter(writer, fieldInfo, classInfo);
+            createDirectSetter(writer, fieldInfo, classInfo.getListSuperClassNames());
+        }
+
+        writeCodeDecoration(writer, "Access to methods");
+        for (MethodInfo methodInfo : classInfo.getListMethodInfos()) {
+            writer.emitEmptyLine();
+            writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+            createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
+        }
+
+        // TODO process inner classes
+        writeCodeDecoration(writer, "Access to boundboxes of inner classes");
+        for (ClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
+            writer.emitEmptyLine();
+            String targetInnerClassName = innerClassInfo.getClassName();
+            //TODO write javadoc generation method for inner classes.
+            //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+            createClassWrapper(writer, innerClassInfo, targetInnerClassName, "BoundBox_inner_"+targetInnerClassName);
         }
     }
 
@@ -223,13 +237,13 @@ public class BoundboxWriter implements IBoundboxWriter {
         String superClassChain = getSuperClassChain(methodInfo, listSuperClassNames);
         if (parameterTypeList.isEmpty()) {
             if (isConstructor || methodInfo.isInstanceInitializer()) {
-                writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor()", targetClassName);
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor()");
             } else {
                 writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
             }
         } else {
             if (isConstructor) {
-                writer.emitStatement("Constructor<? extends %s> method = boundClass.getDeclaredConstructor(%s)", targetClassName, parametersTypesCommaSeparated);
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
             } else {
                 writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             }

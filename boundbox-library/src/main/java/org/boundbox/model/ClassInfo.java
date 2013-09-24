@@ -39,6 +39,9 @@ public class ClassInfo {
     @Setter
     @Getter
     private Set<String> listImports;
+    @Setter
+    @Getter
+    private List<ClassInfo> listInnerClassInfo;
 
     public ClassInfo(String className) {
         this.className = className;

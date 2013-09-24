@@ -32,12 +32,9 @@ import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
-import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.squareup.javawriter.JavaWriter;
 
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 //http://stackoverflow.com/a/7989365/693752
@@ -108,6 +105,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -146,6 +144,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -185,6 +184,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -230,6 +230,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -273,6 +274,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -336,6 +338,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -382,6 +385,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -451,6 +455,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -487,6 +492,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField", "TestClassWithSingleField"));
         classInfo.setListImports(new HashSet<String>());
 
@@ -525,6 +531,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField", "TestClassWithSingleField"));
         classInfo.setListImports(new HashSet<String>());
 
@@ -562,6 +569,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
 
@@ -606,6 +614,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
 
@@ -645,6 +654,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod",
                 "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
@@ -689,6 +699,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -724,6 +735,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);
@@ -761,6 +773,7 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Collections.<ClassInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);

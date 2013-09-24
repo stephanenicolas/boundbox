@@ -25,10 +25,11 @@ import org.boundbox.model.MethodInfo;
 public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
     private String maxSuperClassName = Object.class.getName();
+    private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
     private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
     private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-    private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
     protected List<String> listSuperClassNames = new ArrayList<String>();
+    private List<ClassInfo> listClassInfos = new ArrayList<ClassInfo>();
     private Set<String> listImports = new HashSet<String>();
 
     public ClassInfo scan(TypeElement boundClass) {
@@ -36,9 +37,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         boundClass.accept(this, 0);
         listImports.remove(boundClass.toString());
         ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
+        classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
         classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
         classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
-        classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
+        classInfo.setListInnerClassInfo(new ArrayList<ClassInfo>(listClassInfos));
         classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
         classInfo.setListImports(new HashSet<String>(listImports));
         listConstructorInfos.clear();
