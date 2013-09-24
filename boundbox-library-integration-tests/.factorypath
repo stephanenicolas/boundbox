@@ -1,5 +1,5 @@
 <factorypath>
     <factorypathentry kind="EXTJAR" id="/Users/stephanenicolas/.m2/repository/org/apache/commons/commons-lang3/3.1/commons-lang3-3.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="EXTJAR" id="/Users/stephanenicolas/.m2/repository/com/squareup/javawriter/2.1.2/javawriter-2.1.2.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/stephanenicolas/.m2/repository/org/boundbox/boundbox-library/1.0.0-SNAPSHOT/boundbox-library-1.0.0-SNAPSHOT.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="EXTJAR" id="/Users/stephanenicolas/.m2/repository/org/boundbox/boundbox-library/1.0.1-SNAPSHOT/boundbox-library-1.0.1-SNAPSHOT.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>

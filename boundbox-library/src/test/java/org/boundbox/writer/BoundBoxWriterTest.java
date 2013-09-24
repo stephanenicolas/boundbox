@@ -54,7 +54,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            FileUtils.deleteDirectory(sandBoxDir);
+            //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
