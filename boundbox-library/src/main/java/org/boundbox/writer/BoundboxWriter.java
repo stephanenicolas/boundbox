@@ -22,6 +22,7 @@ import org.boundbox.BoundBoxException;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.Inheritable;
+import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
 import com.squareup.javawriter.JavaWriter;
@@ -80,7 +81,6 @@ public class BoundboxWriter implements IBoundboxWriter {
             writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
             createClassWrapper(writer, classInfo, targetClassName, boundBoxClassName);
 
-            writer.endType();
         } finally {
             if (writer != null) {
                 writer.close();
@@ -129,14 +129,74 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         // TODO process inner classes
         writeCodeDecoration(writer, "Access to boundboxes of inner classes");
-        for (ClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
+        for (InnerClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
             writer.emitEmptyLine();
             String targetInnerClassName = innerClassInfo.getClassName();
             //TODO write javadoc generation method for inner classes.
             //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-            createClassWrapper(writer, innerClassInfo, targetInnerClassName, "BoundBox_inner_"+targetInnerClassName);
+            createInnerClassWrapper(writer, innerClassInfo, targetInnerClassName, "BoundBox_inner_"+targetInnerClassName);
         }
+        
+        writer.endType();
     }
+    
+    private void createInnerClassWrapper(JavaWriter writer, InnerClassInfo innerClassInfo, String targetClassName, String boundBoxClassName) throws IOException {
+        EnumSet<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC, Modifier.FINAL);
+        if( innerClassInfo.isStaticField() ) {
+            modifiers.add(Modifier.STATIC);
+        }
+        writer.beginType(boundBoxClassName, "class", modifiers, null)
+        //
+        .emitEmptyLine()
+        //
+        .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
+        //
+        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE))//
+        .emitEmptyLine();//
+        
+        writeJavadocForBoundBoxConstructor(writer, innerClassInfo);
+        writer.beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), Object.class.getName(), "boundObject", "Class<?>", "boundClass")//
+        .emitStatement("this.boundObject = boundObject")//
+        .emitStatement("this.boundClass = boundClass")//
+        .endMethod()//
+        .emitEmptyLine();
+
+        writeCodeDecoration(writer, "Access to constructors");
+        for (MethodInfo methodInfo : innerClassInfo.getListConstructorInfos()) {
+            writer.emitEmptyLine();
+            writeJavadocForBoundConstructor(writer, innerClassInfo, methodInfo);
+            createMethodWrapper(writer, methodInfo, targetClassName, innerClassInfo.getListSuperClassNames());
+        }
+
+        writeCodeDecoration(writer, "Direct access to fields");
+        for (FieldInfo fieldInfo : innerClassInfo.getListFieldInfos()) {
+            writeJavadocForBoundGetter(writer, fieldInfo, innerClassInfo);
+            createDirectGetter(writer, fieldInfo, innerClassInfo.getListSuperClassNames());
+            writer.emitEmptyLine();
+            writeJavadocForBoundSetter(writer, fieldInfo, innerClassInfo);
+            createDirectSetter(writer, fieldInfo, innerClassInfo.getListSuperClassNames());
+        }
+
+        writeCodeDecoration(writer, "Access to methods");
+        for (MethodInfo methodInfo : innerClassInfo.getListMethodInfos()) {
+            writer.emitEmptyLine();
+            writeJavadocForBoundMethod(writer, innerClassInfo, methodInfo);
+            createMethodWrapper(writer, methodInfo, targetClassName, innerClassInfo.getListSuperClassNames());
+        }
+
+        // TODO process inner classes
+        writeCodeDecoration(writer, "Access to boundboxes of inner classes");
+        for (InnerClassInfo innerInnerClassInfo : innerClassInfo.getListInnerClassInfo()) {
+            writer.emitEmptyLine();
+            String targetInnerClassName = innerInnerClassInfo.getClassName();
+            //TODO write javadoc generation method for inner classes.
+            //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+            createInnerClassWrapper(writer, innerInnerClassInfo, targetInnerClassName, "BoundBox_inner_"+targetInnerClassName);
+        }
+        
+        writer.endType();
+    }
+
 
     private void writeCodeDecoration(JavaWriter writer, String decorationTitle) throws IOException {
         writer.emitSingleLineComment(CODE_DECORATOR);

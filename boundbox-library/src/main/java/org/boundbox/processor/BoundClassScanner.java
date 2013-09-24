@@ -19,6 +19,7 @@ import lombok.extern.java.Log;
 
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
 @Log
@@ -29,7 +30,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
     private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
     private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
     protected List<String> listSuperClassNames = new ArrayList<String>();
-    private List<ClassInfo> listClassInfos = new ArrayList<ClassInfo>();
+    private List<InnerClassInfo> listInnerClassInfos = new ArrayList<InnerClassInfo>();
     private Set<String> listImports = new HashSet<String>();
 
     public ClassInfo scan(TypeElement boundClass) {
@@ -40,7 +41,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         classInfo.setListConstructorInfos(new ArrayList<MethodInfo>(listConstructorInfos));
         classInfo.setListFieldInfos(new ArrayList<FieldInfo>(listFieldInfos));
         classInfo.setListMethodInfos(new ArrayList<MethodInfo>(listMethodInfos));
-        classInfo.setListInnerClassInfo(new ArrayList<ClassInfo>(listClassInfos));
+        classInfo.setListInnerClassInfo(new ArrayList<InnerClassInfo>(listInnerClassInfos));
         classInfo.setListSuperClassNames(new ArrayList<String>(listSuperClassNames));
         classInfo.setListImports(new HashSet<String>(listImports));
         listConstructorInfos.clear();

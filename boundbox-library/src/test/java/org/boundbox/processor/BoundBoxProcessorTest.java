@@ -497,7 +497,7 @@ public class BoundBoxProcessorTest {
     @Test
     public void testProcess_class_with_inner_class() throws URISyntaxException {
         // given
-        String[] testSourceFileNames = new String[] { "TestClassWithInnerClass.java" };
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticInnerClass.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when

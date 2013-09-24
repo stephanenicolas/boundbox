@@ -1,6 +1,7 @@
 package org.boundbox.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,13 +21,13 @@ public class ClassInfo {
     private String className;
     @Setter
     @Getter
-    private List<FieldInfo> listFieldInfos;
+    private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
     @Setter
     @Getter
-    private List<MethodInfo> listMethodInfos;
+    private List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
     @Setter
     @Getter
-    private List<MethodInfo> listConstructorInfos;
+    private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
     @Setter
     @Getter
     private List<String> listSuperClassNames;
@@ -38,10 +39,10 @@ public class ClassInfo {
     private String boundBoxClassName;
     @Setter
     @Getter
-    private Set<String> listImports;
+    private Set<String> listImports = new HashSet<String>();
     @Setter
     @Getter
-    private List<ClassInfo> listInnerClassInfo;
+    private List<InnerClassInfo> listInnerClassInfo = new ArrayList<InnerClassInfo>();
 
     public ClassInfo(String className) {
         this.className = className;
