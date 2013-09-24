@@ -26,9 +26,11 @@ import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
 import org.boundbox.FakeFieldInfo;
+import org.boundbox.FakeInnerClassInfo;
 import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.IBoundboxWriter;
 import org.easymock.EasyMock;
@@ -517,6 +519,11 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), new ArrayList<String>());
         assertContains(listMethodInfos, fakeMethodInfo);
+        
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertContains(listInnerClassInfos, fakeInnerClassInfo);
     }
 
     // ----------------------------------
@@ -629,6 +636,14 @@ public class BoundBoxProcessorTest {
             assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
         }
     }
+    
+    private void assertContains(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
+        InnerClassInfo innerClassInfo2 = retrieveInnerClassInfo(listInnerClassInfos, fakeInnerClassInfo);
+        assertNotNull(innerClassInfo2);
+        assertEquals(fakeInnerClassInfo.getInheritanceLevel(), innerClassInfo2.getInheritanceLevel());
+        assertEquals(fakeInnerClassInfo.isStaticInnerClass(), innerClassInfo2.isStaticInnerClass());
+        assertEquals(fakeInnerClassInfo.getEffectiveInheritanceLevel(), innerClassInfo2.getEffectiveInheritanceLevel());
+    }
 
     private FieldInfo retrieveFieldInfo(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {
         for (FieldInfo fieldInfo : listFieldInfos) {
@@ -657,5 +672,15 @@ public class BoundBoxProcessorTest {
         }
         return null;
     }
+    
+    private InnerClassInfo retrieveInnerClassInfo(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
+        for (InnerClassInfo innerClassInfo : listInnerClassInfos) {
+            if (innerClassInfo.equals(fakeInnerClassInfo)) {
+                return innerClassInfo;
+            }
+        }
+        return null;
+    }
+
 
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
+@EqualsAndHashCode(of={"className"})
 public class ClassInfo {
     public static final String DEFAULT_BOUND_BOX_OF_CLASS_PREFIX = "BoundBoxOf";
 

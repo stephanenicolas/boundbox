@@ -1,11 +1,13 @@
 package org.boundbox.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
+@EqualsAndHashCode(callSuper=true)
 public class InnerClassInfo extends ClassInfo implements Inheritable {
 
     @Setter
@@ -25,7 +27,7 @@ public class InnerClassInfo extends ClassInfo implements Inheritable {
     
     @Getter
     @Setter
-    private boolean staticField;
+    private boolean staticInnerClass;
     
     public InnerClassInfo(String className) {
         super(className);
