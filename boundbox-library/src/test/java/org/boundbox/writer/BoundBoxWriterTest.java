@@ -1,6 +1,9 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,9 +32,12 @@ import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.MethodInfo;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.squareup.javawriter.JavaWriter;
 
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 //http://stackoverflow.com/a/7989365/693752
@@ -57,6 +63,33 @@ public class BoundBoxWriterTest {
             //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
+    
+    // ----------------------------------
+    // JAVADOC
+    // ----------------------------------
+//    @Test
+//    public void testProcess_class_without_javadoc() throws Exception {
+//        // given
+//        String classUnderTestName = "TestClassWithNothing";
+//
+//        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+//        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+//        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+//        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+//        classInfo.setListImports(new HashSet<String>());
+//
+//        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).createMock();
+//        javaWriter.emitJavadoc(EasyMock.anyString());
+//        EasyMock.expectLastCall().times(0);
+//        EasyMock.replay(javaWriter);
+//        writer.setWritingJavadoc(false);
+//        
+//        // when
+//        writer.writeBoundBox(classInfo, javaWriter);
+//
+//        // then
+//        EasyMock.verify(javaWriter);
+//    }
 
     // ----------------------------------
     // FIELDS

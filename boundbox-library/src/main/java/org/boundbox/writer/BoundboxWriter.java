@@ -50,6 +50,11 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     @Override
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
+        JavaWriter writer = new JavaWriter(out);
+        writeBoundBox(classInfo, writer);
+    }
+
+    protected void writeBoundBox(ClassInfo classInfo, JavaWriter writer) throws IOException {
         String boundClassName = classInfo.getClassName();
         log.info("BoundClassName is " + boundClassName);
 
@@ -58,7 +63,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         String boundBoxClassName = classInfo.getBoundBoxClassName();
 
         try {
-            JavaWriter writer = new JavaWriter(out);
             writer.emitPackage(targetPackageName)//
             .emitEmptyLine();
 
@@ -113,10 +117,9 @@ public class BoundboxWriter implements IBoundboxWriter {
             // TODO process inner classes
 
             writer.endType();
-            writer.close();
         } finally {
-            if (out != null) {
-                out.close();
+            if (writer != null) {
+                writer.close();
             }
         }
     }
