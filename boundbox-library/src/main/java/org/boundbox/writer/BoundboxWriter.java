@@ -80,7 +80,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             //
             .emitEmptyLine()
             //
-            .emitField(targetClassName, "boundObject", EnumSet.of(Modifier.PRIVATE))
+            .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
             //
             .emitField("Class<" + targetClassName + ">", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
             .emitEmptyLine();//
