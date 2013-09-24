@@ -68,6 +68,7 @@ public class BoundBoxWriterTest {
     // JAVADOC
     // ----------------------------------
 //    @Test
+//    we need this pull request to be accepted : https://github.com/square/javawriter/pull/25/
 //    public void testProcess_class_without_javadoc() throws Exception {
 //        // given
 //        String classUnderTestName = "TestClassWithNothing";
