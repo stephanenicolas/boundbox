@@ -713,9 +713,8 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     //  INNER CLASSES
     // ----------------------------------
-    //This test is smoky for now, we should add inner class information
     @Test
-    public void testProcess_class_with_inner_class() throws Exception {
+    public void testProcess_class_with_static_inner_class() throws Exception {
         // given
         String classUnderTestName = "TestClassWithStaticInnerClass";
         List<String> neededClasses = new ArrayList<String>();

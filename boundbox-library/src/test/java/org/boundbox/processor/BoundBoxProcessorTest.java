@@ -497,9 +497,39 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
 
     @Test
-    public void testProcess_class_with_inner_class() throws URISyntaxException {
+    public void testProcess_class_with_static_inner_class() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithStaticInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
+        assertContains(listFieldInfos, fakeFieldInfo);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), new ArrayList<String>());
+        assertContains(listMethodInfos, fakeMethodInfo);
+        
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+    }
+    
+    @Test
+    public void testProcess_class_with_private_static_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithPrivateStaticInnerClass.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
