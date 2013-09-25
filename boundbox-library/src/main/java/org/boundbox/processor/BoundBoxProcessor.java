@@ -38,6 +38,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
@@ -46,6 +47,7 @@ import lombok.extern.java.Log;
 
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
+import org.boundbox.model.FieldInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
@@ -66,6 +68,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS = "boundClass";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS = "maxSuperClass";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS = "extraFields";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME = "fieldName";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS = "fieldClass";
 
     private Filer filer;
     private Messager messager;
@@ -92,6 +97,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             // Get the annotation information
             TypeElement boundClass = null;
             String maxSuperClass = null;
+            List<? extends AnnotationValue> extraBoundFields = null;
             List<? extends AnnotationMirror> listAnnotationMirrors = classElement.getAnnotationMirrors();
             if (listAnnotationMirrors == null) {
                 messager.printMessage(Kind.WARNING, "listAnnotationMirrors is null", classElement);
@@ -112,6 +118,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     if (BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS.equals(entry.getKey().getSimpleName().toString())) {
                         maxSuperClass = getAnnotationValueAsTypeElement(entry.getValue()).asType().toString();
                     }
+                    if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS.equals(entry.getKey().getSimpleName().toString())) {
+                    	extraBoundFields = getAnnotationValueAsAnnotationValueList(entry.getValue());
+                    }
                 }
             }
 
@@ -125,6 +134,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
 
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
+            
+            if(extraBoundFields != null) {
+            	injectExtraBoundFields(extraBoundFields, classInfo);
+            }
+            
             listClassInfo.add(classInfo);
 
             // perform some computations on meta model
@@ -150,6 +164,35 @@ public class BoundBoxProcessor extends AbstractProcessor {
         return true;
     }
 
+    /*
+     * Inject extra bound fields into a classInfo.
+     */
+	private void injectExtraBoundFields(List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
+		if(extraBoundFields == null || extraBoundFields.isEmpty()) {
+			return;
+		}
+		List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+		TypeMirror fieldClass = null;
+		String fieldName = null;
+		for(AnnotationValue annotationValue : extraBoundFields) {
+			AnnotationMirror annotationMirror = (AnnotationMirror) annotationValue.getValue();
+		    log.info("mirror " + annotationMirror.getAnnotationType());
+			Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotationMirror.getElementValues();
+		    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
+				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME.equals(entry.getKey().getSimpleName().toString())) {
+					fieldName = getAnnotationValueAsString(entry.getValue());
+				}
+				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS.equals(entry.getKey().getSimpleName().toString())) {
+					fieldClass = toName(entry.getValue());
+				}
+		    }
+			FieldInfo fieldInfo = new FieldInfo(fieldName, fieldClass);
+			if (!listFieldInfos.contains(fieldInfo)) {
+				listFieldInfos.add(fieldInfo);
+			}
+		}
+	}
+
     public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
         this.boundboxWriter = boundboxWriter;
     }
@@ -165,6 +208,21 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue) {
         DeclaredType declaredType = (DeclaredType) annotationValue.getValue();
         return (TypeElement) declaredType.asElement();
+    }
+    
+    private List<? extends AnnotationValue> getAnnotationValueAsAnnotationValueList(AnnotationValue annotationValue) {
+    	return (List<? extends AnnotationValue>) annotationValue.getValue();
+    }
+    
+    private TypeMirror toName(AnnotationValue annotationValue) {
+    	
+    	Object value = annotationValue.getValue();
+    	
+		return (TypeMirror) value;
+    }
+    
+    private String getAnnotationValueAsString(AnnotationValue annotationValue) {
+    	return (String) annotationValue.getValue();
     }
 
     private void error(final Element element, final String message) {

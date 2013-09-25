@@ -113,6 +113,83 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo4);
 
     }
+    
+    // ----------------------------------
+    // EXTRA FIELDS
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_single_extra_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleExtraField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+    
+
+    @Test
+    public void testProcess_class_with_single_extra_field_already_exists() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleExtraFieldAlreadyExists.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+        assertEquals(listFieldInfos.size(), 1); // only one field even if foo already exists in the class
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
+
+    @Test
+    public void testProcess_class_with_many_extra_fields() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithManyExtraFields.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, fakeFieldInfo);
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
+        assertContains(listFieldInfos, fakeFieldInfo2);
+        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
+        assertContains(listFieldInfos, fakeFieldInfo3);
+        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
+        assertContains(listFieldInfos, fakeFieldInfo4);
+        FakeFieldInfo fakeFieldInfo5 = new FakeFieldInfo("ss", "java.util.ArrayList");
+        assertContains(listFieldInfos, fakeFieldInfo5);
+
+    }
 
     // ----------------------------------
     // STATIC FIELDS
@@ -487,7 +564,7 @@ public class BoundBoxProcessorTest {
 
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
         FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<java.lang.String>");
-        listParameters.add(fakeParameterInfo );
+        listParameters.add(fakeParameterInfo);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
         assertContains(listMethodInfos, fakeMethodInfo);
     }
