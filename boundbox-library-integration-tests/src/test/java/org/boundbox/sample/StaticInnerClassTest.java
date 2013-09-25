@@ -20,6 +20,7 @@ public class StaticInnerClassTest {
     public void test_access_static_private_inner_class() {
         Object instanceofInnerClass = BoundBoxOfStaticPrivateInnerClassTestClass.boundBox_new_InnerClass();
         assertNotNull(instanceofInnerClass);
+        assertEquals(StaticPrivateInnerClassTestClass.class.getDeclaredClasses()[0], instanceofInnerClass.getClass() );
         assertNotNull( new BoundBoxOfStaticPrivateInnerClassTestClass.BoundBox_inner_InnerClass(instanceofInnerClass) );
     }
 

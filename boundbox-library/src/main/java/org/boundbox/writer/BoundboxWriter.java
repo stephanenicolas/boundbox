@@ -155,6 +155,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             modifiers.add(Modifier.STATIC);
         }
         String enclosingBoundBoxClassName = createBoundBoxName(classInfo);
+        String thisOrNot = ((classInfo instanceof InnerClassInfo) && !((InnerClassInfo)classInfo).isStaticInnerClass()) ? ".this" : "";
         EnumSet<Modifier> boundClassFieldModifiers = EnumSet.of(Modifier.PRIVATE);
         if( innerClassInfo.isStaticInnerClass() ) {
             boundClassFieldModifiers.add(Modifier.STATIC);
@@ -165,7 +166,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         //
         .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
         //
-        .emitField("Class<?>", "boundClass", boundClassFieldModifiers, enclosingBoundBoxClassName+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
+        .emitField("Class<?>", "boundClass", boundClassFieldModifiers, enclosingBoundBoxClassName+thisOrNot+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
         .emitEmptyLine();//
 
         writeJavadocForBoundBoxConstructor(writer, innerClassInfo);
