@@ -613,6 +613,47 @@ public class BoundBoxProcessorTest {
 
     }
     
+    @Test
+    public void testProcess_class_with_static_inner_class_with_many_fields_and_methods() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticInnerClassWithManyFieldsAndMethods.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        
+        List<FieldInfo> listInnerClassFieldsInfos = classInfo.getListInnerClassInfo().get(0).getListFieldInfos();
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
+        assertContains(listInnerClassFieldsInfos, fakeFieldInfo);
+
+        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("b", Object.class.getName());
+        assertContains(listInnerClassFieldsInfos, fakeFieldInfo2);
+
+        List<MethodInfo> listInnerClassMethodInfos = classInfo.getListInnerClassInfo().get(0).getListMethodInfos();
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listInnerClassMethodInfos, fakeMethodInfo);
+
+        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
+        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("bar", "void", Arrays.asList(paramInt), null);
+        assertContains(listInnerClassMethodInfos, fakeMethodInfo2);
+
+    }
+    
     // ----------------------------------
     // IMPORTS
     // ----------------------------------
