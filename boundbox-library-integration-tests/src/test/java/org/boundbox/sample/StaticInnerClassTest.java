@@ -22,4 +22,19 @@ public class StaticInnerClassTest {
         assertNotNull(instanceofInnerClass);
         assertNotNull( new BoundBoxOfStaticPrivateInnerClassTestClass.BoundBox_inner_InnerClass(instanceofInnerClass) );
     }
+
+    @BoundBox(boundClass = StaticInnerClassWithManyConstructorsTestClass.class)
+    @Test
+    public void test_access_static_inner_class_with_many_constructors() {
+        Object instanceofInnerClass = BoundBoxOfStaticInnerClassWithManyConstructorsTestClass.BoundBox_inner_InnerClass.boundBox_new_InnerClass();
+        assertNotNull( new BoundBoxOfStaticPrivateInnerClassTestClass.BoundBox_inner_InnerClass(instanceofInnerClass) );
+
+        assertNotNull(instanceofInnerClass);
+        
+        instanceofInnerClass = BoundBoxOfStaticInnerClassWithManyConstructorsTestClass.BoundBox_inner_InnerClass.boundBox_new_InnerClass(2);
+        assertNotNull(instanceofInnerClass);
+
+        instanceofInnerClass = BoundBoxOfStaticInnerClassWithManyConstructorsTestClass.BoundBox_inner_InnerClass.boundBox_new_InnerClass("toto");
+        assertNotNull(instanceofInnerClass);
+    }
 }

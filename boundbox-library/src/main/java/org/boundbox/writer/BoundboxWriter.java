@@ -167,7 +167,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         for(MethodInfo methodInfo : innerClassInfo.getListConstructorInfos() ) {
             writer.emitEmptyLine();
             createInnerClassAccessor(writer, innerClassInfo, methodInfo, targetInnerClassName);
-
         }
 
         writeCodeDecoration(writer, "Direct access to fields");
@@ -296,14 +295,14 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         if (parameterTypeList.isEmpty()) {
             if (innerClassInfo.isStaticInnerClass()) {
-                writer.emitStatement(returnString + "method.newInstance((Object[])null)");
+                writer.emitStatement(returnString + "method.newInstance()");
             } else {
                 //TODO boundObject de la class externe
                 writer.emitStatement(returnString + "method.newInstance(boundObject)");
             }
         } else {
             if (innerClassInfo.isStaticInnerClass()) {
-                writer.emitStatement(returnString + "method.newInstance((Object[])null, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "method.newInstance(%s)", parametersNamesCommaSeparated);
             } else {
                 //TODO boundObject de la class externe
                 writer.emitStatement(returnString + "method.newInstance(boundObject, %s)", parametersNamesCommaSeparated);

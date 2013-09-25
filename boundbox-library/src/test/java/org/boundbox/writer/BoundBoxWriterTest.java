@@ -764,22 +764,13 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     //  INNER CLASSES
     // ----------------------------------
-    //This test is smoky for now, we should add inner class information
     @Test
-    public void testProcess_class_with_inner_class_with_constructor() throws Exception {
+    public void testProcess_class_with_static_inner_class_with_constructor() throws Exception {
         // given
         String classUnderTestName = "TestClassWithStaticInnerClassWithConstructor";
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
-        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
-        
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
         
         FakeMethodInfo fakeInnerClassConstructorInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
@@ -789,8 +780,6 @@ public class BoundBoxWriterTest {
         fakeInnerClassInfo.setStaticInnerClass(true);
         fakeInnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
         
-        classInfo.setListFieldInfos(listFieldInfos);
-        classInfo.setListMethodInfos(listInnerClassConstructorInfos);
         classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
@@ -805,20 +794,70 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(classInfo);
-        Method method = clazz.getDeclaredMethod("boundBox_getA");
-        assertNotNull(method);
-        Method method2 = clazz.getDeclaredMethod("boundBox_setA", int.class);
-        assertNotNull(method2);
-        
         
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
         
         assertEquals("BoundBox_inner_InnerClass",innerClass.getSimpleName());
         
-        Method method3 = innerClass.getDeclaredMethod("boundBox_new_InnerClass");
-        assertNotNull(method3);
+        Method innerClassConstructor = innerClass.getDeclaredMethod("boundBox_new_InnerClass");
+        assertNotNull(innerClassConstructor);
     }
+    
+    @Test
+    public void testProcess_class_with_static_inner_class_with_many_constructors() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithStaticInnerClassWithConstructor";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        
+        List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
+        FakeMethodInfo fakeInnerClassConstructorInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo);
+        
+        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
+        FakeMethodInfo fakeInnerClassConstructorInfo2 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo2);
+
+        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
+        FakeMethodInfo fakeInnerClassConstructorInfo3 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo3);
+
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        fakeInnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListImports(new HashSet<String>());
+
+        Writer out = createWriterInSandbox(classInfo);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+
+        // then
+        CompilationTask task = createCompileTask(classInfo, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(classInfo);
+        
+        Class<?> innerClass = clazz.getDeclaredClasses()[0];
+        assertNotNull(innerClass);
+        
+        assertEquals("BoundBox_inner_InnerClass",innerClass.getSimpleName());
+        
+        Method innerClassConstructor = innerClass.getDeclaredMethod("boundBox_new_InnerClass");
+        assertNotNull(innerClassConstructor);
+        
+        Method innerClassConstructor2 = innerClass.getDeclaredMethod("boundBox_new_InnerClass", int.class);
+        assertNotNull(innerClassConstructor2);
+        
+        Method innerClassConstructor3 = innerClass.getDeclaredMethod("boundBox_new_InnerClass", Object.class);
+        assertNotNull(innerClassConstructor3);
+    }
+    
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------

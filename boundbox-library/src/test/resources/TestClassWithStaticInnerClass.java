@@ -4,8 +4,6 @@ import org.boundbox.BoundBox;
 //proposed by Flavien Laurent
 @BoundBox(boundClass = TestClassWithStaticInnerClass.class)
 public class TestClassWithStaticInnerClass {
-    public int a = 0;
-    public void foo() {};
     public static class InnerClass {
         
     }
