@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import org.boundbox.BoundBox;
 import org.boundbox.BoundBoxField;
 
-@SuppressWarnings("unused")
 @BoundBox(
 		boundClass = TestClassWithManyExtraFields.class,
 		extraFields = {

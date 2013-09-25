@@ -1,7 +1,6 @@
 import org.boundbox.BoundBox;
 import org.boundbox.BoundBoxField;
 
-@SuppressWarnings("unused")
 @BoundBox(
 			boundClass = TestClassWithSingleExtraField.class,
 			extraFields = {

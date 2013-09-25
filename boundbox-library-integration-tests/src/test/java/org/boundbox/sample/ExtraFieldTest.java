@@ -1,6 +1,7 @@
 package org.boundbox.sample;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.boundbox.BoundBox;
 import org.boundbox.BoundBoxException;
@@ -10,9 +11,8 @@ import org.junit.Test;
 
 public class ExtraFieldTest {
 
-    private FieldTestClassB fieldTestClassB;
     @BoundBox(
-    		boundClass = FieldTestClassB.class,
+    		boundClass = ExtraFieldTestClassB.class,
     		extraFields = {
     			@BoundBoxField(
     					fieldName =  "fakeField1",
@@ -20,22 +20,20 @@ public class ExtraFieldTest {
     			)
     		}
     )
-    private BoundBoxOfFieldTestClassB boundBoxOfB;
+    private BoundBoxOfExtraFieldTestClassB boundBoxOfB;
 
     @Before
     public void setup() {
-        fieldTestClassB = new FieldTestClassB();
-        boundBoxOfB = new BoundBoxOfFieldTestClassB(fieldTestClassB);
+        boundBoxOfB = new BoundBoxOfExtraFieldTestClassB(new ExtraFieldTestClassB());
     }
 
     @Test
     public void test_read_access_to_field() {
-    	boolean thrownNoSuchField = false;
     	try {
 			boundBoxOfB.boundBox_getFakeField1();
+			fail();
 		} catch (BoundBoxException e) {
-			thrownNoSuchField = e.getCause() instanceof NoSuchFieldException;
+		    assertTrue(e.getCause() instanceof NoSuchFieldException);
 		}
-    	assertTrue(thrownNoSuchField);
     }
 }

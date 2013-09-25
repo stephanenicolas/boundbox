@@ -1,13 +1,24 @@
 package org.boundbox;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.CLASS)
+//no target, on purpose
+/**
+ * The main annotation of the BoundBox library. 
+ * @author SNI
+ */
 public @interface BoundBox {
+    /** The class to be bound. */
     Class<?> boundClass();
 
+    /** The highest super class in the hierarchy that this boundbox exposes. @see <a href="https://github.com/stephanenicolas/boundbox/wiki/Limiting-hierarchy-exposure-of-a-BoundBox">Limiting hierarchy exposure.</a>*/
     Class<?> maxSuperClass() default Object.class;
     
     /*
-     * List of extra field to be boundboxed
-     * Default behavior: all fields found while reading boundClass source are boundboxed
+     * List of extra fields to add to the BoundBox.
+     * @see <a href="https://github.com/stephanenicolas/boundbox/wiki/Adding-extra-fields-to-a-boundbox">Adding extra fields to a BoundBox.</a>
      */
     BoundBoxField[] extraFields() default {};
 }

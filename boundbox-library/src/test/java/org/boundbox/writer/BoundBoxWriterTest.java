@@ -15,6 +15,7 @@ import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class BoundBoxWriterTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            //FileUtils.deleteDirectory(sandBoxDir);
+            FileUtils.deleteDirectory(sandBoxDir);
         }
     }
     
@@ -141,80 +142,6 @@ public class BoundBoxWriterTest {
         listFieldInfos.add(fakeFieldInfo3);
         listFieldInfos.add(fakeFieldInfo4);
         classInfo.setListFieldInfos(listFieldInfos);
-        classInfo.setListImports(new HashSet<String>());
-
-        Writer out = createWriterInSandbox(classInfo);
-
-        // when
-        writer.writeBoundBox(classInfo, out);
-
-        // then
-        CompilationTask task = createCompileTask(classInfo, neededClasses);
-        boolean result = task.call();
-        assertTrue(result);
-
-        Class<?> clazz = loadBoundBoxClass(classInfo);
-        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
-        assertNotNull(method);
-        Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
-        assertNotNull(method2);
-    }
-
-    // ----------------------------------
-    // EXTRA FIELDS
-    // ----------------------------------
-
-    @Test
-    public void testProcess_class_with_single_extra_field() throws Exception {
-        // given
-        String classUnderTestName = "TestClassWithSingleExtraField";
-        List<String> neededClasses = new ArrayList<String>();
-
-        ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
-        classInfo.setListFieldInfos(listFieldInfos);
-        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
-        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
-        classInfo.setListImports(new HashSet<String>());
-
-        Writer out = createWriterInSandbox(classInfo);
-
-        // when
-        writer.writeBoundBox(classInfo, out);
-
-        // then
-        CompilationTask task = createCompileTask(classInfo, neededClasses);
-        boolean result = task.call();
-        assertTrue(result);
-
-        Class<?> clazz = loadBoundBoxClass(classInfo);
-        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
-        assertNotNull(method);
-        Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
-        assertNotNull(method2);
-    }
-    
-    @Test
-    public void testProcess_class_with_many_extra_fields() throws Exception {
-        // given
-        String classUnderTestName = "TestClassWithManyExtraFields";
-        List<String> neededClasses = new ArrayList<String>();
-
-        ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
-        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
-        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
-        listFieldInfos.add(fakeFieldInfo2);
-        listFieldInfos.add(fakeFieldInfo3);
-        listFieldInfos.add(fakeFieldInfo4);
-        classInfo.setListFieldInfos(listFieldInfos);
-        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
-        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(classInfo);

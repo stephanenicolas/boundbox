@@ -43,6 +43,7 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
+import lombok.NonNull;
 import lombok.extern.java.Log;
 
 import org.boundbox.BoundBox;
@@ -164,29 +165,37 @@ public class BoundBoxProcessor extends AbstractProcessor {
         return true;
     }
 
-    /*
+    /**
      * Inject extra bound fields into a classInfo.
+     * @param extraBoundFields a list that represents the extra fields defined inside a @{@link BoundBox} annotation.
+     * @param classInfo representation of the class whose BoundBox will receive the extra fields.
      */
-	private void injectExtraBoundFields(List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
-		if(extraBoundFields == null || extraBoundFields.isEmpty()) {
+	private void injectExtraBoundFields(@NonNull List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
+		if(extraBoundFields.isEmpty()) {
 			return;
 		}
+		
 		List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
 		TypeMirror fieldClass = null;
 		String fieldName = null;
 		for(AnnotationValue annotationValue : extraBoundFields) {
 			AnnotationMirror annotationMirror = (AnnotationMirror) annotationValue.getValue();
 		    log.info("mirror " + annotationMirror.getAnnotationType());
-			Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotationMirror.getElementValues();
-		    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
+		    
+			Map<? extends ExecutableElement, ? extends AnnotationValue> mapExecutableElementToAnnotationValue = annotationMirror.getElementValues();
+		    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mapExecutableElementToAnnotationValue.entrySet()) {
 				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME.equals(entry.getKey().getSimpleName().toString())) {
 					fieldName = getAnnotationValueAsString(entry.getValue());
+					//TODO shoot an error if its null or not a valid field name in java
 				}
 				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS.equals(entry.getKey().getSimpleName().toString())) {
-					fieldClass = toName(entry.getValue());
+					fieldClass = (TypeMirror) entry.getValue().getValue();
 				}
 		    }
 			FieldInfo fieldInfo = new FieldInfo(fieldName, fieldClass);
+			
+			//TODO we should add a warning to the developer here.
+			//TODO there can even be an error if a field of the same name but with a different type exists.
 			if (!listFieldInfos.contains(fieldInfo)) {
 				listFieldInfos.add(fieldInfo);
 			}
@@ -206,19 +215,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     // ----------------------------------
 
     private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue) {
-        DeclaredType declaredType = (DeclaredType) annotationValue.getValue();
-        return (TypeElement) declaredType.asElement();
+        return (TypeElement) ((DeclaredType) annotationValue.getValue()).asElement();
     }
     
+    @SuppressWarnings("unchecked")
     private List<? extends AnnotationValue> getAnnotationValueAsAnnotationValueList(AnnotationValue annotationValue) {
     	return (List<? extends AnnotationValue>) annotationValue.getValue();
-    }
-    
-    private TypeMirror toName(AnnotationValue annotationValue) {
-    	
-    	Object value = annotationValue.getValue();
-    	
-		return (TypeMirror) value;
     }
     
     private String getAnnotationValueAsString(AnnotationValue annotationValue) {

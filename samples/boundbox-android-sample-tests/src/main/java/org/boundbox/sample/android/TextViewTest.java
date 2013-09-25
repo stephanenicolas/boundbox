@@ -1,6 +1,5 @@
 package org.boundbox.sample.android;
-/*package org.boundbox.sample.android;
-
+/*
 import java.util.ArrayList;
 
 import org.boundbox.BoundBox;
@@ -15,18 +14,18 @@ import android.widget.TextView;
 
 @BoundBox(
 		boundClass = TextView.class,
-		extraBoundFields = {
+		extraFields = {
 			@BoundBoxField(
 					fieldName = "mListeners",
 					fieldClass = ArrayList.class
 			)
 		}
 )
-public class AndroidWidgetTest extends ActivityInstrumentationTestCase2<MainActivity> {
+public class TextViewTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     BoundBoxOfTextView boundBoxOfTextView;
     
-    public AndroidWidgetTest() {
+    public TextViewTest() {
         super(MainActivity.class);
     }
 
@@ -55,4 +54,5 @@ public class AndroidWidgetTest extends ActivityInstrumentationTestCase2<MainActi
         assertEquals(textWatcher, boundBoxOfTextView.boundBox_getMListeners().get(0));
     }
 
-}*/
+}
+*/
