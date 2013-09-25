@@ -10,7 +10,7 @@ import android.test.UiThreadTest;
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
     BoundBoxOfMainActivity boundBoxOfMainActivity;
-
+    
     public MainActivityTest() {
         super(MainActivity.class);
     }
