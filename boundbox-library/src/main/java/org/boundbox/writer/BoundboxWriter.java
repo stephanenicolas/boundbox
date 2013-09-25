@@ -127,6 +127,16 @@ public class BoundboxWriter implements IBoundboxWriter {
             createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
         }
 
+        writeCodeDecoration(writer, "Access to instances of inner classes");
+        for (InnerClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
+            writer.emitEmptyLine();
+            for (MethodInfo methodInfo : innerClassInfo.getListConstructorInfos()) {
+                //TODO write javadoc generation method for inner classes.
+                //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+                createInnerClassAccessor(writer, innerClassInfo, methodInfo);
+            }
+        }
+
         writeCodeDecoration(writer, "Access to boundboxes of inner classes");
         for (InnerClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
             writer.emitEmptyLine();
@@ -145,13 +155,17 @@ public class BoundboxWriter implements IBoundboxWriter {
             modifiers.add(Modifier.STATIC);
         }
         String enclosingBoundBoxClassName = createBoundBoxName(classInfo);
+        EnumSet<Modifier> boundClassFieldModifiers = EnumSet.of(Modifier.PRIVATE);
+        if( innerClassInfo.isStaticInnerClass() ) {
+            boundClassFieldModifiers.add(Modifier.STATIC);
+        }
         writer.beginType(boundBoxClassName, "class", modifiers, null)
         //
         .emitEmptyLine()
         //
         .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
         //
-        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), enclosingBoundBoxClassName+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
+        .emitField("Class<?>", "boundClass", boundClassFieldModifiers, enclosingBoundBoxClassName+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
         .emitEmptyLine();//
 
         writeJavadocForBoundBoxConstructor(writer, innerClassInfo);
@@ -159,15 +173,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         .emitStatement("this.boundObject = boundObject")//
         .endMethod()//
         .emitEmptyLine();
-
-        writeCodeDecoration(writer, "Access to constructors");
-        String targetInnerClassName = innerClassInfo.getClassName();
-        //TODO write javadoc generation method for inner classes.
-        //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-        for(MethodInfo methodInfo : innerClassInfo.getListConstructorInfos() ) {
-            writer.emitEmptyLine();
-            createInnerClassAccessor(writer, innerClassInfo, methodInfo, targetInnerClassName);
-        }
 
         writeCodeDecoration(writer, "Direct access to fields");
         for (FieldInfo fieldInfo : innerClassInfo.getListFieldInfos()) {
@@ -185,7 +190,16 @@ public class BoundboxWriter implements IBoundboxWriter {
             createMethodWrapperForInnerClass(writer, methodInfo, innerClassInfo.getListSuperClassNames());
         }
 
-        // TODO process inner classes
+        writeCodeDecoration(writer, "Access to instances of inner classes");
+        for (InnerClassInfo innerInnerClassInfo : innerClassInfo.getListInnerClassInfo()) {
+            writer.emitEmptyLine();
+            for (MethodInfo methodInfo : innerInnerClassInfo.getListConstructorInfos()) {
+                //TODO write javadoc generation method for inner classes.
+                //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+                createInnerClassAccessor(writer, innerInnerClassInfo, methodInfo);
+            }
+        }
+
         writeCodeDecoration(writer, "Access to boundboxes of inner classes");
         for (InnerClassInfo innerInnerClassInfo : innerClassInfo.getListInnerClassInfo()) {
             writer.emitEmptyLine();
@@ -313,7 +327,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endMethod();
     }
 
-    private void createInnerClassAccessor(JavaWriter writer, InnerClassInfo innerClassInfo, MethodInfo methodInfo, String targetClassName) throws IOException {
+    private void createInnerClassAccessor(JavaWriter writer, InnerClassInfo innerClassInfo, MethodInfo methodInfo) throws IOException {
         String returnType = "Object";
         List<FieldInfo> parameterTypeList = methodInfo.getParameterTypes();
 
@@ -321,7 +335,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         List<String> thrownTypesCommaSeparated = methodInfo.getThrownTypeNames();
 
         // beginBoundInvocationMethod
-        String signature = "boundBox_new_"+targetClassName;
+        String signature = "boundBox_new_"+innerClassInfo.getClassName();
 
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (innerClassInfo.isStaticInnerClass()) {
@@ -334,10 +348,18 @@ public class BoundboxWriter implements IBoundboxWriter {
         // emit method retrieval
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
-        if (parameterTypeList.isEmpty()) {
-            writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor()");
+        if( innerClassInfo.isStaticInnerClass() ) {
+            if (parameterTypeList.isEmpty()) {
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor()", innerClassInfo.getInnerClassIndex());
+            } else {
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(%s)",innerClassInfo.getInnerClassIndex(), parametersTypesCommaSeparated);
+            }
         } else {
-            writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
+            if (parameterTypeList.isEmpty()) {
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(boundClass)", innerClassInfo.getInnerClassIndex());
+            } else {
+                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(boundClass, %s)",innerClassInfo.getInnerClassIndex(), parametersTypesCommaSeparated);
+            }
         }
         writer.emitStatement("method.setAccessible(true)");
 
@@ -509,7 +531,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
 
         if (parameterTypeList.isEmpty()) {
-           if (methodInfo.isStaticMethod()) {
+            if (methodInfo.isStaticMethod()) {
                 writer.emitStatement(returnString + "method.invoke(null)");
             } else {
                 writer.emitStatement(returnString + "method.invoke(boundObject)");
