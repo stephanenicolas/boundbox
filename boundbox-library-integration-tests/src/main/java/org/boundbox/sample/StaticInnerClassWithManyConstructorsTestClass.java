@@ -1,6 +1,6 @@
 package org.boundbox.sample;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("all")
 @edu.umd.cs.findbugs.annotations.SuppressWarnings(
         value={"URF_UNREAD_FIELD"}, 
         justification="Only used for tests")

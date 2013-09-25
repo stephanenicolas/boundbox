@@ -61,7 +61,7 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         String targetPackageName = classInfo.getTargetPackageName();
         String targetClassName = classInfo.getTargetClassName();
-        String boundBoxClassName = classInfo.getBoundBoxClassName();
+        String boundBoxClassName = createBoundBoxName(classInfo);
 
         try {
             writer.emitPackage(targetPackageName)//
@@ -144,14 +144,14 @@ public class BoundboxWriter implements IBoundboxWriter {
         if( innerClassInfo.isStaticInnerClass() ) {
             modifiers.add(Modifier.STATIC);
         }
-        String className = classInfo.getClassName().contains(".") ? StringUtils.substringAfterLast(classInfo.getClassName(),".") : classInfo.getClassName();
+        String enclosingBoundBoxClassName = createBoundBoxName(classInfo);
         writer.beginType(boundBoxClassName, "class", modifiers, null)
         //
         .emitEmptyLine()
         //
         .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
         //
-        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), "BoundBoxOf"+className+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
+        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), enclosingBoundBoxClassName+".boundClass.getDeclaredClasses()["+innerClassInfo.getInnerClassIndex()+"]")//
         .emitEmptyLine();//
 
         writeJavadocForBoundBoxConstructor(writer, innerClassInfo);
@@ -198,6 +198,15 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endType();
     }
 
+
+    private String createBoundBoxName(ClassInfo classInfo) {
+        String className = classInfo.getClassName().contains(".") ? StringUtils.substringAfterLast(classInfo.getClassName(),".") : classInfo.getClassName();
+
+        if( classInfo instanceof InnerClassInfo ) {
+            return "BoundBox_inner_"+className;
+        }
+        return "BoundBoxOf"+className;
+    }
 
     private void writeCodeDecoration(JavaWriter writer, String decorationTitle) throws IOException {
         writer.emitSingleLineComment(CODE_DECORATOR);

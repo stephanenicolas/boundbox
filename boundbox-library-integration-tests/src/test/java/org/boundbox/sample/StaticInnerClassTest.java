@@ -43,9 +43,24 @@ public class StaticInnerClassTest {
     public void test_access_static_inner_class_with_many_fields_and_methods() {
         Object instanceofInnerClass = BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass.boundBox_new_InnerClass();
         assertNotNull(instanceofInnerClass);
-        assertNotNull( new BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass(instanceofInnerClass) );
+        BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass boundBoxOfInnerClass = new BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass(instanceofInnerClass);
+        assertNotNull( boundBoxOfInnerClass );
         
-        new BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass(instanceofInnerClass).foo();
-        new BoundBoxOfStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass(instanceofInnerClass).bar(2);
+        boundBoxOfInnerClass.foo();
+        boundBoxOfInnerClass.bar(2);
+    }
+    
+    @BoundBox(boundClass = StaticInnerClassInStaticInnerTestClass.class)
+    @Test
+    public void test_access_static_inner_class_in_static_inner_class() {
+        Object instanceofInBetweenClass = BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass.boundBox_new_InBetweenClass();
+        assertNotNull(instanceofInBetweenClass);
+        BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass boundBoxOfInBetweenClass = new BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass(instanceofInBetweenClass);
+        assertNotNull( boundBoxOfInBetweenClass );
+        
+        Object instanceofInnerClass = BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass.BoundBox_inner_InnerClass.boundBox_new_InnerClass();
+        assertNotNull(instanceofInnerClass);
+        BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass.BoundBox_inner_InnerClass boundBoxOfInnerClass = new BoundBoxOfStaticInnerClassInStaticInnerTestClass.BoundBox_inner_InBetweenClass.BoundBox_inner_InnerClass(instanceofInBetweenClass);
+        assertNotNull( boundBoxOfInnerClass );
     }
 }
