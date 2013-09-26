@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
 /**
@@ -68,5 +69,23 @@ public class JavadocGenerator {
         javadoc += " \nIn case of overloading, the method that will be invoked is the method with the exact same signature as this method.";
         javadoc += "\n@see %s#%s(%s)";
         return String.format(javadoc, methodName, className, listSuperClassNames.get(methodInfo.getInheritanceLevel()), methodName, parametersTypesCommaSeparated);
+    }
+
+    public String writeJavadocForBoundInnerClass(InnerClassInfo innerInnerClassInfo) {
+        String className = innerInnerClassInfo.getClassName();
+        String javadoc = "BoundBox for the inner class {@link %s}.";
+        javadoc += " \nThis class will let you access all fields, constructors or methods of %s.";
+        javadoc += "\n@see <a href='https://github.com/stephanenicolas/boundbox/wiki'>BoundBox's wiki on GitHub</a>";
+        javadoc += "\n@see %s";
+        return String.format(javadoc, className, className, className);
+    }
+
+    public String writeJavadocForBoundInnerClassAccessor(InnerClassInfo innerClassInfo, MethodInfo methodInfo, String parametersTypesCommaSeparated) {
+        String className = innerClassInfo.getClassName();
+        String javadoc = "Creates a BoundBoxOf%s for the inner class {@link %s}.";
+        javadoc += "\n@param %s the instance of {@link %s} that is bound by this BoundBox.";
+        javadoc += "\n@see %s#%s(%s)";
+        String simpleClassName = className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
+        return String.format(javadoc, simpleClassName, className, "boundObject", className, className, simpleClassName, parametersTypesCommaSeparated);
     }
 }
