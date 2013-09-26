@@ -45,6 +45,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     @Getter
     private boolean isWritingJavadoc = true;
 
+    private JavadocGenerator javadocGenerator = new JavadocGenerator();
     // ----------------------------------
     // METHODS
     // ----------------------------------
@@ -552,71 +553,39 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private void writeJavadocForBoundBoxClass(JavaWriter writer, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            String className = classInfo.getClassName();
-            String javadoc = "BoundBox for the class {@link %s}.";
-            javadoc += " \nThis class will let you access all fields, constructors or methods of %s.";
-            javadoc += "\n@see <a href='https://github.com/stephanenicolas/boundbox/wiki'>BoundBox's wiki on GitHub</a>";
-            javadoc += "\n@see %s";
-            writer.emitJavadoc(javadoc, className, className, className);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundBoxClass(classInfo));
         }
     }
 
     private void writeJavadocForBoundBoxConstructor(JavaWriter writer, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            String className = classInfo.getClassName();
-            String javadoc = "Creates a BoundBoxOf%s.";
-            javadoc += "\n@param %s the instance of {@link %s} that is bound by this BoundBox.";
-            writer.emitJavadoc(javadoc, StringUtils.substringAfterLast(className,"."), "boundObject",className);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundBoxConstructor(classInfo));
         }
     }
 
     private void writeJavadocForBoundConstructor(JavaWriter writer, ClassInfo classInfo, MethodInfo methodInfo) throws IOException {
         if (isWritingJavadoc) {
-            String className = classInfo.getClassName();
             String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(methodInfo.getParameterTypes());
-            String javadoc = "Invokes a constructor of the class {@link %s}.";
-            javadoc += " \nThis constructor that will be invoked is the constructor with the exact same signature as this method.";
-            javadoc += "\n@see %s#%s(%s)";
-            writer.emitJavadoc(javadoc, className, className,className, parametersTypesCommaSeparated);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundConstructor(classInfo, methodInfo, parametersTypesCommaSeparated));
         }
     }
 
     private void writeJavadocForBoundSetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            String fieldName = fieldInfo.getFieldName();
-            List<String> listSuperClassNames = classInfo.getListSuperClassNames();
-            String className = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
-            String javadoc = "Sets directly the value of %s.";
-            javadoc += " \nThis method doesn't invoke the setter but changes the value of the field directly.";
-            javadoc += "\n@param %s the new value of the field \"%s\" declared in class {@link %s}.";
-            javadoc += "\n@see %s#%s";
-            writer.emitJavadoc(javadoc, fieldName, fieldName, fieldName, className, className, fieldName);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundSetter(fieldInfo, classInfo));
         }
     }
 
     private void writeJavadocForBoundGetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            String fieldName = fieldInfo.getFieldName();
-            List<String> listSuperClassNames = classInfo.getListSuperClassNames();
-            String className = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
-            String javadoc = "Returns directly the value of %s.";
-            javadoc += " \nThis method doesn't invoke the getter but returns the value of the field directly.";
-            javadoc += "\n@return the value of the field \"%s\" declared in class {@link %s}.";
-            javadoc += "\n@see %s#%s";
-            writer.emitJavadoc(javadoc, fieldName, fieldName, className, className, fieldName);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundGetter(fieldInfo, classInfo));
         }
     }
 
     private void writeJavadocForBoundMethod(JavaWriter writer, ClassInfo classInfo, MethodInfo methodInfo) throws IOException {
         if (isWritingJavadoc) {
-            String className = classInfo.getClassName();
             String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(methodInfo.getParameterTypes());
-            String methodName = methodInfo.getMethodName();
-            List<String> listSuperClassNames = classInfo.getListSuperClassNames();
-            String javadoc = "Invokes the method \"%s\"of the class {@link %s}.";
-            javadoc += " \nIn case of overloading, the method that will be invoked is the method with the exact same signature as this method.";
-            javadoc += "\n@see %s#%s(%s)";
-            writer.emitJavadoc(javadoc, methodName, className, listSuperClassNames.get(methodInfo.getInheritanceLevel()),methodName, parametersTypesCommaSeparated);
+            writer.emitJavadoc(javadocGenerator.writeJavadocForBoundMethod(classInfo, methodInfo, parametersTypesCommaSeparated));
         }
     }
 
@@ -672,7 +641,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.endControlFlow();
     }
 
-    //
+    //TODO use Types from processing environment ?
     private String createCastReturnTypeString(String returnType) {
         String castReturnTypeString = "";
         if ("int".equals(returnType)) {
