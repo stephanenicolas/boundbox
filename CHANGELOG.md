@@ -1,4 +1,5 @@
 ## Release 1.1.0 (planned on October 17th 2013)
+* Flavien Laurent joined the team of BoundBox !
 * A problem in import statement management has been solved. https://github.com/stephanenicolas/boundbox/issues/2. Thx to Flavien Laurent
 * A problem in generics handling has been solved. https://github.com/stephanenicolas/boundbox/issues/1. Thx to Flavien Laurent
 * Javadoc has been added to methods of a BoundBox. https://github.com/stephanenicolas/boundbox/issues/5
