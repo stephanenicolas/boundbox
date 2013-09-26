@@ -140,20 +140,20 @@ public class BoundboxWriter implements IBoundboxWriter {
         writeCodeDecoration(writer, "Access to boundboxes of inner classes");
         for (InnerClassInfo innerClassInfo : classInfo.getListInnerClassInfo()) {
             writer.emitEmptyLine();
-            String targetInnerClassName = innerClassInfo.getClassName();
             //TODO write javadoc generation method for inner classes.
             //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-            createInnerClassWrapper(writer, classInfo, innerClassInfo, "BoundBox_inner_"+targetInnerClassName);
+            createInnerClassWrapper(writer, classInfo, innerClassInfo);
         }
 
         writer.endType();
     }
 
-    private void createInnerClassWrapper(JavaWriter writer, ClassInfo classInfo, InnerClassInfo innerClassInfo, String boundBoxClassName) throws IOException {
+    private void createInnerClassWrapper(JavaWriter writer, ClassInfo classInfo, InnerClassInfo innerClassInfo) throws IOException {
         EnumSet<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC, Modifier.FINAL);
         if( innerClassInfo.isStaticInnerClass() ) {
             modifiers.add(Modifier.STATIC);
         }
+        String boundBoxClassName = createBoundBoxName(innerClassInfo);
         String enclosingBoundBoxClassName = createBoundBoxName(classInfo);
         String thisOrNot = ((classInfo instanceof InnerClassInfo) && !((InnerClassInfo)classInfo).isStaticInnerClass()) ? ".this" : "";
         EnumSet<Modifier> boundClassFieldModifiers = EnumSet.of(Modifier.PRIVATE);
@@ -204,10 +204,9 @@ public class BoundboxWriter implements IBoundboxWriter {
         writeCodeDecoration(writer, "Access to boundboxes of inner classes");
         for (InnerClassInfo innerInnerClassInfo : innerClassInfo.getListInnerClassInfo()) {
             writer.emitEmptyLine();
-            String targetInnerInnerClassName = innerInnerClassInfo.getClassName();
             //TODO write javadoc generation method for inner classes.
             //writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-            createInnerClassWrapper(writer, innerClassInfo, innerInnerClassInfo, "BoundBox_inner_"+targetInnerInnerClassName);
+            createInnerClassWrapper(writer, innerClassInfo, innerInnerClassInfo);
         }
 
         writer.endType();
@@ -216,10 +215,6 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private String createBoundBoxName(ClassInfo classInfo) {
         String className = classInfo.getClassName().contains(".") ? StringUtils.substringAfterLast(classInfo.getClassName(),".") : classInfo.getClassName();
-
-        if( classInfo instanceof InnerClassInfo ) {
-            return "BoundBox_inner_"+className;
-        }
         return "BoundBoxOf"+className;
     }
 

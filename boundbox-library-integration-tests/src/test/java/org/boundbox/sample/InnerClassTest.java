@@ -13,7 +13,7 @@ public class InnerClassTest {
         NonStaticInnerClassTestClass instanceofOuterClass = BoundBoxOfNonStaticInnerClassTestClass.boundBox_new();
         Object instanceofInnerClass = new BoundBoxOfNonStaticInnerClassTestClass(instanceofOuterClass).boundBox_new_InnerClass();
         assertTrue(instanceofInnerClass instanceof NonStaticInnerClassTestClass.InnerClass);
-        assertNotNull( new BoundBoxOfNonStaticInnerClassTestClass(instanceofOuterClass).new BoundBox_inner_InnerClass(instanceofInnerClass) );
+        assertNotNull( new BoundBoxOfNonStaticInnerClassTestClass(instanceofOuterClass).new BoundBoxOfInnerClass(instanceofInnerClass) );
     }
     
     @BoundBox(boundClass = NonStaticPrivateInnerClassTestClass.class)
@@ -22,7 +22,7 @@ public class InnerClassTest {
         NonStaticPrivateInnerClassTestClass instanceofOuterClass = BoundBoxOfNonStaticPrivateInnerClassTestClass.boundBox_new();
         Object instanceofInnerClass = new BoundBoxOfNonStaticPrivateInnerClassTestClass(instanceofOuterClass).boundBox_new_InnerClass();
         assertEquals(NonStaticPrivateInnerClassTestClass.class.getDeclaredClasses()[0], instanceofInnerClass.getClass() );
-        assertNotNull( new BoundBoxOfNonStaticPrivateInnerClassTestClass(instanceofOuterClass).new BoundBox_inner_InnerClass(instanceofInnerClass) );
+        assertNotNull( new BoundBoxOfNonStaticPrivateInnerClassTestClass(instanceofOuterClass).new BoundBoxOfInnerClass(instanceofInnerClass) );
     }
     
     @BoundBox(boundClass = NonStaticInnerClassWithManyConstructorsTestClass.class)
@@ -30,7 +30,7 @@ public class InnerClassTest {
     public void test_access_static_inner_class_with_many_constructors() {
         NonStaticInnerClassWithManyConstructorsTestClass instanceofOuterClass = BoundBoxOfNonStaticInnerClassWithManyConstructorsTestClass.boundBox_new();
         Object instanceofInnerClass = new BoundBoxOfNonStaticInnerClassWithManyConstructorsTestClass(instanceofOuterClass).boundBox_new_InnerClass();
-        assertNotNull( new BoundBoxOfNonStaticPrivateInnerClassTestClass(instanceofOuterClass).new BoundBox_inner_InnerClass(instanceofInnerClass) );
+        assertNotNull( new BoundBoxOfNonStaticPrivateInnerClassTestClass(instanceofOuterClass).new BoundBoxOfInnerClass(instanceofInnerClass) );
 
         assertNotNull(instanceofInnerClass);
         
@@ -47,7 +47,7 @@ public class InnerClassTest {
         NonStaticInnerClassWithManyFieldsAndMethodsTestClass instanceofOuterClass = BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass.boundBox_new();
         Object instanceofInnerClass = new BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass(instanceofOuterClass).boundBox_new_InnerClass();
         assertNotNull(instanceofInnerClass);
-        BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBox_inner_InnerClass boundBoxOfInnerClass = new BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass(instanceofOuterClass).new BoundBox_inner_InnerClass(instanceofInnerClass);
+        BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass.BoundBoxOfInnerClass boundBoxOfInnerClass = new BoundBoxOfNonStaticInnerClassWithManyFieldsAndMethodsTestClass(instanceofOuterClass).new BoundBoxOfInnerClass(instanceofInnerClass);
         assertNotNull( boundBoxOfInnerClass );
         
         boundBoxOfInnerClass.foo();
@@ -60,12 +60,12 @@ public class InnerClassTest {
         NonStaticInnerClassInNonStaticInnerTestClass instanceofOuterClass = BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass.boundBox_new();
         Object instanceofInBetweenClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).boundBox_new_InBetweenClass();
         assertNotNull(instanceofInBetweenClass);
-        BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass.BoundBox_inner_InBetweenClass boundBoxOfInBetweenClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBox_inner_InBetweenClass(instanceofInBetweenClass);
+        BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass.BoundBoxOfInBetweenClass boundBoxOfInBetweenClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBoxOfInBetweenClass(instanceofInBetweenClass);
         assertNotNull( boundBoxOfInBetweenClass );
         
-        Object instanceofInnerClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBox_inner_InBetweenClass(instanceofInBetweenClass).boundBox_new_InnerClass();
+        Object instanceofInnerClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBoxOfInBetweenClass(instanceofInBetweenClass).boundBox_new_InnerClass();
         assertNotNull(instanceofInnerClass);
-        BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass.BoundBox_inner_InBetweenClass.BoundBox_inner_InnerClass boundBoxOfInnerClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBox_inner_InBetweenClass(instanceofInBetweenClass).new BoundBox_inner_InnerClass(instanceofInnerClass);
+        BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass.BoundBoxOfInBetweenClass.BoundBoxOfInnerClass boundBoxOfInnerClass = new BoundBoxOfNonStaticInnerClassInNonStaticInnerTestClass(instanceofOuterClass).new BoundBoxOfInBetweenClass(instanceofInBetweenClass).new BoundBoxOfInnerClass(instanceofInnerClass);
         assertNotNull( boundBoxOfInnerClass );
     }
     

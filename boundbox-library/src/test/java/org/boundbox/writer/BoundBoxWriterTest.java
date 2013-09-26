@@ -758,7 +758,7 @@ public class BoundBoxWriterTest {
         Class<?> class1 = clazz.getDeclaredClasses()[0];
         assertNotNull(class1);
         
-        assertEquals("BoundBox_inner_InnerClass",class1.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass",class1.getSimpleName());
     }
     
     // ----------------------------------
@@ -798,7 +798,7 @@ public class BoundBoxWriterTest {
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
         
-        assertEquals("BoundBox_inner_InnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
         
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
@@ -846,7 +846,7 @@ public class BoundBoxWriterTest {
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
         
-        assertEquals("BoundBox_inner_InnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
         
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
@@ -908,7 +908,7 @@ public class BoundBoxWriterTest {
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
         
-        assertEquals("BoundBox_inner_InnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
         
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
