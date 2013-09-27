@@ -147,18 +147,28 @@ public class BoundBoxProcessor extends AbstractProcessor {
             inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos(), boundClass, elements);
 
             // write meta model to java class file
+            Writer sourceWriter = null;
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = classInfo.getBoundBoxClassName();
 
                 String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "." + boundBoxClassName;
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
-                Writer out = sourceFile.openWriter();
+                sourceWriter = sourceFile.openWriter();
 
-                boundboxWriter.writeBoundBox(classInfo, out);
+                boundboxWriter.writeBoundBox(classInfo, sourceWriter);
             } catch (IOException e) {
                 e.printStackTrace();
                 error(classElement, e.getMessage());
+            } finally {
+            	if(sourceWriter != null) {
+	            	try {
+	            		sourceWriter.close();
+	            	} catch(IOException e) {
+	                    e.printStackTrace();
+	                    error(classElement, e.getMessage());
+	            	}
+            	}
             }
         }
 

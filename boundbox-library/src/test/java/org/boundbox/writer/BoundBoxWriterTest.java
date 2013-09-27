@@ -45,6 +45,7 @@ public class BoundBoxWriterTest {
 
     private BoundboxWriter writer;
     private File sandBoxDir;
+	private FileWriter sandboxWriter;
 
     @Before
     public void setup() throws IOException {
@@ -61,7 +62,15 @@ public class BoundBoxWriterTest {
         if (sandBoxDir.exists()) {
             FileUtils.deleteDirectory(sandBoxDir);
         }
+        closeSandboxWriter();
     }
+
+	private void closeSandboxWriter() throws IOException {
+		if (sandboxWriter != null) {
+        	sandboxWriter.close();
+        	sandboxWriter = null;
+        }
+	}
     
     // ----------------------------------
     // JAVADOC
@@ -111,6 +120,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -147,6 +157,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -184,6 +195,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -227,6 +239,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -268,6 +281,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -329,6 +343,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -373,6 +388,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -440,6 +456,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -475,6 +492,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -511,6 +529,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -546,6 +565,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -588,6 +608,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -626,6 +647,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -666,6 +688,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -699,6 +722,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -740,6 +764,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -787,6 +812,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -835,6 +861,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -897,6 +924,7 @@ public class BoundBoxWriterTest {
 
         // when
         writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
 
         // then
         CompilationTask task = createCompileTask(classInfo, neededClasses);
@@ -939,7 +967,8 @@ public class BoundBoxWriterTest {
     }
 
     private FileWriter createWriterInSandbox(ClassInfo classInfo) throws IOException {
-        return new FileWriter(new File(sandBoxDir, classNameToJavaFile(classInfo.getBoundBoxClassName())));
+        sandboxWriter = new FileWriter(new File(sandBoxDir, classNameToJavaFile(classInfo.getBoundBoxClassName())));
+		return sandboxWriter;
     }
 
     private String classNameToJavaFile(String className) {

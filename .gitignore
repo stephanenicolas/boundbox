@@ -41,3 +41,7 @@ target/
 
 #symoblic link to action bar sherlock
 library
+
+#eclipse
+.metadata
+.factorypath

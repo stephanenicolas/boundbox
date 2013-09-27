@@ -66,32 +66,25 @@ public class BoundboxWriter implements IBoundboxWriter {
         String targetClassName = classInfo.getTargetClassName();
         String boundBoxClassName = createBoundBoxName(classInfo);
 
-        try {
-            writer.emitPackage(targetPackageName)//
-            .emitEmptyLine();
+        writer.emitPackage(targetPackageName)//
+        .emitEmptyLine();
 
-            //TODO javawriter doesn't handle imports properly. V3.0.0 should change this
-            //but for now just don't use imports, except a few.
-            classInfo.getListImports().clear();
-            classInfo.getListImports().add(Field.class.getName());
-            classInfo.getListImports().add(Method.class.getName());
-            classInfo.getListImports().add(Constructor.class.getName());
-            classInfo.getListImports().add(InvocationTargetException.class.getName());
-            classInfo.getListImports().add(BoundBoxException.class.getName());
-            writer.emitImports(classInfo.getListImports());
+        //TODO javawriter doesn't handle imports properly. V3.0.0 should change this
+        //but for now just don't use imports, except a few.
+        classInfo.getListImports().clear();
+        classInfo.getListImports().add(Field.class.getName());
+        classInfo.getListImports().add(Method.class.getName());
+        classInfo.getListImports().add(Constructor.class.getName());
+        classInfo.getListImports().add(InvocationTargetException.class.getName());
+        classInfo.getListImports().add(BoundBoxException.class.getName());
+        writer.emitImports(classInfo.getListImports());
 
-            // TODO search the inner class tree for imports
+        // TODO search the inner class tree for imports
 
-            writer.emitEmptyLine();
-            writeJavadocForBoundBoxClass(writer, classInfo);
-            writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
-            createClassWrapper(writer, classInfo, targetClassName, boundBoxClassName);
-
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
+        writer.emitEmptyLine();
+        writeJavadocForBoundBoxClass(writer, classInfo);
+        writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
+        createClassWrapper(writer, classInfo, targetClassName, boundBoxClassName);
     }
 
     private void createClassWrapper(JavaWriter writer, ClassInfo classInfo, String targetClassName, String boundBoxClassName) throws IOException {
