@@ -167,7 +167,7 @@ BoundBox is [heavily tested](https://github.com/stephanenicolas/boundbox/wiki/Co
 It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok is used to decrease the amount of code to write and maintain.
 
 
-BoundBox is under CI on Travis <br/><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/>
+BoundBox is under CI on Travis <br/><a href="https://travis-ci.org/stephanenicolas/boundbox/builds"><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/></a>
 
 License
 -------
