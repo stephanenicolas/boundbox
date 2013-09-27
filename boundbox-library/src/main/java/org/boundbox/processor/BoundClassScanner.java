@@ -58,6 +58,8 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
             InnerClassInfo innerClassInfo = new InnerClassInfo(e.getSimpleName().toString());
             innerClassInfo.setInnerClassIndex(classInfo.getListInnerClassInfo().size());
             innerClassInfo.setStaticInnerClass(e.getModifiers().contains(Modifier.STATIC));
+            innerClassInfo.getListSuperClassNames().add(e.toString());
+
             stackClassInfos.add(innerClassInfo);
             classInfo.getListInnerClassInfo().add(innerClassInfo);
             classInfo = innerClassInfo;
@@ -72,10 +74,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
-        if (!maxSuperClassName.equals(superclassOfBoundClass.toString()) && superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
+        if (!maxSuperClassName.equals(superclassOfBoundClass.toString()) && !Object.class.getName().equals(superclassOfBoundClass.toString()) && superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
             DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
             Element superClassElement = superClassDeclaredType.asElement();
-            classInfo.getListSuperClassNames().add(superClassElement.getSimpleName().toString());
+            classInfo.getListSuperClassNames().add(superClassElement.toString());
             superClassElement.accept(BoundClassScanner.this, inheritanceLevel + 1);
         }
 

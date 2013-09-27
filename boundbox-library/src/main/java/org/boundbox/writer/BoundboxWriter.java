@@ -52,6 +52,9 @@ public class BoundboxWriter implements IBoundboxWriter {
     @Override
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
         JavaWriter writer = new JavaWriter(out);
+        //TODO javawriter doesn't handle imports properly. V3.0.0 should change this
+        //but for now just don't use imports, except a few.
+        writer.setCompressingTypes(false);
         writeBoundBox(classInfo, writer);
     }
 
@@ -67,6 +70,9 @@ public class BoundboxWriter implements IBoundboxWriter {
             writer.emitPackage(targetPackageName)//
             .emitEmptyLine();
 
+            //TODO javawriter doesn't handle imports properly. V3.0.0 should change this
+            //but for now just don't use imports, except a few.
+            classInfo.getListImports().clear();
             classInfo.getListImports().add(Field.class.getName());
             classInfo.getListImports().add(Method.class.getName());
             classInfo.getListImports().add(Constructor.class.getName());
@@ -432,18 +438,18 @@ public class BoundboxWriter implements IBoundboxWriter {
         String superClassChain = getSuperClassName(methodInfo, listSuperClassNames);
         if (parameterTypeList.isEmpty()) {
             if (isConstructor || methodInfo.isInstanceInitializer()) {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor()");
+                writer.emitStatement("Constructor<?> methodToInvoke = boundClass.getDeclaredConstructor()");
             } else {
-                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
+                writer.emitStatement("Method methodToInvoke = " + superClassChain + ".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
             }
         } else {
             if (isConstructor) {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
+                writer.emitStatement("Constructor<?> methodToInvoke = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
             } else {
-                writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
+                writer.emitStatement("Method methodToInvoke = " + superClassChain + ".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
             }
         }
-        writer.emitStatement("method.setAccessible(true)");
+        writer.emitStatement("methodToInvoke.setAccessible(true)");
 
         // emit method invocation
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
@@ -457,19 +463,19 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         if (parameterTypeList.isEmpty()) {
             if (isConstructor) {
-                writer.emitStatement(returnString + "method.newInstance()");
+                writer.emitStatement(returnString + "methodToInvoke.newInstance()");
             } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "method.invoke(null)");
+                writer.emitStatement(returnString + "methodToInvoke.invoke(null)");
             } else {
-                writer.emitStatement(returnString + "method.invoke(boundObject)");
+                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject)");
             }
         } else {
             if (isConstructor) {
-                writer.emitStatement(returnString + "method.newInstance(%s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.newInstance(%s)", parametersNamesCommaSeparated);
             } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "method.invoke(null, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.invoke(null, %s)", parametersNamesCommaSeparated);
             } else {
-                writer.emitStatement(returnString + "method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject, %s)", parametersNamesCommaSeparated);
             }
         }
         writer.endControlFlow();
@@ -495,6 +501,9 @@ public class BoundboxWriter implements IBoundboxWriter {
         String signature = createSignatureMethod(methodInfo, listSuperClassNames);
         if (methodInfo.isStaticInitializer()) {
             signature = "boundBox_static_init";
+            if( methodInfo.getInheritanceLevel() >0 ) {
+                signature += "_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()));
+            }
             returnType = "void";
         } else if (methodInfo.isInstanceInitializer()) {
             signature = "boundBox_init";
@@ -514,11 +523,11 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         String superClassChain = getSuperClassChain(methodInfo);
         if (parameterTypeList.isEmpty()) {
-            writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
+            writer.emitStatement("Method methodToInvoke = " + superClassChain + ".getDeclaredMethod(%s)", JavaWriter.stringLiteral(methodName));
         } else {
-            writer.emitStatement("Method method = " + superClassChain + ".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
+            writer.emitStatement("Method methodToInvoke = " + superClassChain + ".getDeclaredMethod(%s,%s)", JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
         }
-        writer.emitStatement("method.setAccessible(true)");
+        writer.emitStatement("methodToInvoke.setAccessible(true)");
 
         // emit method invocation
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
@@ -532,15 +541,15 @@ public class BoundboxWriter implements IBoundboxWriter {
 
         if (parameterTypeList.isEmpty()) {
             if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "method.invoke(null)");
+                writer.emitStatement(returnString + "methodToInvoke.invoke(null)");
             } else {
-                writer.emitStatement(returnString + "method.invoke(boundObject)");
+                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject)");
             }
         } else {
             if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "method.invoke(null, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.invoke(null, %s)", parametersNamesCommaSeparated);
             } else {
-                writer.emitStatement(returnString + "method.invoke(boundObject, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject, %s)", parametersNamesCommaSeparated);
             }
         }
         writer.endControlFlow();
@@ -617,7 +626,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
             getterName = "boundBox_get" + fieldNameCamelCase;
         } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
+            String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
             getterName = "boundBox_super_" + superClassName + "_get" + fieldNameCamelCase;
         }
         return getterName;
@@ -628,7 +637,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
             getterName = "boundBox_set" + fieldNameCamelCase;
         } else {
-            String superClassName = listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel());
+            String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
             getterName = "boundBox_super_" + superClassName + "_set" + fieldNameCamelCase;
         }
         return getterName;
@@ -639,7 +648,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (methodInfo.getEffectiveInheritanceLevel() == 0) {
             getterName = methodInfo.getMethodName();
         } else {
-            String superClassName = listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel());
+            String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
             getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
         }
         return getterName;
@@ -652,7 +661,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     private String getSuperClassChain(Inheritable inheritable) {
         StringBuilder superClassChain = new StringBuilder("boundClass");
         for (int inheritanceLevel = 0; inheritanceLevel < inheritable.getInheritanceLevel(); inheritanceLevel++) {
-            superClassChain.append(".getSuperClass()");
+            superClassChain.append(".getSuperclass()");
         }
         return superClassChain.toString();
     }
@@ -702,6 +711,10 @@ public class BoundboxWriter implements IBoundboxWriter {
 
     private String extractRawType(String fieldTypeName) {
         return fieldTypeName.replaceAll("<.*>", "");
+    }
+    
+    private String extractSimpleName(String className) {
+        return className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
     }
 
     private String createListOfParametersNamesCommaSeparated(List<FieldInfo> parameterTypeList) {

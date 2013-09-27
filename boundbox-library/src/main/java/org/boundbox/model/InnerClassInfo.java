@@ -3,11 +3,13 @@ package org.boundbox.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
 @EqualsAndHashCode(callSuper=true)
+@ToString
 public class InnerClassInfo extends ClassInfo implements Inheritable {
 
     @Setter

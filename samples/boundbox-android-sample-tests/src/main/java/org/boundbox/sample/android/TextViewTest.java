@@ -1,5 +1,4 @@
 package org.boundbox.sample.android;
-/*
 import java.util.ArrayList;
 
 import org.boundbox.BoundBox;
@@ -19,7 +18,9 @@ import android.widget.TextView;
 					fieldName = "mListeners",
 					fieldClass = ArrayList.class
 			)
-		}
+		},
+		maxSuperClass = TextView.class
+		
 )
 public class TextViewTest extends ActivityInstrumentationTestCase2<MainActivity> {
 
@@ -55,4 +56,3 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<MainActivity>
     }
 
 }
-*/
