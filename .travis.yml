@@ -55,4 +55,4 @@ before_install:
 # We will run findbugs and checkstyle in the script phase
 install: mvn clean install --quiet -DskipTests=true -Dmaven.javadoc.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
 
-script: mvn clean install -Dandroid.device=test -Dmaven.javadoc.skip=true
+script: mvn clean install -Pcoveralls -Dandroid.device=test -Dmaven.javadoc.skip=true
