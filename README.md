@@ -168,6 +168,9 @@ It also integrates checkstyle, findbugs, PMD to increase its robustness. Lombok 
 
 
 BoundBox is under CI on Travis <br/><a href="https://travis-ci.org/stephanenicolas/boundbox/builds"><img src="https://travis-ci.org/stephanenicolas/boundbox.png?branch=master"/></a>
+<br/>
+BoundBox uses coveralls.io for code coverage of unit-tests <br/>
+[![Coverage Status](https://coveralls.io/repos/stephanenicolas/boundbox/badge.png?branch=master)](https://coveralls.io/r/stephanenicolas/boundbox?branch=master)
 
 License
 -------
