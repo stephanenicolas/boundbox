@@ -44,6 +44,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     private boolean isWritingJavadoc = true;
 
     private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
+    private NamingGenerator namingGenerator = new NamingGenerator();
 
     // ----------------------------------
     // METHODS
@@ -223,16 +224,15 @@ public class BoundboxWriter implements IBoundboxWriter {
     }
 
     private String createBoundBoxName(ClassInfo classInfo) {
-        String className = classInfo.getClassName().contains(".") ? StringUtils.substringAfterLast(classInfo.getClassName(), ".") : classInfo.getClassName();
-        return "BoundBoxOf" + className;
+        return namingGenerator.createBoundBoxName(classInfo);
     }
 
     private void createDirectSetter(JavaWriter writer, FieldInfo fieldInfo, List<String> listSuperClassNames) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String setterName = createSignatureSetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
+        String fieldNameCamelCase = namingGenerator.computeCamelCaseNameStartUpperCase(fieldName);
+        String setterName = namingGenerator.createSetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
@@ -247,8 +247,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String setterName = createSignatureSetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
+        String fieldNameCamelCase = namingGenerator.computeCamelCaseNameStartUpperCase(fieldName);
+        String setterName = namingGenerator.createSetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
@@ -279,8 +279,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String getterName = createSignatureGetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
+        String fieldNameCamelCase = namingGenerator.computeCamelCaseNameStartUpperCase(fieldName);
+        String getterName = namingGenerator.createGetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
@@ -295,8 +295,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         String fieldName = fieldInfo.getFieldName();
         String fieldType = fieldInfo.getFieldTypeName();
 
-        String fieldNameCamelCase = computeCamelCaseNameStartUpperCase(fieldName);
-        String getterName = createSignatureGetter(fieldInfo, listSuperClassNames, fieldNameCamelCase);
+        String fieldNameCamelCase = namingGenerator.computeCamelCaseNameStartUpperCase(fieldName);
+        String getterName = namingGenerator.createGetterName(fieldInfo, listSuperClassNames, fieldNameCamelCase);
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (fieldInfo.isStaticField()) {
             modifiers.add(Modifier.STATIC);
@@ -333,7 +333,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         List<String> thrownTypesCommaSeparated = methodInfo.getThrownTypeNames();
 
         // beginBoundInvocationMethod
-        String signature = "boundBox_new_" + innerClassInfo.getClassName();
+        String signature = namingGenerator.createInnerClassAccessorName(innerClassInfo);
 
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
         if (innerClassInfo.isStaticInnerClass()) {
@@ -414,7 +414,7 @@ public class BoundboxWriter implements IBoundboxWriter {
             signature = "boundBox_init";
             returnType = "void";
         } else {
-            signature = createSignatureMethod(methodInfo, listSuperClassNames);
+            signature = namingGenerator.createMethodName(methodInfo, listSuperClassNames);
         }
 
         Set<Modifier> modifiers = EnumSet.of(Modifier.PUBLIC);
@@ -491,7 +491,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         List<String> thrownTypesCommaSeparated = methodInfo.getThrownTypeNames();
 
         // beginBoundInvocationMethod
-        String signature = createSignatureMethod(methodInfo, listSuperClassNames);
+        String signature = namingGenerator.createMethodName(methodInfo, listSuperClassNames);
         if (methodInfo.isStaticInitializer()) {
             signature = "boundBox_static_init";
             if( methodInfo.getInheritanceLevel() >0 ) {
@@ -614,39 +614,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         }
     }
 
-    private String createSignatureGetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
-        String getterName;
-        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_get" + fieldNameCamelCase;
-        } else {
-            String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_get" + fieldNameCamelCase;
-        }
-        return getterName;
-    }
 
-    private String createSignatureSetter(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
-        String getterName;
-        if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_set" + fieldNameCamelCase;
-        } else {
-            String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_set" + fieldNameCamelCase;
-        }
-        return getterName;
-    }
-
-    private String createSignatureMethod(MethodInfo methodInfo, List<String> listSuperClassNames) {
-        String getterName;
-        if (methodInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = methodInfo.getMethodName();
-        } else {
-            String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
-        }
-        return getterName;
-    }
-
+    
     private String getSuperClassName(Inheritable inheritable, List<String> listSuperClassNames) {
         return listSuperClassNames.get(inheritable.getInheritanceLevel()) + ".class";
     }
@@ -725,10 +694,6 @@ public class BoundboxWriter implements IBoundboxWriter {
             listParameters.add(fieldInfo.getFieldName());
         }
         return listParameters;
-    }
-
-    private String computeCamelCaseNameStartUpperCase(String fieldName) {
-        return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
 }
