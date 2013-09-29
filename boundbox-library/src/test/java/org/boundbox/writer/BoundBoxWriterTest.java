@@ -82,6 +82,8 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     // JAVADOC
     // ----------------------------------
+	//TODO this test tests the documentation generator, put these in its test class
+	//TODO replace by a mock of documentation generator here
 	@SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testProcess_class_without_javadoc() throws Exception {
