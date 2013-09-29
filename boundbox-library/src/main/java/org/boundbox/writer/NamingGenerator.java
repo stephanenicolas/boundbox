@@ -27,10 +27,10 @@ public class NamingGenerator {
         if (methodInfo.isConstructor()) {
             return "boundBox_new";
         } else if (methodInfo.isStaticInitializer()) {
-            if( methodInfo.getInheritanceLevel() >0 ) {
-                return "boundBox_static_init_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()));
-            } else {
+            if( methodInfo.getInheritanceLevel() == 0 ) {
                 return "boundBox_static_init";
+            } else {
+                return "boundBox_super_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()))+"_static_init";
             }
         } else if (methodInfo.isInstanceInitializer()) {
             return "boundBox_init";
@@ -75,6 +75,4 @@ public class NamingGenerator {
     private String extractSimpleName(String className) {
         return className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
     }
-    
-
 }
