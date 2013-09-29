@@ -50,7 +50,6 @@ import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.writer.BoundboxWriter;
-import org.boundbox.writer.IBoundboxWriter;
 
 /*
  * Annotation processor http://blog.retep
@@ -76,7 +75,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Filer filer;
     private Messager messager;
     private Elements elements;
-    private IBoundboxWriter boundboxWriter = new BoundboxWriter();
+    private BoundboxWriter boundboxWriter = new BoundboxWriter();
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
     private BoundClassScanner boundClassVisitor = new BoundClassScanner();
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
@@ -212,7 +211,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 		}
 	}
 
-    public void setBoundboxWriter(IBoundboxWriter boundboxWriter) {
+    public void setBoundboxWriter(BoundboxWriter boundboxWriter) {
         this.boundboxWriter = boundboxWriter;
     }
 

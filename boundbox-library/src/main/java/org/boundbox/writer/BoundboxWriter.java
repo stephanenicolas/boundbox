@@ -28,7 +28,7 @@ import org.boundbox.model.MethodInfo;
 import com.squareup.javawriter.JavaWriter;
 
 @Log
-public class BoundboxWriter implements IBoundboxWriter {
+public class BoundboxWriter {
 
     // ----------------------------------
     // CONSTANTS
@@ -50,7 +50,6 @@ public class BoundboxWriter implements IBoundboxWriter {
     // METHODS
     // ----------------------------------
 
-    @Override
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
         JavaWriter writer = new JavaWriter(out);
         //TODO javawriter doesn't handle imports properly. V3.0.0 should change this

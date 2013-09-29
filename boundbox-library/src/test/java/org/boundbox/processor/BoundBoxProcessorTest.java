@@ -32,7 +32,7 @@ import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
-import org.boundbox.writer.IBoundboxWriter;
+import org.boundbox.writer.BoundboxWriter;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class BoundBoxProcessorTest {
     @Before
     public void setup() throws IOException {
         boundBoxProcessor = new BoundBoxProcessor();
-        boundBoxProcessor.setBoundboxWriter(EasyMock.createNiceMock(IBoundboxWriter.class));
+        boundBoxProcessor.setBoundboxWriter(EasyMock.createNiceMock(BoundboxWriter.class));
         sandBoxDir = new File("target/sandbox");
         if (sandBoxDir.exists()) {
             FileUtils.deleteDirectory(sandBoxDir);
@@ -58,7 +58,7 @@ public class BoundBoxProcessorTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            //FileUtils.deleteDirectory(sandBoxDir);
+            FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 

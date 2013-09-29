@@ -114,6 +114,7 @@ public class BoundBoxWriterTest {
         writer.writeBoundBox(classInfo, javaWriter);
 
         // then
+        //nothing to check, test will break via capture
     }
 	
     @Test
