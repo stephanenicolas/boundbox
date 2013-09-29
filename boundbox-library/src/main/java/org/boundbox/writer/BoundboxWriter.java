@@ -439,13 +439,10 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.emitStatement("methodToInvoke.setAccessible(true)");
 
         // emit method invocation
-        String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
         String returnString = "";
         if (methodInfo.isConstructor() || methodInfo.hasReturnType()) {
-            returnString = "return ";
-            String castReturnTypeString = createCastReturnTypeString(returnType);
-            returnString += castReturnTypeString;
+            returnString = "return " + createCastReturnTypeString(returnType);
         }
 
         String invocationTarget = methodInfo.isStaticMethod() ? "null" : "boundObject";
@@ -456,6 +453,7 @@ public class BoundboxWriter implements IBoundboxWriter {
                 writer.emitStatement(returnString + "methodToInvoke.invoke(%s)",invocationTarget);
             }
         } else {
+            String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
             if (isConstructor) {
                 writer.emitStatement(returnString + "methodToInvoke.newInstance(%s)", parametersNamesCommaSeparated);
             } else {
@@ -514,7 +512,6 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.emitStatement("methodToInvoke.setAccessible(true)");
 
         // emit method invocation
-        String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
         String returnString = "";
         if (methodInfo.isConstructor() || methodInfo.hasReturnType()) {
@@ -527,6 +524,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (parameterTypeList.isEmpty()) {
             writer.emitStatement(returnString + "methodToInvoke.invoke(%s)",invocationTarget);
         } else {
+            String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
             writer.emitStatement(returnString + "methodToInvoke.invoke(%s,%s)",invocationTarget, parametersNamesCommaSeparated);
         }
 

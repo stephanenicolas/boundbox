@@ -52,12 +52,12 @@ import org.boundbox.model.FieldInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.IBoundboxWriter;
 
-/**
+/*
  * Annotation processor http://blog.retep
  * .org/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/
  * https://forums.oracle.com/thread/1184190
  */
-/*
+/**
  * TODO static initializers and instance initializers. Done ? TODO handle inner classes as bounded
  * class ?
  * @author SNI
