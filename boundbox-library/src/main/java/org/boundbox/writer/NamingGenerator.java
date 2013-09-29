@@ -23,14 +23,27 @@ public class NamingGenerator {
     }
     
     public String createMethodName(MethodInfo methodInfo, List<String> listSuperClassNames) {
-        String getterName;
-        if (methodInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = methodInfo.getMethodName();
+        
+        if (methodInfo.isConstructor()) {
+            return "boundBox_new";
+        } else if (methodInfo.isStaticInitializer()) {
+            if( methodInfo.getInheritanceLevel() >0 ) {
+                return "boundBox_static_init_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()));
+            } else {
+                return "boundBox_static_init";
+            }
+        } else if (methodInfo.isInstanceInitializer()) {
+            return "boundBox_init";
         } else {
-            String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
+            String getterName;
+            if (methodInfo.getEffectiveInheritanceLevel() == 0) {
+                getterName = methodInfo.getMethodName();
+            } else {
+                String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
+                getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
+            }
+            return getterName;
         }
-        return getterName;
     }
     
     public String createGetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {

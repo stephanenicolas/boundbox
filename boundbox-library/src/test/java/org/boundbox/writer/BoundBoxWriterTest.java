@@ -9,12 +9,14 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +36,14 @@ import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.squareup.javawriter.JavaWriter;
 
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 //http://stackoverflow.com/a/7989365/693752
@@ -75,30 +82,60 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     // JAVADOC
     // ----------------------------------
-//    @Test
-//    we need this pull request to be accepted : https://github.com/square/javawriter/pull/25/
-//    public void testProcess_class_without_javadoc() throws Exception {
-//        // given
-//        String classUnderTestName = "TestClassWithNothing";
-//
-//        ClassInfo classInfo = new ClassInfo(classUnderTestName);
-//        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
-//        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
-//        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
-//        classInfo.setListImports(new HashSet<String>());
-//
-//        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).createMock();
-//        javaWriter.emitJavadoc(EasyMock.anyString());
-//        EasyMock.expectLastCall().times(0);
-//        EasyMock.replay(javaWriter);
-//        writer.setWritingJavadoc(false);
-//        
-//        // when
-//        writer.writeBoundBox(classInfo, javaWriter);
-//
-//        // then
-//        EasyMock.verify(javaWriter);
-//    }
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+    @Test
+    public void testProcess_class_without_javadoc() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithNothing";
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new HashSet<String>());
+
+        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).withConstructor(Writer.class).withArgs(new PrintWriter(System.out)).addMockedMethod("emitJavadoc").createMock();
+        final Capture<String> captured = new Capture<String>();
+        javaWriter.emitJavadoc(EasyMock.capture(captured));
+        EasyMock.expectLastCall().andAnswer(new IAnswer() {
+            public Object answer() {
+                //used to debug the call
+                System.out.println(captured.getValue());
+                assertTrue(false);
+                return null;
+            }
+        });
+        EasyMock.replay(javaWriter);
+        writer.setWritingJavadoc(false);
+        
+        // when
+        writer.writeBoundBox(classInfo, javaWriter);
+
+        // then
+    }
+	
+    @Test
+    public void testProcess_class_with_javadoc() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithNothing";
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListConstructorInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new HashSet<String>());
+
+        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).withConstructor(Writer.class).withArgs(new PrintWriter(System.out)).addMockedMethod("emitJavadoc").createMock();
+        EasyMock.expect(javaWriter.emitJavadoc(EasyMock.anyString())).andReturn(javaWriter).atLeastOnce();
+        EasyMock.replay(javaWriter);
+        writer.setWritingJavadoc(true);
+        
+        // when
+        writer.writeBoundBox(classInfo, javaWriter);
+
+        // then
+        EasyMock.verify(javaWriter);
+    }
 
     // ----------------------------------
     // FIELDS
