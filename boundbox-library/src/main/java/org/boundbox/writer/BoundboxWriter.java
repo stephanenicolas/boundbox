@@ -265,11 +265,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.beginControlFlow("try");
         writer.emitStatement("Field field = " + nameOfClassThatOwnsField + ".getDeclaredField(%s)", JavaWriter.stringLiteral(fieldName));
         writer.emitStatement("field.setAccessible(true)");
-        if (isStaticField) {
-            writer.emitStatement("field.set(null, %s)", fieldName);
-        } else {
-            writer.emitStatement("field.set(boundObject, %s)", fieldName);
-        }
+        String invocationTarget = isStaticField ? "null" : "boundObject";
+        writer.emitStatement("field.set(%s, %s)", invocationTarget, fieldName);
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, Exception.class);
         writer.endMethod();
@@ -315,11 +312,8 @@ public class BoundboxWriter implements IBoundboxWriter {
         writer.emitStatement("field.setAccessible(true)");
         String castReturnType = createCastReturnTypeString(fieldType);
 
-        if (isStaticField) {
-            writer.emitStatement("return %s field.get(null)", castReturnType);
-        } else {
-            writer.emitStatement("return %s field.get(boundObject)", castReturnType);
-        }
+        String invocationTarget = isStaticField ? "null" : "boundObject";
+        writer.emitStatement("return %s field.get(%s)", castReturnType, invocationTarget);
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, Exception.class);
         writer.endMethod();
@@ -454,21 +448,18 @@ public class BoundboxWriter implements IBoundboxWriter {
             returnString += castReturnTypeString;
         }
 
+        String invocationTarget = methodInfo.isStaticMethod() ? "null" : "boundObject";
         if (parameterTypeList.isEmpty()) {
             if (isConstructor) {
                 writer.emitStatement(returnString + "methodToInvoke.newInstance()");
-            } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(null)");
             } else {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject)");
+                writer.emitStatement(returnString + "methodToInvoke.invoke(%s)",invocationTarget);
             }
         } else {
             if (isConstructor) {
                 writer.emitStatement(returnString + "methodToInvoke.newInstance(%s)", parametersNamesCommaSeparated);
-            } else if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(null, %s)", parametersNamesCommaSeparated);
             } else {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject, %s)", parametersNamesCommaSeparated);
+                writer.emitStatement(returnString + "methodToInvoke.invoke(%s, %s)",invocationTarget, parametersNamesCommaSeparated);
             }
         }
         writer.endControlFlow();
@@ -491,15 +482,15 @@ public class BoundboxWriter implements IBoundboxWriter {
         List<String> thrownTypesCommaSeparated = methodInfo.getThrownTypeNames();
 
         // beginBoundInvocationMethod
-        String signature = namingGenerator.createMethodName(methodInfo, listSuperClassNames);
+        String wrapperMethodName = namingGenerator.createMethodName(methodInfo, listSuperClassNames);
         if (methodInfo.isStaticInitializer()) {
-            signature = "boundBox_static_init";
+            wrapperMethodName = "boundBox_static_init";
             if( methodInfo.getInheritanceLevel() >0 ) {
-                signature += "_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()));
+                wrapperMethodName += "_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()));
             }
             returnType = "void";
         } else if (methodInfo.isInstanceInitializer()) {
-            signature = "boundBox_init";
+            wrapperMethodName = "boundBox_init";
             returnType = "void";
         }
 
@@ -507,7 +498,7 @@ public class BoundboxWriter implements IBoundboxWriter {
         if (methodInfo.isStaticMethod() || methodInfo.isConstructor()) {
             modifiers.add(Modifier.STATIC);
         }
-        writer.beginMethod(returnType, signature, modifiers, parameters, thrownTypesCommaSeparated);
+        writer.beginMethod(returnType, wrapperMethodName, modifiers, parameters, thrownTypesCommaSeparated);
 
         writer.beginControlFlow("try");
 
@@ -532,19 +523,13 @@ public class BoundboxWriter implements IBoundboxWriter {
             returnString += castReturnTypeString;
         }
 
+        String invocationTarget = methodInfo.isStaticMethod() ? "null" : "boundObject";
         if (parameterTypeList.isEmpty()) {
-            if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(null)");
-            } else {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject)");
-            }
+            writer.emitStatement(returnString + "methodToInvoke.invoke(%s)",invocationTarget);
         } else {
-            if (methodInfo.isStaticMethod()) {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(null, %s)", parametersNamesCommaSeparated);
-            } else {
-                writer.emitStatement(returnString + "methodToInvoke.invoke(boundObject, %s)", parametersNamesCommaSeparated);
-            }
+            writer.emitStatement(returnString + "methodToInvoke.invoke(%s,%s)",invocationTarget, parametersNamesCommaSeparated);
         }
+
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, IllegalAccessException.class);
         addReflectionExceptionCatchClause(writer, IllegalArgumentException.class);
@@ -615,7 +600,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     }
 
 
-    
+
     private String getSuperClassName(Inheritable inheritable, List<String> listSuperClassNames) {
         return listSuperClassNames.get(inheritable.getInheritanceLevel()) + ".class";
     }
@@ -674,7 +659,7 @@ public class BoundboxWriter implements IBoundboxWriter {
     private String extractRawType(String fieldTypeName) {
         return fieldTypeName.replaceAll("<.*>", "");
     }
-    
+
     private String extractSimpleName(String className) {
         return className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
     }
