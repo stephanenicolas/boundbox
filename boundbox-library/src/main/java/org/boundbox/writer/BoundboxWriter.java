@@ -43,12 +43,21 @@ public class BoundboxWriter {
     @Getter
     private boolean isWritingJavadoc = true;
 
-    private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
+    @Getter
     private NamingGenerator namingGenerator = new NamingGenerator();
+
+    private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
 
     // ----------------------------------
     // METHODS
     // ----------------------------------
+    public void setPrefixes(String[] prefixes) {
+        if( prefixes != null ) {
+            namingGenerator = new NamingGenerator(prefixes[0], prefixes[1]);
+        } else {
+            namingGenerator = new NamingGenerator();
+        }
+    }
 
     public void writeBoundBox(ClassInfo classInfo, Writer out) throws IOException {
         JavaWriter writer = new JavaWriter(out);

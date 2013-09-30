@@ -33,6 +33,7 @@ import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
+import org.boundbox.writer.NamingGenerator;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +48,11 @@ public class BoundBoxProcessorTest {
     @Before
     public void setup() throws IOException {
         boundBoxProcessor = new BoundBoxProcessor();
-        boundBoxProcessor.setBoundboxWriter(EasyMock.createNiceMock(BoundboxWriter.class));
+        BoundboxWriter mockBoundBoxWriter = EasyMock.createNiceMock(BoundboxWriter.class);
+        boundBoxProcessor.setBoundboxWriter(mockBoundBoxWriter);
+        EasyMock.expect(mockBoundBoxWriter.getNamingGenerator()).andReturn( new NamingGenerator());
+        EasyMock.expectLastCall().anyTimes();
+        EasyMock.replay(mockBoundBoxWriter);
         sandBoxDir = new File("target/sandbox");
         if (sandBoxDir.exists()) {
             FileUtils.deleteDirectory(sandBoxDir);

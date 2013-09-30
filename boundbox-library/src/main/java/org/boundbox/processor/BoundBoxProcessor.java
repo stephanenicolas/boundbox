@@ -69,6 +69,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_BOUND_CLASS = "boundClass";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS = "maxSuperClass";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS = "extraFields";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_PREFIXES = "prefixes";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME = "fieldName";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS = "fieldClass";
 
@@ -97,6 +98,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             // Get the annotation information
             TypeElement boundClass = null;
             String maxSuperClass = null;
+            String[] prefixes = null;
             List<? extends AnnotationValue> extraBoundFields = null;
             List<? extends AnnotationMirror> listAnnotationMirrors = classElement.getAnnotationMirrors();
             if (listAnnotationMirrors == null) {
@@ -121,6 +123,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS.equals(entry.getKey().getSimpleName().toString())) {
                     	extraBoundFields = getAnnotationValueAsAnnotationValueList(entry.getValue());
                     }
+                    if (BOUNDBOX_ANNOTATION_PARAMETER_PREFIXES.equals(entry.getKey().getSimpleName().toString())) {
+                        prefixes = getAnnotationValueAsStringArray(entry.getValue());
+                    }
                 }
             }
 
@@ -132,6 +137,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
             if (maxSuperClass != null) {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
+
+            if (prefixes != null && prefixes.length != 2) {
+                error(classElement, "You must provide 2 prefixes. The first one for class names, the second one for methods.");
+                return true;
+            }
+            boundboxWriter.setPrefixes(prefixes);
 
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
             
@@ -149,7 +160,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             Writer sourceWriter = null;
             try {
                 String targetPackageName = classInfo.getTargetPackageName();
-                String boundBoxClassName = classInfo.getBoundBoxClassName();
+                String boundBoxClassName = boundboxWriter.getNamingGenerator().createBoundBoxName(classInfo);
 
                 String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "." + boundBoxClassName;
                 JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
@@ -234,6 +245,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
     
     private String getAnnotationValueAsString(AnnotationValue annotationValue) {
     	return (String) annotationValue.getValue();
+    }
+
+    private String[] getAnnotationValueAsStringArray(AnnotationValue annotationValue) {
+        return (String[]) annotationValue.getValue();
     }
 
     private void error(final Element element, final String message) {

@@ -39,8 +39,6 @@ public class ClassInfo {
     private String targetPackageName;
     @Getter
     private String targetClassName;
-    @Getter
-    private String boundBoxClassName;
     @Setter
     @Getter
     private Set<String> listImports = new HashSet<String>();
@@ -57,7 +55,6 @@ public class ClassInfo {
             targetPackageName = StringUtils.EMPTY;
             targetClassName = className;
         }
-        boundBoxClassName = DEFAULT_BOUND_BOX_OF_CLASS_PREFIX + targetClassName;
         listSuperClassNames = new ArrayList<String>();
         listSuperClassNames.add(className);
     }

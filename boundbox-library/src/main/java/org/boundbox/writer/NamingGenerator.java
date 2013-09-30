@@ -2,6 +2,10 @@ package org.boundbox.writer;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
@@ -12,69 +16,87 @@ import org.boundbox.model.MethodInfo;
  * This entity can name stuff like BoundBox classes, methods, etc.
  * @author SNI
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class NamingGenerator {
     
-    public String createBoundBoxName(ClassInfo classInfo) {
+    @NonNull
+    /** Prefix used to name BoundBox classes. */
+    private String boundBoxClassNamePrefix = "BoundBoxOf";
+    
+    @NonNull
+    /** Prefix used to name BoundBox methods. */
+    private String boundBoxMethodPrefix = "boundBox";
+    
+    public String createBoundBoxName(@NonNull ClassInfo classInfo) {
         String className = extractSimpleName(classInfo.getClassName());
-        return "BoundBoxOf" + className;
+        return prefixClass(className);
     }
     
-    public String createInnerClassAccessorName(InnerClassInfo innerClassInfo) {
-        return "boundBox_new_" + innerClassInfo.getClassName();
+    public String createInnerClassAccessorName(@NonNull InnerClassInfo innerClassInfo) {
+        return prefixMethod("_new_" + innerClassInfo.getClassName());
     }
     
-    public String createMethodName(MethodInfo methodInfo, List<String> listSuperClassNames) {
+    public String createMethodName(@NonNull MethodInfo methodInfo, @NonNull List<String> listSuperClassNames) {
         
         if (methodInfo.isConstructor()) {
-            return "boundBox_new";
+            return prefixMethod("_new");
         } else if (methodInfo.isStaticInitializer()) {
             if( methodInfo.getInheritanceLevel() == 0 ) {
-                return "boundBox_static_init";
+                return prefixMethod("_static_init");
             } else {
                 String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-                return "boundBox_super_"+superClassName+"_static_init";
+                return prefixMethod("_super_"+superClassName+"_static_init");
             }
         } else if (methodInfo.isInstanceInitializer()) {
-            return "boundBox_init";
+            return prefixMethod("_init");
         } else {
             String methodWrapperName;
             if (methodInfo.getEffectiveInheritanceLevel() == 0) {
                 methodWrapperName = methodInfo.getMethodName();
             } else {
                 String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-                methodWrapperName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
+                methodWrapperName = prefixMethod("_super_" + superClassName + "_" + methodInfo.getMethodName());
             }
             return methodWrapperName;
         }
     }
     
-    public String createGetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+    public String createGetterName(@NonNull FieldInfo fieldInfo, @NonNull List<String> listSuperClassNames, @NonNull String fieldNameCamelCase) {
         String getterName;
         if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_get" + fieldNameCamelCase;
+            getterName = prefixMethod("_get" + fieldNameCamelCase);
         } else {
             String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_get" + fieldNameCamelCase;
+            getterName = prefixMethod("_super_" + superClassName + "_get" + fieldNameCamelCase);
         }
         return getterName;
     }
 
-    public String createSetterName(FieldInfo fieldInfo, List<String> listSuperClassNames, String fieldNameCamelCase) {
+    public String createSetterName(@NonNull FieldInfo fieldInfo, @NonNull List<String> listSuperClassNames, @NonNull String fieldNameCamelCase) {
         String getterName;
         if (fieldInfo.getEffectiveInheritanceLevel() == 0) {
-            getterName = "boundBox_set" + fieldNameCamelCase;
+            getterName = prefixMethod("_set" + fieldNameCamelCase);
         } else {
             String superClassName = extractSimpleName(listSuperClassNames.get(fieldInfo.getEffectiveInheritanceLevel()));
-            getterName = "boundBox_super_" + superClassName + "_set" + fieldNameCamelCase;
+            getterName = prefixMethod("_super_" + superClassName + "_set" + fieldNameCamelCase);
         }
         return getterName;
     }
     
-    public String computeCamelCaseNameStartUpperCase(String fieldName) {
+    public String computeCamelCaseNameStartUpperCase(@NonNull String fieldName) {
         return Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
     }
 
-    private String extractSimpleName(String className) {
+    private String extractSimpleName(@NonNull String className) {
         return className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
+    }
+    
+    private String prefixClass( @NonNull String className ) {
+       return boundBoxClassNamePrefix + className;
+    }
+    
+    private String prefixMethod( @NonNull String methodName) {
+        return boundBoxMethodPrefix + methodName;
     }
 }
