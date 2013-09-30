@@ -13,8 +13,9 @@ import org.boundbox.model.MethodInfo;
  * @author SNI
  */
 public class NamingGenerator {
+    
     public String createBoundBoxName(ClassInfo classInfo) {
-        String className = classInfo.getClassName().contains(".") ? StringUtils.substringAfterLast(classInfo.getClassName(), ".") : classInfo.getClassName();
+        String className = extractSimpleName(classInfo.getClassName());
         return "BoundBoxOf" + className;
     }
     
@@ -30,19 +31,20 @@ public class NamingGenerator {
             if( methodInfo.getInheritanceLevel() == 0 ) {
                 return "boundBox_static_init";
             } else {
-                return "boundBox_super_"+extractSimpleName(listSuperClassNames.get(methodInfo.getInheritanceLevel()))+"_static_init";
+                String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
+                return "boundBox_super_"+superClassName+"_static_init";
             }
         } else if (methodInfo.isInstanceInitializer()) {
             return "boundBox_init";
         } else {
-            String getterName;
+            String methodWrapperName;
             if (methodInfo.getEffectiveInheritanceLevel() == 0) {
-                getterName = methodInfo.getMethodName();
+                methodWrapperName = methodInfo.getMethodName();
             } else {
                 String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-                getterName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
+                methodWrapperName = "boundBox_super_" + superClassName + "_" + methodInfo.getMethodName();
             }
-            return getterName;
+            return methodWrapperName;
         }
     }
     

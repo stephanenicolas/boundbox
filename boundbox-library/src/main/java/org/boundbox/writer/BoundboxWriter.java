@@ -398,7 +398,6 @@ public class BoundboxWriter {
         writer.emitStatement("methodToInvoke.setAccessible(true)");
 
         // emit method invocation
-
         String returnString = "";
         if (methodInfo.isConstructor() || methodInfo.hasReturnType()) {
             returnString = "return " + createCastReturnTypeString(returnType);
@@ -560,7 +559,6 @@ public class BoundboxWriter {
         writer.endControlFlow();
     }
 
-    // TODO use Types from processing environment ?
     private String createCastReturnTypeString(String returnType) {
         String castReturnTypeString = "";
         if ("int".equals(returnType)) {
