@@ -339,42 +339,17 @@ public class BoundboxWriter {
         // emit method retrieval
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
-        if (innerClassInfo.isStaticInnerClass()) {
-            if (parameterTypeList.isEmpty()) {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor()", innerClassInfo.getInnerClassIndex());
-            } else {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(%s)", innerClassInfo.getInnerClassIndex(), parametersTypesCommaSeparated);
-            }
-        } else {
-            if (parameterTypeList.isEmpty()) {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(boundClass)", innerClassInfo.getInnerClassIndex());
-            } else {
-                writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(boundClass, %s)", innerClassInfo.getInnerClassIndex(),
-                        parametersTypesCommaSeparated);
-            }
-        }
+        String hiddenParameterClass = innerClassInfo.isStaticInnerClass() ? "" : "boundClass";
+        writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(%s)", innerClassInfo.getInnerClassIndex(),
+                makeParams(hiddenParameterClass,parametersTypesCommaSeparated));
         writer.emitStatement("method.setAccessible(true)");
 
         // emit method invocation
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
-        String returnString = "return ";
+        String hiddenParameter = innerClassInfo.isStaticInnerClass() ? "" : "boundObject";
+        writer.emitStatement("return method.newInstance(%s)", makeParams(hiddenParameter,parametersNamesCommaSeparated));
 
-        if (parameterTypeList.isEmpty()) {
-            if (innerClassInfo.isStaticInnerClass()) {
-                writer.emitStatement("%s method.newInstance()", returnString);
-            } else {
-                // TODO boundObject de la class externe
-                writer.emitStatement("%s method.newInstance(boundObject)", returnString);
-            }
-        } else {
-            if (innerClassInfo.isStaticInnerClass()) {
-                writer.emitStatement("%s method.newInstance(%s)", returnString, parametersNamesCommaSeparated);
-            } else {
-                // TODO boundObject de la class externe
-                writer.emitStatement("%s method.newInstance(boundObject, %s)", returnString, parametersNamesCommaSeparated);
-            }
-        }
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, IllegalAccessException.class);
         addReflectionExceptionCatchClause(writer, IllegalArgumentException.class);
@@ -415,18 +390,10 @@ public class BoundboxWriter {
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
         String superClassChain = getSuperClassName(methodInfo, listSuperClassNames);
-        if (parameterTypeList.isEmpty()) {
-            if (isConstructor || methodInfo.isInstanceInitializer()) {
-                writer.emitStatement("Constructor<?> methodToInvoke = boundClass.getDeclaredConstructor()");
-            } else {
-                writer.emitStatement("Method methodToInvoke = %s.getDeclaredMethod(%s)", superClassChain, JavaWriter.stringLiteral(methodName));
-            }
+        if (isConstructor || methodInfo.isInstanceInitializer()) {
+            writer.emitStatement("Constructor<?> methodToInvoke = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
         } else {
-            if (isConstructor) {
-                writer.emitStatement("Constructor<?> methodToInvoke = boundClass.getDeclaredConstructor(%s)", parametersTypesCommaSeparated);
-            } else {
-                writer.emitStatement("Method methodToInvoke = %s.getDeclaredMethod(%s,%s)", superClassChain, JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated);
-            }
+            writer.emitStatement("Method methodToInvoke = %s.getDeclaredMethod(%s)", superClassChain, makeParams(JavaWriter.stringLiteral(methodName), parametersTypesCommaSeparated));
         }
         writer.emitStatement("methodToInvoke.setAccessible(true)");
 
@@ -438,20 +405,13 @@ public class BoundboxWriter {
         }
 
         String invocationTarget = methodInfo.isStaticMethod() ? "null" : "boundObject";
-        if (parameterTypeList.isEmpty()) {
-            if (isConstructor) {
-                writer.emitStatement("%s methodToInvoke.newInstance()", returnString);
-            } else {
-                writer.emitStatement("%s methodToInvoke.invoke(%s)", returnString, invocationTarget);
-            }
+        String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
+        if (isConstructor) {
+            writer.emitStatement("%s methodToInvoke.newInstance(%s)", returnString, parametersNamesCommaSeparated);
         } else {
-            String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
-            if (isConstructor) {
-                writer.emitStatement("%s methodToInvoke.newInstance(%s)", returnString, parametersNamesCommaSeparated);
-            } else {
-                writer.emitStatement("%s methodToInvoke.invoke(%s, %s)", returnString, invocationTarget, parametersNamesCommaSeparated);
-            }
+            writer.emitStatement("%s methodToInvoke.invoke(%s)", returnString, makeParams(invocationTarget, parametersNamesCommaSeparated));
         }
+
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, IllegalAccessException.class);
         addReflectionExceptionCatchClause(writer, IllegalArgumentException.class);
@@ -657,6 +617,16 @@ public class BoundboxWriter {
             listParameters.add(fieldInfo.getFieldName());
         }
         return listParameters;
+    }
+
+    private String makeParams( String... params ) {
+        List<String> paramList = new ArrayList<String>();
+        for( String param : params ) {
+            if( StringUtils.isNotEmpty( param ) ) {
+                paramList.add(param);
+            }
+        }
+        return StringUtils.join(paramList,",");
     }
 
 }
