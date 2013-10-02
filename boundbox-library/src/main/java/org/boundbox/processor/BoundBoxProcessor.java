@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -121,13 +122,13 @@ public class BoundBoxProcessor extends AbstractProcessor {
                         maxSuperClass = getAnnotationValueAsTypeElement(entry.getValue()).asType().toString();
                     }
                     if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS.equals(entry.getKey().getSimpleName().toString())) {
-                    	extraBoundFields = getAnnotationValueAsAnnotationValueList(entry.getValue());
+                        extraBoundFields = getAnnotationValueAsAnnotationValueList(entry.getValue());
                     }
                     if (BOUNDBOX_ANNOTATION_PARAMETER_PREFIXES.equals(entry.getKey().getSimpleName().toString())) {
                         List<? extends AnnotationValue> listPrefixes = getAnnotationValueAsAnnotationValueList(entry.getValue());
                         prefixes = new String[listPrefixes.size()];
-                        for( int indexAnnotation = 0; indexAnnotation < listPrefixes.size(); indexAnnotation++ ) {
-                            prefixes[indexAnnotation] =  getAnnotationValueAsString(listPrefixes.get(indexAnnotation));
+                        for (int indexAnnotation = 0; indexAnnotation < listPrefixes.size(); indexAnnotation++) {
+                            prefixes[indexAnnotation] = getAnnotationValueAsString(listPrefixes.get(indexAnnotation));
                         }
                     }
                 }
@@ -142,18 +143,22 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 boundClassVisitor.setMaxSuperClass(maxSuperClass);
             }
 
-            if (prefixes != null && prefixes.length != 2) {
-                error(classElement, "You must provide 2 prefixes. The first one for class names, the second one for methods.");
+            if (prefixes != null && prefixes.length != 2 && prefixes.length != 1) {
+                error(classElement, "You must provide 1 or 2 prefixes. The first one for class names, the second one for methods.");
                 return true;
+            }
+            if (prefixes != null && prefixes.length == 1) {
+                String[] newPrefixes = new String[] { prefixes[0], prefixes[0].toLowerCase(Locale.US) };
+                prefixes = newPrefixes;
             }
             boundboxWriter.setPrefixes(prefixes);
 
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
-            
-            if(extraBoundFields != null) {
-            	injectExtraBoundFields(extraBoundFields, classInfo);
+
+            if (extraBoundFields != null) {
+                injectExtraBoundFields(extraBoundFields, classInfo);
             }
-            
+
             listClassInfo.add(classInfo);
 
             // perform some computations on meta model
@@ -175,14 +180,14 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 e.printStackTrace();
                 error(classElement, e.getMessage());
             } finally {
-            	if(sourceWriter != null) {
-	            	try {
-	            		sourceWriter.close();
-	            	} catch(IOException e) {
-	                    e.printStackTrace();
-	                    error(classElement, e.getMessage());
-	            	}
-            	}
+                if (sourceWriter != null) {
+                    try {
+                        sourceWriter.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        error(classElement, e.getMessage());
+                    }
+                }
             }
         }
 
@@ -191,40 +196,44 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     /**
      * Inject extra bound fields into a classInfo.
-     * @param extraBoundFields a list that represents the extra fields defined inside a @{@link BoundBox} annotation.
-     * @param classInfo representation of the class whose BoundBox will receive the extra fields.
+     * @param extraBoundFields
+     *            a list that represents the extra fields defined inside a @{@link BoundBox}
+     *            annotation.
+     * @param classInfo
+     *            representation of the class whose BoundBox will receive the extra fields.
      */
-	private void injectExtraBoundFields(@NonNull List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
-		if(extraBoundFields.isEmpty()) {
-			return;
-		}
-		
-		List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-		TypeMirror fieldClass = null;
-		String fieldName = null;
-		for(AnnotationValue annotationValue : extraBoundFields) {
-			AnnotationMirror annotationMirror = (AnnotationMirror) annotationValue.getValue();
-		    log.info("mirror " + annotationMirror.getAnnotationType());
-		    
-			Map<? extends ExecutableElement, ? extends AnnotationValue> mapExecutableElementToAnnotationValue = annotationMirror.getElementValues();
-		    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mapExecutableElementToAnnotationValue.entrySet()) {
-				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME.equals(entry.getKey().getSimpleName().toString())) {
-					fieldName = getAnnotationValueAsString(entry.getValue());
-					//TODO shoot an error if its null or not a valid field name in java
-				}
-				if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS.equals(entry.getKey().getSimpleName().toString())) {
-					fieldClass = (TypeMirror) entry.getValue().getValue();
-				}
-		    }
-			FieldInfo fieldInfo = new FieldInfo(fieldName, fieldClass);
-			
-			//TODO we should add a warning to the developer here.
-			//TODO there can even be an error if a field of the same name but with a different type exists.
-			if (!listFieldInfos.contains(fieldInfo)) {
-				listFieldInfos.add(fieldInfo);
-			}
-		}
-	}
+    private void injectExtraBoundFields(@NonNull List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
+        if (extraBoundFields.isEmpty()) {
+            return;
+        }
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        TypeMirror fieldClass = null;
+        String fieldName = null;
+        for (AnnotationValue annotationValue : extraBoundFields) {
+            AnnotationMirror annotationMirror = (AnnotationMirror) annotationValue.getValue();
+            log.info("mirror " + annotationMirror.getAnnotationType());
+
+            Map<? extends ExecutableElement, ? extends AnnotationValue> mapExecutableElementToAnnotationValue = annotationMirror.getElementValues();
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mapExecutableElementToAnnotationValue.entrySet()) {
+                if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME.equals(entry.getKey().getSimpleName().toString())) {
+                    fieldName = getAnnotationValueAsString(entry.getValue());
+                    // TODO shoot an error if its null or not a valid field name in java
+                }
+                if (BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS.equals(entry.getKey().getSimpleName().toString())) {
+                    fieldClass = (TypeMirror) entry.getValue().getValue();
+                }
+            }
+            FieldInfo fieldInfo = new FieldInfo(fieldName, fieldClass);
+
+            // TODO we should add a warning to the developer here.
+            // TODO there can even be an error if a field of the same name but with a different type
+            // exists.
+            if (!listFieldInfos.contains(fieldInfo)) {
+                listFieldInfos.add(fieldInfo);
+            }
+        }
+    }
 
     public void setBoundboxWriter(BoundboxWriter boundboxWriter) {
         this.boundboxWriter = boundboxWriter;
@@ -241,14 +250,14 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private TypeElement getAnnotationValueAsTypeElement(AnnotationValue annotationValue) {
         return (TypeElement) ((DeclaredType) annotationValue.getValue()).asElement();
     }
-    
+
     @SuppressWarnings("unchecked")
     private List<? extends AnnotationValue> getAnnotationValueAsAnnotationValueList(AnnotationValue annotationValue) {
-    	return (List<? extends AnnotationValue>) annotationValue.getValue();
+        return (List<? extends AnnotationValue>) annotationValue.getValue();
     }
-    
+
     private String getAnnotationValueAsString(AnnotationValue annotationValue) {
-    	return (String) annotationValue.getValue();
+        return (String) annotationValue.getValue();
     }
 
     private void error(final Element element, final String message) {

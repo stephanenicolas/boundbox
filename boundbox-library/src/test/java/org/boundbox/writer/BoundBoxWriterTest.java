@@ -1015,7 +1015,7 @@ public class BoundBoxWriterTest {
     // PREFIXES
     // ----------------------------------
     @Test
-    public void testProcess_class_with_prefix() throws Exception {
+    public void testProcess_class_with_prefixes() throws Exception {
         // given
         String classUnderTestName = "TestClassWithSingleField";
         List<String> neededClasses = new ArrayList<String>();
@@ -1047,7 +1047,7 @@ public class BoundBoxWriterTest {
         Method method2 = clazz.getDeclaredMethod("_setFoo", String.class);
         assertNotNull(method2);
     }
-
+    
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------

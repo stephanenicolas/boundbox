@@ -841,6 +841,36 @@ public class BoundBoxProcessorTest {
         assertEquals("BB",capturedPrefixes.getValue()[0]);
         assertEquals("bb",capturedPrefixes.getValue()[1]);
     }
+    
+    @Test
+    public void testProcess_class_with_prefix() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithPrefix.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        BoundboxWriter mockBoundBoxWriter = EasyMock.createNiceMock(BoundboxWriter.class);
+        boundBoxProcessor.setBoundboxWriter(mockBoundBoxWriter);
+        EasyMock.expect(mockBoundBoxWriter.getNamingGenerator()).andReturn( new NamingGenerator("BB","bb"));
+        EasyMock.expectLastCall().anyTimes();
+        Capture<String[]> capturedPrefixes = new Capture<String[]>();
+        mockBoundBoxWriter.setPrefixes(EasyMock.capture(capturedPrefixes));
+        EasyMock.replay(mockBoundBoxWriter);
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
+        
+        EasyMock.verify(mockBoundBoxWriter);
+        assertEquals(2,capturedPrefixes.getValue().length);
+        assertEquals("BB",capturedPrefixes.getValue()[0]);
+        assertEquals("bb",capturedPrefixes.getValue()[1]);
+    }
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------
