@@ -18,15 +18,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>0.12.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.github.peichhorn</groupId>
 			<artifactId>lombok-pg</artifactId>
-			<version>0.11.2</version>
+			<version>0.11.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

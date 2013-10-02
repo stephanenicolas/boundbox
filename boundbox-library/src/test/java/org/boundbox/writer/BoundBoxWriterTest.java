@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -28,6 +27,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import lombok.Getter;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.FakeFieldInfo;
@@ -44,13 +45,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.squareup.javawriter.JavaWriter;
-
 //https://today.java.net/pub/a/today/2008/04/10/source-code-analysis-using-java-6-compiler-apis.html#invoking-the-compiler-from-code-the-java-compiler-api
 //http://stackoverflow.com/a/7989365/693752
 //TODO compile in memory ? Not sure, it's cool to debug
 public class BoundBoxWriterTest {
 
+    @Getter
     private BoundboxWriter writer;
     private File sandBoxDir;
     private FileWriter sandboxWriter;
@@ -100,12 +100,22 @@ public class BoundBoxWriterTest {
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
-        final Capture<String> captured = new Capture<String>();
-        EasyMock.expect(mockDocumentationGenerator.generateCodeDecoration(EasyMock.capture(captured))).andReturn(Collections.<String>emptyList());
+        final Capture<ClassInfo> captured = new Capture<ClassInfo>();
+        EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxClass(EasyMock.capture(captured))).andReturn(StringUtils.EMPTY);
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
                 //used to debug the call
                 System.out.println(captured.getValue());
+                assertTrue(false);
+                return null;
+            }
+        });
+        final Capture<ClassInfo> captured2 = new Capture<ClassInfo>();
+        EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxConstructor(EasyMock.capture(captured2))).andReturn(StringUtils.EMPTY);
+        EasyMock.expectLastCall().andAnswer(new IAnswer() {
+            public Object answer() {
+                //used to debug the call
+                System.out.println(captured2.getValue());
                 assertTrue(false);
                 return null;
             }
