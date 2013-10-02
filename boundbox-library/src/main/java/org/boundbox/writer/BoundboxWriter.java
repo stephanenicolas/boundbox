@@ -15,6 +15,7 @@ import javax.lang.model.element.Modifier;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.VisibleForTesting;
 import lombok.extern.java.Log;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,11 +47,17 @@ public class BoundboxWriter {
     @Getter
     private NamingGenerator namingGenerator = new NamingGenerator();
 
+    
     private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
 
     // ----------------------------------
     // METHODS
     // ----------------------------------
+    @VisibleForTesting
+    public void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
+        this.javadocGenerator = javadocGenerator;
+    }
+    
     public void setPrefixes(String[] prefixes) {
         if( prefixes != null ) {
             namingGenerator = new NamingGenerator(prefixes[0], prefixes[1]);
@@ -518,13 +525,13 @@ public class BoundboxWriter {
 
     private void writeJavadocForBoundSetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundSetter(fieldInfo, classInfo));
+            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundSetter(classInfo, fieldInfo));
         }
     }
 
     private void writeJavadocForBoundGetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundGetter(fieldInfo, classInfo));
+            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundGetter(classInfo, fieldInfo));
         }
     }
 

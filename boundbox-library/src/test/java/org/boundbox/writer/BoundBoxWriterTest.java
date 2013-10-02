@@ -29,6 +29,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.boundbox.FakeFieldInfo;
 import org.boundbox.FakeInnerClassInfo;
 import org.boundbox.FakeMethodInfo;
@@ -53,6 +54,7 @@ public class BoundBoxWriterTest {
     private BoundboxWriter writer;
     private File sandBoxDir;
     private FileWriter sandboxWriter;
+    private DocumentationGenerator mockDocumentationGenerator;
 
     @Before
     public void setup() throws IOException {
@@ -62,6 +64,8 @@ public class BoundBoxWriterTest {
             FileUtils.deleteDirectory(sandBoxDir);
         }
         sandBoxDir.mkdirs();
+        
+        mockDocumentationGenerator = EasyMock.createMock(DocumentationGenerator.class);
     }
 
     @After
@@ -96,9 +100,8 @@ public class BoundBoxWriterTest {
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
-        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).withConstructor(Writer.class).withArgs(new PrintWriter(System.out)).addMockedMethod("emitJavadoc").createMock();
         final Capture<String> captured = new Capture<String>();
-        javaWriter.emitJavadoc(EasyMock.capture(captured));
+        EasyMock.expect(mockDocumentationGenerator.generateCodeDecoration(EasyMock.capture(captured))).andReturn(Collections.<String>emptyList());
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
                 //used to debug the call
@@ -107,14 +110,18 @@ public class BoundBoxWriterTest {
                 return null;
             }
         });
-        EasyMock.replay(javaWriter);
+
+        EasyMock.replay(mockDocumentationGenerator);
         writer.setWritingJavadoc(false);
 
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
+
         // when
-        writer.writeBoundBox(classInfo, javaWriter);
+        writer.setJavadocGenerator(mockDocumentationGenerator);
+        writer.writeBoundBox(classInfo, out);
 
         // then
-        //nothing to check, test will break via capture
+        //tested by the capture.
     }
 
     @Test
@@ -128,16 +135,22 @@ public class BoundBoxWriterTest {
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
         classInfo.setListImports(new HashSet<String>());
 
-        JavaWriter javaWriter = EasyMock.createMockBuilder(JavaWriter.class).withConstructor(Writer.class).withArgs(new PrintWriter(System.out)).addMockedMethod("emitJavadoc").createMock();
-        EasyMock.expect(javaWriter.emitJavadoc(EasyMock.anyString())).andReturn(javaWriter).atLeastOnce();
-        EasyMock.replay(javaWriter);
+        EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxClass(EasyMock.anyObject(ClassInfo.class))).andReturn(StringUtils.EMPTY);
+        EasyMock.expectLastCall().atLeastOnce();
+        EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxConstructor(EasyMock.anyObject(ClassInfo.class))).andReturn(StringUtils.EMPTY);
+        EasyMock.expectLastCall().atLeastOnce();
+
+        EasyMock.replay(mockDocumentationGenerator);
+        
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
         writer.setWritingJavadoc(true);
 
         // when
-        writer.writeBoundBox(classInfo, javaWriter);
+        writer.setJavadocGenerator(mockDocumentationGenerator);
+        writer.writeBoundBox(classInfo, out);
 
         // then
-        EasyMock.verify(javaWriter);
+        EasyMock.verify(mockDocumentationGenerator);
     }
 
     // ----------------------------------
