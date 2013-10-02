@@ -189,7 +189,7 @@
 							</goals>
 							<configuration>
 								<excludes>
-									<exclude>**/BoundBoxOf*.java</exclude>
+									<exclude>**/*annotations*/**/*.java</exclude>
 								</excludes>
 								<rulesets>
 									<ruleset>config/quality/pmd/pmd-ruleset.xml</ruleset>

@@ -34,6 +34,7 @@ import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 import org.boundbox.writer.BoundboxWriter;
 import org.boundbox.writer.NamingGenerator;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -782,7 +783,39 @@ public class BoundBoxProcessorTest {
         assertTrue(classInfo.getListImports().contains(List.class.getName()));
         assertTrue(classInfo.getListImports().contains(HashMap.class.getName()));
     }
+    
+    // ----------------------------------
+    // NAMING PREFIXES
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_prefixes() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithPrefixes.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
+        BoundboxWriter mockBoundBoxWriter = EasyMock.createNiceMock(BoundboxWriter.class);
+        boundBoxProcessor.setBoundboxWriter(mockBoundBoxWriter);
+        EasyMock.expect(mockBoundBoxWriter.getNamingGenerator()).andReturn( new NamingGenerator("BB","bb"));
+        EasyMock.expectLastCall().anyTimes();
+        Capture<String[]> capturedPrefixes = new Capture<String[]>();
+        mockBoundBoxWriter.setPrefixes(EasyMock.capture(capturedPrefixes));
+        EasyMock.replay(mockBoundBoxWriter);
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
+        
+        EasyMock.verify(mockBoundBoxWriter);
+        assertEquals(2,capturedPrefixes.getValue().length);
+        assertEquals("BB",capturedPrefixes.getValue()[0]);
+        assertEquals("bb",capturedPrefixes.getValue()[1]);
+    }
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------

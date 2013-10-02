@@ -4,11 +4,15 @@
 	xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
 	<description>
           <exclude-pattern>**/BoundBoxOf*</exclude-pattern>
+          <exclude-pattern>**/BB*</exclude-pattern>
 	  <rule>
 	    <exclude name="UnusedPrivateField" />
 	  </rule>
 	  <rule>
 	    <exclude name="UnusedFormalParameter" />
+	  </rule>
+	  <rule>
+	    <exclude name="UnusedImports" />
 	  </rule>
   </description>
 </ruleset>

@@ -124,7 +124,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
                     	extraBoundFields = getAnnotationValueAsAnnotationValueList(entry.getValue());
                     }
                     if (BOUNDBOX_ANNOTATION_PARAMETER_PREFIXES.equals(entry.getKey().getSimpleName().toString())) {
-                        prefixes = getAnnotationValueAsStringArray(entry.getValue());
+                        List<? extends AnnotationValue> listPrefixes = getAnnotationValueAsAnnotationValueList(entry.getValue());
+                        prefixes = new String[listPrefixes.size()];
+                        for( int indexAnnotation = 0; indexAnnotation < listPrefixes.size(); indexAnnotation++ ) {
+                            prefixes[indexAnnotation] =  getAnnotationValueAsString(listPrefixes.get(indexAnnotation));
+                        }
                     }
                 }
             }
@@ -245,10 +249,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
     
     private String getAnnotationValueAsString(AnnotationValue annotationValue) {
     	return (String) annotationValue.getValue();
-    }
-
-    private String[] getAnnotationValueAsStringArray(AnnotationValue annotationValue) {
-        return (String[]) annotationValue.getValue();
     }
 
     private void error(final Element element, final String message) {
