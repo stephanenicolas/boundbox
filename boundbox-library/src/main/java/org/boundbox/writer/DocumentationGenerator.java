@@ -16,7 +16,7 @@ import org.boundbox.model.MethodInfo;
  */
 public class DocumentationGenerator {
     private static final String CODE_DECORATOR_TITLE_PREFIX = "\t";
-    private static final String CODE_DECORATOR = "******************************";
+    private static final char CODE_DECORATOR = '*';
 
     public String generateJavadocForBoundBoxClass(ClassInfo classInfo) throws IOException {
         String className = classInfo.getClassName();
@@ -29,7 +29,7 @@ public class DocumentationGenerator {
 
     public String generateJavadocForBoundBoxConstructor(ClassInfo classInfo) throws IOException {
         String className = classInfo.getClassName();
-        String javadoc = "Creates a BoundBoxOf%s.";
+        String javadoc = "Creates a BoundBox for %s.";
         javadoc += "\n@param %s the instance of {@link %s} that is bound by this BoundBox.";
         return String.format(javadoc, StringUtils.substringAfterLast(className, "."), "boundObject", className);
     }
@@ -42,7 +42,7 @@ public class DocumentationGenerator {
         return String.format(javadoc, className, className, className, parametersTypesCommaSeparated);
     }
 
-    public String generateJavadocForBoundSetter(FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
+    public String generateJavadocForBoundSetter(ClassInfo classInfo, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         List<String> listSuperClassNames = classInfo.getListSuperClassNames();
         String className = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
@@ -53,7 +53,7 @@ public class DocumentationGenerator {
         return String.format(javadoc, fieldName, fieldName, fieldName, className, className, fieldName);
     }
 
-    public String generateJavadocForBoundGetter(FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
+    public String generateJavadocForBoundGetter(ClassInfo classInfo, FieldInfo fieldInfo) throws IOException {
         String fieldName = fieldInfo.getFieldName();
         List<String> listSuperClassNames = classInfo.getListSuperClassNames();
         String className = listSuperClassNames.get(fieldInfo.getInheritanceLevel());
@@ -85,7 +85,7 @@ public class DocumentationGenerator {
 
     public String generateJavadocForBoundInnerClassAccessor(InnerClassInfo innerClassInfo, MethodInfo methodInfo, String parametersTypesCommaSeparated) {
         String className = innerClassInfo.getClassName();
-        String javadoc = "Creates a BoundBoxOf%s for the inner class {@link %s}.";
+        String javadoc = "Creates a BoundBox of %s, for the inner class {@link %s}.";
         javadoc += "\n@param %s the instance of {@link %s} that is bound by this BoundBox.";
         javadoc += "\n@see %s#%s(%s)";
         String simpleClassName = className.contains(".") ? StringUtils.substringAfterLast(className, ".") : className;
@@ -94,9 +94,10 @@ public class DocumentationGenerator {
     
     public List<String> generateCodeDecoration(String decorationTitle) throws IOException {
         List<String> decoration = new ArrayList<String>();
-        decoration.add(CODE_DECORATOR);
+        String decoratorString = StringUtils.repeat(CODE_DECORATOR, decorationTitle.length());
+        decoration.add(CODE_DECORATOR_TITLE_PREFIX + decoratorString);
         decoration.add(CODE_DECORATOR_TITLE_PREFIX + decorationTitle);
-        decoration.add(CODE_DECORATOR);
+        decoration.add(CODE_DECORATOR_TITLE_PREFIX + decoratorString);
         return decoration;
     }
 }

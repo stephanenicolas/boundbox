@@ -46,11 +46,16 @@ public class BoundboxWriter {
     @Getter
     private NamingGenerator namingGenerator = new NamingGenerator();
 
+    
     private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
 
     // ----------------------------------
     // METHODS
     // ----------------------------------
+    /* package-private*/ void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
+        this.javadocGenerator = javadocGenerator;
+    }
+    
     public void setPrefixes(String[] prefixes) {
         if( prefixes != null ) {
             namingGenerator = new NamingGenerator(prefixes[0], prefixes[1]);
@@ -518,13 +523,13 @@ public class BoundboxWriter {
 
     private void writeJavadocForBoundSetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundSetter(fieldInfo, classInfo));
+            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundSetter(classInfo, fieldInfo));
         }
     }
 
     private void writeJavadocForBoundGetter(JavaWriter writer, FieldInfo fieldInfo, ClassInfo classInfo) throws IOException {
         if (isWritingJavadoc) {
-            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundGetter(fieldInfo, classInfo));
+            writer.emitJavadoc(javadocGenerator.generateJavadocForBoundGetter(classInfo, fieldInfo));
         }
     }
 
