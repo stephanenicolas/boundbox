@@ -1,9 +1,6 @@
 package org.boundbox.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -547,6 +544,34 @@ public class BoundBoxProcessorTest {
         assertContains(listMethodInfos, fakeMethodInfo2);
     }
 
+    // ----------------------------------
+    // MAX SUPER CLASS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_max_super_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithMaxSuperClass.java",
+                "TestClassWithOverridingMethod.java", "TestClassWithSingleMethod.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<String> listSuperClassNames = classInfo.getListSuperClassNames();
+        assertFalse(listSuperClassNames.isEmpty());
+        assertEquals("TestClassWithMaxSuperClass", listSuperClassNames.get(0));
+        assertEquals(1, listSuperClassNames.size());
+        
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+
+    }
+    
     // ----------------------------------
     // GENERICS
     // ----------------------------------

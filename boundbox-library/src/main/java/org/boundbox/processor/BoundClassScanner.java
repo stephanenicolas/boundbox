@@ -30,7 +30,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
         stackClassInfos.add(classInfo);
         boundClass.accept(this, 0);
-        classInfo.getListSuperClassNames().add(boundClass.toString());
         classInfo.getListImports().remove(boundClass.toString());
         maxSuperClassName = Object.class.getName();
         return classInfo;
