@@ -1,6 +1,9 @@
 package org.boundbox.processor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +64,7 @@ public class BoundBoxProcessorTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            FileUtils.deleteDirectory(sandBoxDir);
+            //FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -116,7 +119,7 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo4);
 
     }
-    
+
     // ----------------------------------
     // EXTRA FIELDS
     // ----------------------------------
@@ -141,7 +144,7 @@ public class BoundBoxProcessorTest {
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, fakeFieldInfo);
     }
-    
+
 
     @Test
     public void testProcess_class_with_single_extra_field_already_exists() throws URISyntaxException {
@@ -222,6 +225,57 @@ public class BoundBoxProcessorTest {
         fakeFieldInfo2.setStaticField(true);
         assertContains(listFieldInfos, fakeFieldInfo2);
     }
+
+    // ----------------------------------
+    // STATIC INITIALIZER
+    // ----------------------------------
+
+    //those tests need to be done in two compilation passes. 
+    //If we create a BoundBox for a class from its source, the BoundBoxProcessor will not be able to see
+    //the methods that can't be invoked like static initializers.
+    //In brief, the annotation processor is not given static during processing.
+    //But, if we create the BoundBox from a class file, then the processor will have access to thos methods
+    //and will be able to wrap them during processing.
+    @Test
+    public void testProcess_class_with_static_initializer() throws URISyntaxException, InterruptedException {
+        // given
+        //first compile the class that is gonna be boundboxed
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticInitializer.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, null);
+        assertTrue(task.call());
+        
+        //then use the class file to process the annotation in the user class
+        testSourceFileNames = new String[] { "TestClassWithStaticInitializerUser.java" };
+        task = processAnnotations(testSourceFileNames, boundBoxProcessor, true);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setStaticField(true);
+        assertContains(listFieldInfos, fakeFieldInfo);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        assertEquals(1, listMethodInfos.size());
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setStaticMethod(true);
+        assertContains(listMethodInfos, fakeMethodInfo);
+    }
+
+    // ----------------------------------
+    // INSTANCE INITIALIZER
+    // ----------------------------------
+
+    //We do not deal with this blocks. A typical compiler will aggregate them with a constructor.
 
     // ----------------------------------
     // CONSTRUCTOR
@@ -566,12 +620,12 @@ public class BoundBoxProcessorTest {
         assertFalse(listSuperClassNames.isEmpty());
         assertEquals("TestClassWithMaxSuperClass", listSuperClassNames.get(0));
         assertEquals(1, listSuperClassNames.size());
-        
+
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertTrue(listMethodInfos.isEmpty());
 
     }
-    
+
     // ----------------------------------
     // GENERICS
     // ----------------------------------
@@ -599,7 +653,7 @@ public class BoundBoxProcessorTest {
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
         assertContains(listMethodInfos, fakeMethodInfo);
     }
-    
+
     // ----------------------------------
     // INNER CLASSES
     // ----------------------------------
@@ -628,7 +682,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos, fakeInnerClassInfo);
     }
-    
+
     @Test
     public void testProcess_class_with_private_static_inner_class() throws URISyntaxException {
         // given
@@ -677,12 +731,12 @@ public class BoundBoxProcessorTest {
         fakeInnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos, fakeInnerClassInfo);
-        
+
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, fakeMethodInfo);
     }
-    
+
     @Test
     public void testProcess_class_with_static_inner_class_with_many_constructors() throws URISyntaxException {
         // given
@@ -706,7 +760,7 @@ public class BoundBoxProcessorTest {
         fakeInnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos, fakeInnerClassInfo);
-        
+
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, fakeMethodInfo);
@@ -720,7 +774,7 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassConstructorInfos, fakeMethodInfo3);
 
     }
-    
+
     @Test
     public void testProcess_class_with_static_inner_class_with_many_fields_and_methods() throws URISyntaxException {
         // given
@@ -744,7 +798,7 @@ public class BoundBoxProcessorTest {
         fakeInnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos, fakeInnerClassInfo);
-        
+
         List<FieldInfo> listInnerClassFieldsInfos = classInfo.getListInnerClassInfo().get(0).getListFieldInfos();
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
         assertContains(listInnerClassFieldsInfos, fakeFieldInfo);
@@ -761,7 +815,7 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassMethodInfos, fakeMethodInfo2);
 
     }
-    
+
     // ----------------------------------
     // IMPORTS
     // ----------------------------------
@@ -808,7 +862,7 @@ public class BoundBoxProcessorTest {
         assertTrue(classInfo.getListImports().contains(List.class.getName()));
         assertTrue(classInfo.getListImports().contains(HashMap.class.getName()));
     }
-    
+
     // ----------------------------------
     // NAMING PREFIXES
     // ----------------------------------
@@ -835,13 +889,13 @@ public class BoundBoxProcessorTest {
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
-        
+
         EasyMock.verify(mockBoundBoxWriter);
         assertEquals(2,capturedPrefixes.getValue().length);
         assertEquals("BB",capturedPrefixes.getValue()[0]);
         assertEquals("bb",capturedPrefixes.getValue()[1]);
     }
-    
+
     @Test
     public void testProcess_class_with_prefix() throws URISyntaxException {
         // given
@@ -865,7 +919,7 @@ public class BoundBoxProcessorTest {
 
         FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
         assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
-        
+
         EasyMock.verify(mockBoundBoxWriter);
         assertEquals(2,capturedPrefixes.getValue().length);
         assertEquals("BB",capturedPrefixes.getValue()[0]);
@@ -876,6 +930,11 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
 
     private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor)
+            throws URISyntaxException {
+        return processAnnotations(testSourceFileNames, boundBoxProcessor, false);
+    }
+    
+    private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor, boolean implicit)
             throws URISyntaxException {
         // Get an instance of java compiler
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -893,17 +952,23 @@ public class BoundBoxProcessorTest {
         Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(listSourceFiles);
 
         // Create the compilation task
-        Iterable<String> options = Arrays.asList("-d", sandBoxDir.getAbsolutePath());
+        List<String> options = new ArrayList<String>(Arrays.asList("-d", sandBoxDir.getAbsolutePath(),"-classpath", sandBoxDir.getAbsolutePath()+File.pathSeparator+System.getProperty("java.class.path")));
+        if( implicit) {
+            options.add("-proc:only");
+            options.add("-implicit:none");
+        }
         CompilationTask task = compiler.getTask(null, fileManager, null, options, null, compilationUnits1);
 
-        // Create a list to hold annotation processors
-        LinkedList<AbstractProcessor> processors = new LinkedList<AbstractProcessor>();
+        if( boundBoxProcessor != null ) {
+            // Create a list to hold annotation processors
+            LinkedList<AbstractProcessor> processors = new LinkedList<AbstractProcessor>();
 
-        // Add an annotation processor to the list
-        processors.add(boundBoxProcessor);
+            // Add an annotation processor to the list
+            processors.add(boundBoxProcessor);
+            // Set the annotation processor to the compiler task
+            task.setProcessors(processors);
+        }
 
-        // Set the annotation processor to the compiler task
-        task.setProcessors(processors);
         return task;
     }
 
@@ -934,7 +999,7 @@ public class BoundBoxProcessorTest {
             assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
         }
     }
-    
+
     private void assertContains(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
         InnerClassInfo innerClassInfo2 = retrieveInnerClassInfo(listInnerClassInfos, fakeInnerClassInfo);
         assertNotNull(innerClassInfo2);
@@ -970,7 +1035,7 @@ public class BoundBoxProcessorTest {
         }
         return null;
     }
-    
+
     private InnerClassInfo retrieveInnerClassInfo(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
         for (InnerClassInfo innerClassInfo : listInnerClassInfos) {
             if (innerClassInfo.equals(fakeInnerClassInfo)) {

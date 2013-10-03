@@ -283,6 +283,40 @@ public class BoundBoxWriterTest {
     }
 
     // ----------------------------------
+    // STATIC INITIALIZER
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_static_initializer() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithStaticInitializer";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
+        fakeMethodInfo.setStaticMethod(true);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(fakeMethodInfo);
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListImports(new HashSet<String>());
+
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(writer.getNamingGenerator().createBoundBoxName(classInfo), neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Method method = clazz.getDeclaredMethod("boundBox_static_init");
+        assertNotNull(method);
+        assertTrue((method.getModifiers() & Modifier.STATIC) != 0);
+    }
+
+    // ----------------------------------
     // CONSTRUCTORS
     // ----------------------------------
     @Test

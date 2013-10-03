@@ -87,7 +87,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
 
         return super.visitTypeAsClass(e, inheritanceLevel);
     }
-
+    
     @Override
     public Void visitExecutable(ExecutableElement e, Integer inheritanceLevel) {
         log.info("executable ->" + e.getSimpleName());

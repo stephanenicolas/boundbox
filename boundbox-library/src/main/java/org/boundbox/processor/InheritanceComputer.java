@@ -16,7 +16,6 @@ import org.boundbox.model.MethodInfo;
 
 @Log
 public class InheritanceComputer {
-
     public void computeInheritanceAndHiding(List<FieldInfo> listFieldInfos) {
         // get min inheritance level of Field.
         Map<String, FieldInfo> mapFieldNameToMinFieldInfo = new HashMap<String, FieldInfo>();
