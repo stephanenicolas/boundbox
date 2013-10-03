@@ -441,8 +441,13 @@ public class BoundBoxWriterTest {
         FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
         listConstructorInfos.add(new FakeMethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3),
                 null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveCharReturnType", "char", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveByteReturnType", "byte", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveShortReturnType", "short", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveLongReturnType", "long", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveFloatReturnType", "float", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos
         .add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays
@@ -469,12 +474,27 @@ public class BoundBoxWriterTest {
         assertNotNull(clazz.getDeclaredMethod("withPrimitiveArgument", int.class));
         assertNotNull(clazz.getDeclaredMethod("withObjectArgument", Object.class));
         assertNotNull(clazz.getDeclaredMethod("withManyArguments", int.class, Object.class));
-        Method declaredMethod = clazz.getDeclaredMethod("withPrimitiveIntReturnType");
-        assertNotNull(declaredMethod);
-        assertTrue(int.class.equals(declaredMethod.getReturnType()));
-        Method declaredMethod2 = clazz.getDeclaredMethod("withPrimitiveDoubleReturnType");
-        assertNotNull(declaredMethod2);
-        assertTrue(double.class.equals(declaredMethod2.getReturnType()));
+        Method declaredMethodChar = clazz.getDeclaredMethod("withPrimitiveCharReturnType");
+        assertNotNull(declaredMethodChar);
+        assertTrue(char.class.equals(declaredMethodChar.getReturnType()));
+        Method declaredMethodInt = clazz.getDeclaredMethod("withPrimitiveIntReturnType");
+        assertNotNull(declaredMethodInt);
+        assertTrue(int.class.equals(declaredMethodInt.getReturnType()));
+        Method declaredMethodLong = clazz.getDeclaredMethod("withPrimitiveLongReturnType");
+        assertNotNull(declaredMethodLong);
+        assertTrue(long.class.equals(declaredMethodLong.getReturnType()));
+        Method declaredMethodByte = clazz.getDeclaredMethod("withPrimitiveByteReturnType");
+        assertNotNull(declaredMethodByte);
+        assertTrue(byte.class.equals(declaredMethodByte.getReturnType()));
+        Method declaredMethodShort = clazz.getDeclaredMethod("withPrimitiveShortReturnType");
+        assertNotNull(declaredMethodShort);
+        assertTrue(short.class.equals(declaredMethodShort.getReturnType()));
+        Method declaredMethodDouble = clazz.getDeclaredMethod("withPrimitiveDoubleReturnType");
+        assertNotNull(declaredMethodDouble);
+        assertTrue(double.class.equals(declaredMethodDouble.getReturnType()));
+        Method declaredMethodFloat = clazz.getDeclaredMethod("withPrimitiveFloatReturnType");
+        assertNotNull(declaredMethodFloat);
+        assertTrue(float.class.equals(declaredMethodFloat.getReturnType()));
         Method declaredMethod3 = clazz.getDeclaredMethod("withPrimitiveBooleanReturnType");
         assertNotNull(declaredMethod3);
         assertTrue(boolean.class.equals(declaredMethod3.getReturnType()));
