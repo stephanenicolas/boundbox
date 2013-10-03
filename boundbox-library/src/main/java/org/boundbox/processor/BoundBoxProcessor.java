@@ -58,8 +58,6 @@ import org.boundbox.writer.BoundboxWriter;
  * https://forums.oracle.com/thread/1184190
  */
 /**
- * TODO static initializers and instance initializers. Done ? TODO handle inner classes as bounded
- * class ?
  * @author SNI
  */
 @SupportedAnnotationTypes("org.boundbox.BoundBox")

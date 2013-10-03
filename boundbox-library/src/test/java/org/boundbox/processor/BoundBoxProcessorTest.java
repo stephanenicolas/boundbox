@@ -797,6 +797,36 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassMethodInfos, fakeMethodInfo2);
 
     }
+    
+    // ----------------------------------
+    // INNER CLASSES
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_inherited_static_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithStaticInheritedInnerClass.java", "TestClassWithStaticInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        fakeInnerClassInfo.setInheritanceLevel(1);
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+    }
 
     // ----------------------------------
     // IMPORTS

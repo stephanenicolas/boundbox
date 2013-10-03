@@ -875,9 +875,6 @@ public class BoundBoxWriterTest {
         assertEquals("BoundBoxOfInnerClass",class1.getSimpleName());
     }
 
-    // ----------------------------------
-    //  INNER CLASSES
-    // ----------------------------------
     @Test
     public void testProcess_class_with_static_inner_class_with_constructor() throws Exception {
         // given
@@ -1036,6 +1033,47 @@ public class BoundBoxWriterTest {
         Method innerClassMethod2 = innerClass.getDeclaredMethod("bar", int.class);
         assertNotNull(innerClassMethod2);
     }
+    
+    // ----------------------------------
+    //  INNER CLASSES
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_static_inherited_inner_class() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithStaticInheritedInnerClass";
+        List<String> neededClasses = new ArrayList<String>();
+        neededClasses.add("TestClassWithStaticInnerClass");
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+
+        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
+        fakeInnerClassInfo.setStaticInnerClass(true);
+        fakeInnerClassInfo.setInheritanceLevel(1);
+        classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListImports(new HashSet<String>());
+
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(writer.getNamingGenerator().createBoundBoxName(classInfo), neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+
+        Class<?> class1 = clazz.getDeclaredClasses()[0];
+        assertNotNull(class1);
+
+        assertEquals("BoundBoxOfInnerClass",class1.getSimpleName());
+    }
+    
+    
 
     // ----------------------------------
     // PREFIXES

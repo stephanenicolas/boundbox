@@ -58,6 +58,8 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
             innerClassInfo.setInnerClassIndex(classInfo.getListInnerClassInfo().size());
             innerClassInfo.setStaticInnerClass(e.getModifiers().contains(Modifier.STATIC));
             innerClassInfo.getListSuperClassNames().add(e.toString());
+            innerClassInfo.setInheritanceLevel(inheritanceLevel);
+
 
             stackClassInfos.add(innerClassInfo);
             classInfo.getListInnerClassInfo().add(innerClassInfo);
