@@ -6,6 +6,4 @@ public interface Inheritable {
 
     int getEffectiveInheritanceLevel();
 
-    boolean isInherited();
-
 }

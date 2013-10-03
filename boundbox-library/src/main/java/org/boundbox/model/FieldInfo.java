@@ -44,9 +44,4 @@ public class FieldInfo implements Inheritable {
         this.effectiveInheritanceLevel = inheritanceLevel;
     }
 
-    @Override
-    public boolean isInherited() {
-        return inheritanceLevel != 0;
-    }
-
 }

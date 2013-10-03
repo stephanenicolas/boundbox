@@ -40,10 +40,5 @@ public class InnerClassInfo extends ClassInfo implements Inheritable {
         this.effectiveInheritanceLevel = inheritanceLevel;
     }
 
-    @Override
-    public boolean isInherited() {
-        return inheritanceLevel != 0;
-    }
-
 }
 //CHECKSTYLE:ON 
