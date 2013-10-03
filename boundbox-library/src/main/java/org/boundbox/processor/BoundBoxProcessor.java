@@ -153,9 +153,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
 
-            if (extraBoundFields != null) {
-                injectExtraBoundFields(extraBoundFields, classInfo);
-            }
+            injectExtraBoundFields(extraBoundFields, classInfo);
 
             listClassInfo.add(classInfo);
 
@@ -200,8 +198,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
      * @param classInfo
      *            representation of the class whose BoundBox will receive the extra fields.
      */
-    private void injectExtraBoundFields(@NonNull List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
-        if (extraBoundFields.isEmpty()) {
+    private void injectExtraBoundFields(List<? extends AnnotationValue> extraBoundFields, ClassInfo classInfo) {
+        if (extraBoundFields == null || extraBoundFields.isEmpty()) {
             return;
         }
 

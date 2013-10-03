@@ -124,6 +124,25 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
 
     @Test
+    public void testProcess_class_with_no_extra_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithNoExtraField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+    }
+
+    
+    @Test
     public void testProcess_class_with_single_extra_field() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithSingleExtraField.java" };
