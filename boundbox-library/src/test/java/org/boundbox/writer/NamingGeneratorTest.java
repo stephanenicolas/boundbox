@@ -1,6 +1,5 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -19,37 +18,29 @@ public class NamingGeneratorTest {
     public void setUp() {
         namingGenerator = new NamingGenerator();
     }
-    
-    @Test
+
+    @Test(expected=IllegalArgumentException.class)
     public void testCreateMethodName_throws_exception_for_instance_initializer() {
         //given
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("", "void", new ArrayList<FieldInfo>(), null);
-        
+
         //when
-        try {
-            namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
-            fail();
-        } catch (Exception e) {
-            assertTrue(true);
-        }
-        
+        namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
+
         //then
+        fail();
     }
-    
-    @Test
+
+    @Test(expected=IllegalArgumentException.class)
     public void testCreateMethodName_throws_exception_for_static_initializer() {
         //given
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
-        
+
         //when
-        try {
-            namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
-            fail();
-        } catch (Exception e) {
-            assertTrue(true);
-        }
-        
+        namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
+
         //then
+        fail();
     }
 
 }

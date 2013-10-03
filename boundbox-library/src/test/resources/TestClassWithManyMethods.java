@@ -17,11 +17,31 @@ public class TestClassWithManyMethods {
     private void withManyArguments(int a, Object b) {
     }
 
+    private char withPrimitiveCharReturnType() {
+        return 0;
+    }
+
+    private byte withPrimitiveByteReturnType() {
+        return 0;
+    }
+
+    private short withPrimitiveShortReturnType() {
+        return 0;
+    }
+
     private int withPrimitiveIntReturnType() {
         return 0;
     }
 
+    private long withPrimitiveLongReturnType() {
+        return 0;
+    }
+
     private double withPrimitiveDoubleReturnType() {
+        return 0;
+    }
+
+    private float withPrimitiveFloatReturnType() {
         return 0;
     }
 

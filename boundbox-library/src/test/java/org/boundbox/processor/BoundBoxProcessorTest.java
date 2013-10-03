@@ -358,13 +358,33 @@ public class BoundBoxProcessorTest {
                 null);
         assertContains(listMethodInfos, fakeMethodInfo4);
 
+        FakeMethodInfo fakeMethodInfoChar = new FakeMethodInfo("withPrimitiveCharReturnType", char.class.getName(),
+                new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfoChar);
+
         FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("withPrimitiveIntReturnType", int.class.getName(),
                 new ArrayList<FieldInfo>(), null);
         assertContains(listMethodInfos, fakeMethodInfo5);
 
+        FakeMethodInfo fakeMethodInfoLong = new FakeMethodInfo("withPrimitiveLongReturnType", long.class.getName(),
+                new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfoLong);
+
+        FakeMethodInfo fakeMethodInfoShort = new FakeMethodInfo("withPrimitiveShortReturnType", short.class.getName(),
+                new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfoShort);
+
+        FakeMethodInfo fakeMethodInfoByte = new FakeMethodInfo("withPrimitiveByteReturnType", byte.class.getName(),
+                new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfoByte);
+
         FakeMethodInfo fakeMethodInfo6 = new FakeMethodInfo("withPrimitiveDoubleReturnType", double.class.getName(),
                 new ArrayList<FieldInfo>(), null);
         assertContains(listMethodInfos, fakeMethodInfo6);
+
+        FakeMethodInfo fakeMethodInfoFloat = new FakeMethodInfo("withPrimitiveFloatReturnType", float.class.getName(),
+                new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, fakeMethodInfoFloat);
 
         FakeMethodInfo fakeMethodInfo7 = new FakeMethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(),
                 new ArrayList<FieldInfo>(), null);
