@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
@@ -958,7 +957,7 @@ public class BoundBoxProcessorTest {
     private void assertContains(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
         MethodInfo methodInfo2 = retrieveMethodInfo(listMethodInfos, fakeMethodInfo);
         assertNotNull(methodInfo2);
-        assertEquals(fakeMethodInfo.getReturnTypeName(), methodInfo2.getReturnType().toString());
+        assertEquals(fakeMethodInfo.getReturnTypeName(), methodInfo2.getReturnTypeName());
         assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
         assertEquals(fakeMethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
 
@@ -968,9 +967,9 @@ public class BoundBoxProcessorTest {
             assertEquals(fakeMethodInfo.getParameterTypes().get(indexParameter).getFieldTypeName(), fieldInfo.getFieldTypeName());
         }
 
-        for (int indexThrownType = 0; indexThrownType < methodInfo2.getThrownTypes().size(); indexThrownType++) {
-            TypeMirror thrownType = methodInfo2.getThrownTypes().get(indexThrownType);
-            assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownType.toString());
+        for (int indexThrownType = 0; indexThrownType < methodInfo2.getThrownTypeNames().size(); indexThrownType++) {
+            String thrownTypeName = methodInfo2.getThrownTypeNames().get(indexThrownType);
+            assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownTypeName);
         }
     }
 

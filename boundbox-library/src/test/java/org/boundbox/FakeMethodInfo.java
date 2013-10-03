@@ -10,7 +10,6 @@ import org.boundbox.model.MethodInfo;
 public class FakeMethodInfo extends MethodInfo {
 
     private String returnTypeName;
-    private List<String> listThrownTypeNames;
 
     public FakeMethodInfo(@NonNull String methodName,@NonNull String returnTypeName, List<FieldInfo> listParameters,
             List<String> listThrownTypeNames) {
@@ -18,17 +17,12 @@ public class FakeMethodInfo extends MethodInfo {
         this.methodName = methodName;
         this.returnTypeName = returnTypeName;
         this.parameterTypes = listParameters;
-        this.listThrownTypeNames = listThrownTypeNames;
+        this.thrownTypeNames = listThrownTypeNames;
     }
 
     @Override
     public String getReturnTypeName() {
         return returnTypeName;
-    }
-
-    @Override
-    public List<String> getThrownTypeNames() {
-        return listThrownTypeNames;
     }
 
     @Override

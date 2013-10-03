@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // for testing
-@EqualsAndHashCode(exclude = { "returnType", "thrownTypes", "effectiveInheritanceLevel", "element" })
+@EqualsAndHashCode(exclude = { "returnType", "thrownTypeNames", "effectiveInheritanceLevel", "element" })
 @ToString
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class MethodInfo implements Inheritable {
@@ -26,13 +26,12 @@ public class MethodInfo implements Inheritable {
     // ----------------------------------
     @Getter
     protected String methodName;
-    @Getter
     @Setter
     protected TypeMirror returnType;
     @Getter
     protected List<FieldInfo> parameterTypes;
     @Getter
-    protected List<? extends TypeMirror> thrownTypes;
+    protected List<String> thrownTypeNames;
     @Getter
     private int inheritanceLevel;
     @Setter
@@ -59,7 +58,10 @@ public class MethodInfo implements Inheritable {
         for (VariableElement variableElement : element.getParameters()) {
             parameterTypes.add(new FieldInfo(variableElement));
         }
-        thrownTypes = element.getThrownTypes();
+        thrownTypeNames = new ArrayList<String>();
+        for (TypeMirror typeMirror : element.getThrownTypes()) {
+            thrownTypeNames.add(typeMirror.toString());
+        }
     }
 
     // ----------------------------------
@@ -67,14 +69,6 @@ public class MethodInfo implements Inheritable {
     // ----------------------------------
     public String getReturnTypeName() {
         return returnType.toString();
-    }
-
-    public List<String> getThrownTypeNames() {
-        List<String> thrownTypeNames = new ArrayList<String>();
-        for (TypeMirror typeMirror : thrownTypes) {
-            thrownTypeNames.add(typeMirror.toString());
-        }
-        return thrownTypeNames;
     }
 
     public boolean isConstructor() {
@@ -96,10 +90,6 @@ public class MethodInfo implements Inheritable {
     public void setInheritanceLevel(int inheritanceLevel) {
         this.inheritanceLevel = inheritanceLevel;
         this.effectiveInheritanceLevel = inheritanceLevel;
-    }
-
-    public boolean isInherited() {
-        return inheritanceLevel != 0;
     }
 
 }
