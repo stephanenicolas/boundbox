@@ -41,15 +41,8 @@ public class NamingGenerator {
         
         if (methodInfo.isConstructor()) {
             return prefixMethod("_new");
-        } else if (methodInfo.isStaticInitializer()) {
-            if( methodInfo.getInheritanceLevel() == 0 ) {
-                return prefixMethod("_static_init");
-            } else {
-                String superClassName = extractSimpleName(listSuperClassNames.get(methodInfo.getEffectiveInheritanceLevel()));
-                return prefixMethod("_super_"+superClassName+"_static_init");
-            }
-        } else if (methodInfo.isInstanceInitializer()) {
-            return prefixMethod("_init");
+        } else if (methodInfo.isStaticInitializer() || methodInfo.isInstanceInitializer()) {
+            throw new IllegalArgumentException("Static initializers and instance initializers can't be boundboxed. Java doesn't allow any such invocation, even via reflection.");
         } else {
             String methodWrapperName;
             if (methodInfo.getEffectiveInheritanceLevel() == 0) {

@@ -230,46 +230,9 @@ public class BoundBoxProcessorTest {
     // STATIC INITIALIZER
     // ----------------------------------
 
-    //those tests need to be done in two compilation passes. 
-    //If we create a BoundBox for a class from its source, the BoundBoxProcessor will not be able to see
-    //the methods that can't be invoked like static initializers.
-    //In brief, the annotation processor is not given static during processing.
-    //But, if we create the BoundBox from a class file, then the processor will have access to thos methods
-    //and will be able to wrap them during processing.
-    @Test
-    public void testProcess_class_with_static_initializer() throws URISyntaxException, InterruptedException {
-        // given
-        //first compile the class that is gonna be boundboxed
-        String[] testSourceFileNames = new String[] { "TestClassWithStaticInitializer.java" };
-        CompilationTask task = processAnnotations(testSourceFileNames, null);
-        assertTrue(task.call());
-        
-        //then use the class file to process the annotation in the user class
-        testSourceFileNames = new String[] { "TestClassWithStaticInitializerUser.java" };
-        task = processAnnotations(testSourceFileNames, boundBoxProcessor, true);
+    //We do not deal with this blocks. They are not accessible via reflection anyway
+    //https://github.com/stephanenicolas/boundbox/issues/13
 
-        // when
-        // Perform the compilation task.
-        task.call();
-
-        // then
-        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
-        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
-
-        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        assertFalse(listFieldInfos.isEmpty());
-
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setStaticField(true);
-        assertContains(listFieldInfos, fakeFieldInfo);
-
-        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
-        assertFalse(listMethodInfos.isEmpty());
-        assertEquals(1, listMethodInfos.size());
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo.setStaticMethod(true);
-        assertContains(listMethodInfos, fakeMethodInfo);
-    }
 
     // ----------------------------------
     // INSTANCE INITIALIZER
@@ -931,11 +894,6 @@ public class BoundBoxProcessorTest {
 
     private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor)
             throws URISyntaxException {
-        return processAnnotations(testSourceFileNames, boundBoxProcessor, false);
-    }
-    
-    private CompilationTask processAnnotations(String[] testSourceFileNames, BoundBoxProcessor boundBoxProcessor, boolean implicit)
-            throws URISyntaxException {
         // Get an instance of java compiler
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -952,11 +910,7 @@ public class BoundBoxProcessorTest {
         Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(listSourceFiles);
 
         // Create the compilation task
-        List<String> options = new ArrayList<String>(Arrays.asList("-d", sandBoxDir.getAbsolutePath(),"-classpath", sandBoxDir.getAbsolutePath()+File.pathSeparator+System.getProperty("java.class.path")));
-        if( implicit) {
-            options.add("-proc:only");
-            options.add("-implicit:none");
-        }
+        List<String> options = new ArrayList<String>(Arrays.asList("-d", sandBoxDir.getAbsolutePath()));
         CompilationTask task = compiler.getTask(null, fileManager, null, options, null, compilationUnits1);
 
         if( boundBoxProcessor != null ) {

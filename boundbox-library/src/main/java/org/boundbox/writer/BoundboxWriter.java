@@ -46,7 +46,7 @@ public class BoundboxWriter {
     @Getter
     private NamingGenerator namingGenerator = new NamingGenerator();
 
-    
+
     private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
 
     // ----------------------------------
@@ -55,7 +55,7 @@ public class BoundboxWriter {
     /* package-private*/ void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
         this.javadocGenerator = javadocGenerator;
     }
-    
+
     public void setPrefixes(String[] prefixes) {
         if( prefixes != null ) {
             namingGenerator = new NamingGenerator(prefixes[0], prefixes[1]);
@@ -140,9 +140,11 @@ public class BoundboxWriter {
         if( !classInfo.getListMethodInfos().isEmpty() ) {
             writeCodeDecoration(writer, "Access to methods");
             for (MethodInfo methodInfo : classInfo.getListMethodInfos()) {
-                writer.emitEmptyLine();
-                writeJavadocForBoundMethod(writer, classInfo, methodInfo);
-                createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
+                if( !methodInfo.isInstanceInitializer() && !methodInfo.isStaticInitializer() ) {
+                    writer.emitEmptyLine();
+                    writeJavadocForBoundMethod(writer, classInfo, methodInfo);
+                    createMethodWrapper(writer, methodInfo, targetClassName, classInfo.getListSuperClassNames());
+                }
             }
         }
 
@@ -209,9 +211,11 @@ public class BoundboxWriter {
         if( !innerClassInfo.getListMethodInfos().isEmpty() ) {
             writeCodeDecoration(writer, "Access to methods");
             for (MethodInfo methodInfo : innerClassInfo.getListMethodInfos()) {
-                writer.emitEmptyLine();
-                writeJavadocForBoundMethod(writer, innerClassInfo, methodInfo);
-                createMethodWrapperForInnerClass(writer, methodInfo, innerClassInfo.getListSuperClassNames());
+                if( !methodInfo.isInstanceInitializer() && !methodInfo.isStaticInitializer() ) {
+                    writer.emitEmptyLine();
+                    writeJavadocForBoundMethod(writer, innerClassInfo, methodInfo);
+                    createMethodWrapperForInnerClass(writer, methodInfo, innerClassInfo.getListSuperClassNames());
+                }
             }
         }
 
