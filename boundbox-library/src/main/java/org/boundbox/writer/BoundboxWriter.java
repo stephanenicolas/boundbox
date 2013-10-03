@@ -52,9 +52,6 @@ public class BoundboxWriter {
     // ----------------------------------
     // METHODS
     // ----------------------------------
-    /* package-private*/ void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
-        this.javadocGenerator = javadocGenerator;
-    }
 
     public void setPrefixes(String[] prefixes) {
         if( prefixes != null ) {
@@ -72,6 +69,10 @@ public class BoundboxWriter {
         writeBoundBox(classInfo, writer);
     }
 
+    /* package-private*/ void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
+        this.javadocGenerator = javadocGenerator;
+    }
+    
     protected void writeBoundBox(ClassInfo classInfo, JavaWriter writer) throws IOException {
         String boundClassName = classInfo.getClassName();
         log.info("BoundClassName is " + boundClassName);
@@ -645,4 +646,5 @@ public class BoundboxWriter {
         return StringUtils.join(paramList,",");
     }
 
+    
 }
