@@ -45,3 +45,7 @@ library
 #eclipse
 .metadata
 .factorypath
+
+#backup file
+CHANGELOG.md~
+README.md~
