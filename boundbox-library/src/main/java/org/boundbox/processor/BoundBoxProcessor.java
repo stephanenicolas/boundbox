@@ -44,7 +44,6 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
-import lombok.NonNull;
 import lombok.extern.java.Log;
 
 import org.boundbox.BoundBox;
