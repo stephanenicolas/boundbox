@@ -118,6 +118,32 @@ public class BoundBoxProcessorTest {
         assertContains(listFieldInfos, fakeFieldInfo4);
 
     }
+    
+    // ----------------------------------
+    // Final FIELDS
+    // ----------------------------------
+    
+    @Test
+    public void testProcess_class_with_single_final_field() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithSingleFinalField.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setFinalField(true);
+        assertContains(listFieldInfos, fakeFieldInfo);
+    }
 
     // ----------------------------------
     // EXTRA FIELDS

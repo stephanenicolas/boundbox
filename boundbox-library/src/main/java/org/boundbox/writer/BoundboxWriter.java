@@ -72,7 +72,7 @@ public class BoundboxWriter {
     /* package-private*/ void setJavadocGenerator(DocumentationGenerator javadocGenerator) {
         this.javadocGenerator = javadocGenerator;
     }
-    
+
     protected void writeBoundBox(ClassInfo classInfo, JavaWriter writer) throws IOException {
         String boundClassName = classInfo.getClassName();
         log.info("BoundClassName is " + boundClassName);
@@ -132,9 +132,11 @@ public class BoundboxWriter {
             for (FieldInfo fieldInfo : classInfo.getListFieldInfos()) {
                 writeJavadocForBoundGetter(writer, fieldInfo, classInfo);
                 createDirectGetter(writer, fieldInfo, classInfo.getListSuperClassNames());
-                writer.emitEmptyLine();
-                writeJavadocForBoundSetter(writer, fieldInfo, classInfo);
-                createDirectSetter(writer, fieldInfo, classInfo.getListSuperClassNames());
+                if( !fieldInfo.isFinalField() ) {
+                    writer.emitEmptyLine();
+                    writeJavadocForBoundSetter(writer, fieldInfo, classInfo);
+                    createDirectSetter(writer, fieldInfo, classInfo.getListSuperClassNames());
+                }
             }
         }
 
@@ -203,9 +205,11 @@ public class BoundboxWriter {
             for (FieldInfo fieldInfo : innerClassInfo.getListFieldInfos()) {
                 writeJavadocForBoundGetter(writer, fieldInfo, innerClassInfo);
                 createDirectGetterForInnerClass(writer, fieldInfo, innerClassInfo.getListSuperClassNames());
-                writer.emitEmptyLine();
-                writeJavadocForBoundSetter(writer, fieldInfo, innerClassInfo);
-                createDirectSetterForInnerClass(writer, fieldInfo, innerClassInfo.getListSuperClassNames());
+                if( !fieldInfo.isFinalField() ) {
+                    writer.emitEmptyLine();
+                    writeJavadocForBoundSetter(writer, fieldInfo, innerClassInfo);
+                    createDirectSetterForInnerClass(writer, fieldInfo, innerClassInfo.getListSuperClassNames());
+                }
             }
         }
 
@@ -646,5 +650,5 @@ public class BoundboxWriter {
         return StringUtils.join(paramList,",");
     }
 
-    
+
 }

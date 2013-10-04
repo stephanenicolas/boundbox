@@ -120,6 +120,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, Integer> {
         FieldInfo fieldInfo = new FieldInfo(e);
         fieldInfo.setInheritanceLevel(inheritanceLevel);
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
+        fieldInfo.setFinalField(e.getModifiers().contains(Modifier.FINAL));
         classInfo.getListFieldInfos().add(fieldInfo);
         log.info("field ->" + fieldInfo.getFieldName() + " added.");
 

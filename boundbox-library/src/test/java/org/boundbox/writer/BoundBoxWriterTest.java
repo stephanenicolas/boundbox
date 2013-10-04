@@ -1,10 +1,6 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -232,6 +228,47 @@ public class BoundBoxWriterTest {
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
+    }
+    
+    // ----------------------------------
+    // FINAL FIELDS
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_single_final_field() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithSingleFinalField";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        fakeFieldInfo.setFinalField(true);
+        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        listFieldInfos.add(fakeFieldInfo);
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListImports(new HashSet<String>());
+
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(writer.getNamingGenerator().createBoundBoxName(classInfo), neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Method method = clazz.getDeclaredMethod("boundBox_getFoo");
+        assertNotNull(method);
+        
+        Method method2 = null;
+        try {
+            method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
+            fail();
+        } catch (Exception e) {
+            assertNull(method2);
+        }
     }
 
     // ----------------------------------

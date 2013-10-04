@@ -24,6 +24,9 @@ public class FieldInfo implements Inheritable {
     @Getter
     @Setter
     private boolean staticField;
+    @Getter
+    @Setter
+    private boolean isFinalField;
 
     public FieldInfo(@NonNull VariableElement e) {
         fieldName = e.getSimpleName().toString();
