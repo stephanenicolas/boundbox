@@ -1,13 +1,15 @@
 package org.boundbox.processor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.boundbox.FakeFieldInfo;
+import org.boundbox.FakeInnerClassInfo;
 import org.boundbox.model.FieldInfo;
-import org.boundbox.processor.InheritanceComputer;
+import org.boundbox.model.InnerClassInfo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +23,7 @@ public class InheritanceComputerTest {
     }
 
     @Test
-    public void testSimplifyInheritance() {
+    public void testComputeInheritanceAndHidingFields() {
         // given
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
         FieldInfo fieldInfo = new FakeFieldInfo("foo", "bar");
@@ -32,12 +34,32 @@ public class InheritanceComputerTest {
         listFieldInfos.add(fieldInfo2);
 
         // when
-        simplifier.computeInheritanceAndHiding(listFieldInfos);
+        simplifier.computeInheritanceAndHidingFields(listFieldInfos);
 
         // then
         assertFalse(listFieldInfos.isEmpty());
         assertEquals(0, listFieldInfos.get(0).getEffectiveInheritanceLevel());
         assertEquals(2, listFieldInfos.get(1).getEffectiveInheritanceLevel());
+    }
+    
+    @Test
+    public void testComputeInheritanceAndHidingInnerClasses() {
+        // given
+        List<InnerClassInfo> listInnerClassInfos = new ArrayList<InnerClassInfo>();
+        InnerClassInfo innerClassInfo = new FakeInnerClassInfo("foo");
+        innerClassInfo.setInheritanceLevel(1);
+        InnerClassInfo innerClassInfo2 = new FakeInnerClassInfo("foo");
+        innerClassInfo2.setInheritanceLevel(2);
+        listInnerClassInfos.add(innerClassInfo);
+        listInnerClassInfos.add(innerClassInfo2);
+
+        // when
+        simplifier.computeInheritanceAndHidingInnerClasses(listInnerClassInfos);
+
+        // then
+        assertFalse(listInnerClassInfos.isEmpty());
+        assertEquals(0, listInnerClassInfos.get(0).getEffectiveInheritanceLevel());
+        assertEquals(2, listInnerClassInfos.get(1).getEffectiveInheritanceLevel());
     }
 
 }

@@ -8,7 +8,7 @@ import lombok.ToString;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
-@EqualsAndHashCode(callSuper=true,exclude="effectiveInheritanceLevel")
+@EqualsAndHashCode(callSuper=true,exclude={"effectiveInheritanceLevel","innerClassIndex"})
 @ToString
 public class InnerClassInfo extends ClassInfo implements Inheritable {
 

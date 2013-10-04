@@ -157,8 +157,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
             listClassInfo.add(classInfo);
 
             // perform some computations on meta model
-            inheritanceComputer.computeInheritanceAndHiding(classInfo.getListFieldInfos());
-            inheritanceComputer.computeInheritanceAndOverriding(classInfo.getListMethodInfos(), boundClass, elements);
+            inheritanceComputer.computeInheritanceAndHidingFields(classInfo.getListFieldInfos());
+            inheritanceComputer.computeInheritanceAndOverridingMethods(classInfo.getListMethodInfos(), boundClass, elements);
+            inheritanceComputer.computeInheritanceAndHidingInnerClasses(classInfo.getListInnerClassInfo());
 
             // write meta model to java class file
             Writer sourceWriter = null;

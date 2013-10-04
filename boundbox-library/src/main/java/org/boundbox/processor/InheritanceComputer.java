@@ -12,11 +12,12 @@ import javax.lang.model.util.Elements;
 import lombok.extern.java.Log;
 
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
 @Log
 public class InheritanceComputer {
-    public void computeInheritanceAndHiding(List<FieldInfo> listFieldInfos) {
+    public void computeInheritanceAndHidingFields(List<FieldInfo> listFieldInfos) {
         // get min inheritance level of Field.
         Map<String, FieldInfo> mapFieldNameToMinFieldInfo = new HashMap<String, FieldInfo>();
         for (FieldInfo fieldInfo : listFieldInfos) {
@@ -35,8 +36,28 @@ public class InheritanceComputer {
             minFields.setEffectiveInheritanceLevel(0);
         }
     }
+    
+    public void computeInheritanceAndHidingInnerClasses(List<InnerClassInfo> listInnerClassInfos) {
+        // get min inheritance level of Field.
+        Map<String, InnerClassInfo> mapFieldNameToMinInnerClassInfo = new HashMap<String, InnerClassInfo>();
+        for (InnerClassInfo innerClassInfo : listInnerClassInfos) {
+            if (!mapFieldNameToMinInnerClassInfo.containsKey(innerClassInfo.getClassName())) {
+                mapFieldNameToMinInnerClassInfo.put(innerClassInfo.getClassName(), innerClassInfo);
+            } else {
+                InnerClassInfo minFieldInfo = mapFieldNameToMinInnerClassInfo.get(innerClassInfo.getClassName());
+                if (minFieldInfo.getInheritanceLevel() > innerClassInfo.getInheritanceLevel()) {
+                    mapFieldNameToMinInnerClassInfo.put(innerClassInfo.getClassName(), innerClassInfo);
+                }
+            }
+        }
+        
+        // and replace it to 0
+        for (InnerClassInfo minClasses : mapFieldNameToMinInnerClassInfo.values()) {
+            minClasses.setEffectiveInheritanceLevel(0);
+        }
+    }
 
-    public void computeInheritanceAndOverriding(List<MethodInfo> listMethodInfos, TypeElement typeElement, Elements elements) {
+    public void computeInheritanceAndOverridingMethods(List<MethodInfo> listMethodInfos, TypeElement typeElement, Elements elements) {
         // put all methods with same name in a list
         Map<String, List<MethodInfo>> mapMethodSignatureNameToListMethodInfo = new HashMap<String, List<MethodInfo>>();
         for (MethodInfo methodInfo : listMethodInfos) {
