@@ -831,6 +831,7 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassFieldsInfos, fakeFieldInfo);
 
         FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("b", Object.class.getName());
+        fakeFieldInfo2.setFinalField(true);
         assertContains(listInnerClassFieldsInfos, fakeFieldInfo2);
 
         List<MethodInfo> listInnerClassMethodInfos = classInfo.getListInnerClassInfo().get(0).getListMethodInfos();

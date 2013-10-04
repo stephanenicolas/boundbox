@@ -1025,6 +1025,7 @@ public class BoundBoxWriterTest {
         listInnerClassFieldInfos.add(fakeInnerClassFieldInfo);
 
         FieldInfo fakeInnerClassFieldInfo2 = new FakeFieldInfo("b", Object.class.getName());
+        fakeInnerClassFieldInfo2.setFinalField(true);
         listInnerClassFieldInfos.add(fakeInnerClassFieldInfo2);
 
         List<MethodInfo> listInnerClassMethodInfos = new ArrayList<MethodInfo>();
@@ -1064,8 +1065,25 @@ public class BoundBoxWriterTest {
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
 
-        Method innerClassMethod = innerClass.getDeclaredMethod("foo");
-        assertNotNull(innerClassMethod);
+        Method innerClassMethodGetterFieldA = innerClass.getDeclaredMethod("boundBox_getA");
+        assertNotNull(innerClassMethodGetterFieldA);
+
+        Method innerClassMethodSetterFieldA = innerClass.getDeclaredMethod("boundBox_setA",int.class);
+        assertNotNull(innerClassMethodSetterFieldA);
+
+        Method innerClassMethodGetterFieldB = innerClass.getDeclaredMethod("boundBox_getB");
+        assertNotNull(innerClassMethodGetterFieldB);
+
+        Method innerClassMethodSetterFieldB = null;
+        try {
+            innerClassMethodSetterFieldB = innerClass.getDeclaredMethod("boundBox_setB",Object.class);
+            fail();
+        } catch (Exception e) {
+        }
+        assertNull(innerClassMethodSetterFieldB);
+
+        Method innerClassMethod1 = innerClass.getDeclaredMethod("foo");
+        assertNotNull(innerClassMethod1);
 
         Method innerClassMethod2 = innerClass.getDeclaredMethod("bar", int.class);
         assertNotNull(innerClassMethod2);

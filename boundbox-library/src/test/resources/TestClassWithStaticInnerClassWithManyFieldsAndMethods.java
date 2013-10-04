@@ -5,7 +5,7 @@ import org.boundbox.BoundBox;
 public class TestClassWithStaticInnerClassWithManyFieldsAndMethods {
     public static class InnerClass {
         public int a;
-        public Object b;
+        public final Object b = null;
         private void foo() {}
         private void bar( int a) {}
     }
