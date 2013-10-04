@@ -870,6 +870,7 @@ public class BoundBoxProcessorTest {
         FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
         fakeInnerClassInfo.setStaticInnerClass(true);
         fakeInnerClassInfo.setInheritanceLevel(1);
+        fakeInnerClassInfo.setEffectiveInheritanceLevel(0);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos, fakeInnerClassInfo);
     }
