@@ -22,4 +22,8 @@ public class ScanningContext {
     private boolean isStatic = false;
     /** Whether or not the class being visited is still visible to the BoundBox. */
     private boolean isVisible = true;
+    /** Used internally during scanning to identify whether or not elements found during scan are enclosed in current scanning context. */
+    private boolean isInsideEnclosedElements = false;
+    /** Used internally during scanning to identify whether or not elements found during scan are superclasses in current scanning context. */
+    private boolean isInsideSuperElements = false;
 }

@@ -17,20 +17,25 @@ import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
+/**
+ * Scans a given {@link TypeElement} to produce its associated {@link ClassInfo}. This class is
+ * based on the visitor design pattern and uses a {@link ScanningContext} to memorize information
+ * during tree visit (and avoid using a stack).
+ * @author SNI
+ */
 @Log
 public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext> {
 
-    // private ClassInfo classInfo;
-    // private Stack<ClassInfo> stackClassInfos = new Stack<ClassInfo>();
     private String maxSuperClassName = Object.class.getName();
+    private ClassInfo initialclassInfo;
 
     public ClassInfo scan(TypeElement boundClass) {
-        ClassInfo classInfo = new ClassInfo(boundClass.getQualifiedName().toString());
-        ScanningContext initialScanningContext = new ScanningContext(classInfo);
+        initialclassInfo = new ClassInfo(boundClass.getQualifiedName().toString());
+        ScanningContext initialScanningContext = new ScanningContext(initialclassInfo);
         boundClass.accept(this, initialScanningContext);
-        classInfo.getListImports().remove(boundClass.toString());
+        initialclassInfo.getListImports().remove(boundClass.toString());
         maxSuperClassName = Object.class.getName();
-        return classInfo;
+        return initialclassInfo;
     }
 
     public void setMaxSuperClass(Class<?> maxSuperClass) {
@@ -45,14 +50,20 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         return maxSuperClassName;
     }
 
+    //TODO create visitor methods visitTypeAsInnerClass and visitTypeAsSuperClass
+    //it will make things more clear. Processing is a in a fuzzy state right now, but I believe
+    //most bricks are in place.
     @Override
     public Void visitTypeAsClass(TypeElement e, ScanningContext scanningContext) {
+        if( !e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) && ! scanningContext.isInsideEnclosedElements() && !scanningContext.isInsideSuperElements() ) {
+            log.info("dropping class ->" + e.getSimpleName());
+            return null;
+        }
         log.info("class ->" + e.getSimpleName());
-        
+
         boolean isInnerClass = e.getNestingKind().isNested();
         log.info("nested ->" + isInnerClass);
 
-        ScanningContext oldScanningContext = scanningContext;
         if (isInnerClass) {
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             int inheritanceLevel = scanningContext.getInheritanceLevel();
@@ -62,18 +73,25 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             innerClassInfo.getListSuperClassNames().add(e.toString());
             innerClassInfo.setInheritanceLevel(inheritanceLevel);
 
-            classInfo.getListInnerClassInfo().add(innerClassInfo);
-            ScanningContext newScanningContext = new ScanningContext(innerClassInfo);
-            newScanningContext.setInheritanceLevel(inheritanceLevel);
-            scanningContext = newScanningContext;
+            if(scanningContext.isInsideEnclosedElements() ) {
+                classInfo.getListInnerClassInfo().add(innerClassInfo);
+            }
+            if( !scanningContext.isInsideSuperElements() ) {
+                ScanningContext newScanningContext = new ScanningContext(innerClassInfo);
+                newScanningContext.setInheritanceLevel(inheritanceLevel);
+                scanningContext = newScanningContext;
+            }
         }
 
         addTypeToImport(scanningContext.getCurrentClassInfo(), e.asType());
 
         // http://stackoverflow.com/q/7738171/693752
         for (Element enclosedElement : e.getEnclosedElements()) {
+            scanningContext.setInsideEnclosedElements(true);
+            scanningContext.setInsideSuperElements(false);
             enclosedElement.accept(this, scanningContext);
         }
+        scanningContext.setInsideEnclosedElements(false);
 
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
@@ -81,12 +99,11 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
             Element superClassElement = superClassDeclaredType.asElement();
             scanningContext.getCurrentClassInfo().getListSuperClassNames().add(superClassElement.toString());
-            scanningContext.setInheritanceLevel(scanningContext.getInheritanceLevel()+1);
+            scanningContext.setInheritanceLevel(scanningContext.getInheritanceLevel() + 1);
+            scanningContext.setInsideEnclosedElements(false);
+            scanningContext.setInsideSuperElements(true);
             superClassElement.accept(BoundClassScanner.this, scanningContext);
-        }
-
-        if (isInnerClass) {
-            scanningContext = oldScanningContext;
+            scanningContext.setInsideSuperElements(false);
         }
 
         return super.visitTypeAsClass(e, scanningContext);
