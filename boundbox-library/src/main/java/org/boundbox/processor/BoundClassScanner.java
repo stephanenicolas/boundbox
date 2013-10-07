@@ -1,5 +1,8 @@
 package org.boundbox.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -28,8 +31,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
 
     private String maxSuperClassName = Object.class.getName();
     private ClassInfo initialclassInfo;
+    private List<String> visitiedTypes = new ArrayList<String>();
 
     public ClassInfo scan(TypeElement boundClass) {
+        visitiedTypes.clear();
         initialclassInfo = new ClassInfo(boundClass.getQualifiedName().toString());
         ScanningContext initialScanningContext = new ScanningContext(initialclassInfo);
         boundClass.accept(this, initialScanningContext);
@@ -59,6 +64,13 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             log.info("dropping class ->" + e.getSimpleName());
             return null;
         }
+        
+        if( visitiedTypes.contains(e.toString()) ) {
+            log.info("dropping visitied class ->" + e.getSimpleName());
+            return null;
+        }
+        visitiedTypes.add(e.toString());
+        
         log.info("class ->" + e.getSimpleName());
 
         boolean isInnerClass = e.getNestingKind().isNested();

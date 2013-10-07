@@ -1004,7 +1004,7 @@ public class BoundBoxProcessorTest {
     @Test
     public void testProcess_class_with_non_static_inner_class_inheriting_fields_from_a_static_inner_class() throws URISyntaxException {
         // given
-        String[] testSourceFileNames = new String[] { "TestClassWithNonStaticInnerClassInheritingStaticInnerClass.java" };
+        String[] testSourceFileNames = new String[] { "TestClassWithNonStaticInnerClassInheritingStaticInnerClass.java", "TestClassWithStaticInnerClass.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
         // when
@@ -1028,6 +1028,29 @@ public class BoundBoxProcessorTest {
         fakeInnerClassInfo.getListFieldInfos().add(fakeFieldInfoFoo);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos.get(0).getListFieldInfos(), fakeFieldInfoFoo);
+    }
+    
+    @Test
+    public void testProcess_class_with_compoisition_of_static_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithCompositionOfStaticInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+
+        FakeFieldInfo fakeFieldInfoFoo = new FakeFieldInfo("a", "TestClassWithStaticInnerClass.InnerClass");
+        assertContains(listFieldInfos, fakeFieldInfoFoo);
     }
 
     // ----------------------------------

@@ -11,6 +11,7 @@ import org.boundbox.model.ClassInfo;
  * to annotation tree exploration such as the current {@link ClassInfo} being explored, its visibility, etc.
  * @author SNI
  */
+@SuppressWarnings("PMD.UnusedPrivateField")
 @Data
 public class ScanningContext {
     
