@@ -888,6 +888,63 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
+    // TEST CLASS IS INNER CLASS
+    // ----------------------------------
+    
+    @Test
+    public void testProcess_class_is_static_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassIsStaticInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", int.class.getSimpleName());
+        fakeFieldInfo.setStaticField(true);
+        assertContains(listFieldInfos, fakeFieldInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertTrue(listInnerClassInfos.isEmpty());
+    }
+    
+    //TDD for issue #18
+    @Test
+    public void testProcess_class_is_non_static_inner_class_that_extends_static_inner_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassIsNonStaticInnerClassThatExtendsStaticInnerClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", int.class.getSimpleName());
+        fakeFieldInfo.setStaticField(false);
+        fakeFieldInfo.setInheritanceLevel(1);
+        fakeFieldInfo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, fakeFieldInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertTrue(listInnerClassInfos.isEmpty());
+    }
+    
+    // ----------------------------------
     // IMPORTS
     // ----------------------------------
 

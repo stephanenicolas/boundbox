@@ -20,7 +20,7 @@ public class ScanningContext {
     /** Current inheritance level. 0 means the BoundClass, 1 its super class, etc. */
     private int inheritanceLevel = 0;
     /** Whether or not we crossed a static context. */
-    private boolean isStatic = false;
+    private boolean isStatic = true;
     /** Whether or not the class being visited is still visible to the BoundBox. */
     private boolean isVisible = true;
     /** Used internally during scanning to identify whether or not elements found during scan are enclosed in current scanning context. */

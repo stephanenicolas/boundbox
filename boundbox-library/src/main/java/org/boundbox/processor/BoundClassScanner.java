@@ -55,28 +55,34 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         return maxSuperClassName;
     }
 
-    //TODO create visitor methods visitTypeAsInnerClass and visitTypeAsSuperClass
-    //it will make things more clear. Processing is a in a fuzzy state right now, but I believe
-    //most bricks are in place.
+    // TODO create visitor methods visitTypeAsInnerClass and visitTypeAsSuperClass
+    // it will make things more clear. Processing is a in a fuzzy state right now, but I believe
+    // most bricks are in place.
     @Override
     public Void visitTypeAsClass(TypeElement e, ScanningContext scanningContext) {
-        if( !e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) && ! scanningContext.isInsideEnclosedElements() && !scanningContext.isInsideSuperElements() ) {
+        if (!e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) && !scanningContext.isInsideEnclosedElements() && !scanningContext.isInsideSuperElements()) {
             log.info("dropping class ->" + e.getSimpleName());
             return null;
         }
-        
-        if( visitiedTypes.contains(e.toString()) ) {
+
+        if (visitiedTypes.contains(e.toString())) {
             log.info("dropping visitied class ->" + e.getSimpleName());
             return null;
         }
-        visitiedTypes.add(e.toString());
         
+        visitiedTypes.add(e.toString());
+
         log.info("class ->" + e.getSimpleName());
 
         boolean isInnerClass = e.getNestingKind().isNested();
         log.info("nested ->" + isInnerClass);
 
-        if (isInnerClass) {
+        boolean isStaticElement = e.getModifiers().contains(Modifier.STATIC);
+        scanningContext.setStatic((!isInnerClass || isStaticElement ) && scanningContext.isStatic());
+
+        //boundboxes around inner classes should not be considered as inner classes
+        //but otherwise, if we are an inner class
+        if (isInnerClass && !e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) ) {
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             int inheritanceLevel = scanningContext.getInheritanceLevel();
             InnerClassInfo innerClassInfo = new InnerClassInfo(e.getSimpleName().toString());
@@ -85,10 +91,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             innerClassInfo.getListSuperClassNames().add(e.toString());
             innerClassInfo.setInheritanceLevel(inheritanceLevel);
 
-            if(scanningContext.isInsideEnclosedElements() ) {
+            //Current element is an inner class and we are currently scanning elements of someone
+            //so we add innerclassinfo to that someone : the current class info.
+            if (scanningContext.isInsideEnclosedElements()) {
                 classInfo.getListInnerClassInfo().add(innerClassInfo);
             }
-            if( !scanningContext.isInsideSuperElements() ) {
+            
+            //inside super classes we don't change the classInfo being scanned (inheritance flatenning)
+            //but outside, we do, to scan the inner class itself.
+            if (!scanningContext.isInsideSuperElements()) {
                 ScanningContext newScanningContext = new ScanningContext(innerClassInfo);
                 newScanningContext.setInheritanceLevel(inheritanceLevel);
                 scanningContext = newScanningContext;
@@ -97,26 +108,41 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
 
         addTypeToImport(scanningContext.getCurrentClassInfo(), e.asType());
 
-        // http://stackoverflow.com/q/7738171/693752
-        for (Element enclosedElement : e.getEnclosedElements()) {
-            scanningContext.setInsideEnclosedElements(true);
-            scanningContext.setInsideSuperElements(false);
-            enclosedElement.accept(this, scanningContext);
-        }
-        scanningContext.setInsideEnclosedElements(false);
-
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
-        if (!maxSuperClassName.equals(superclassOfBoundClass.toString()) && !Object.class.getName().equals(superclassOfBoundClass.toString()) && superclassOfBoundClass.getKind() == TypeKind.DECLARED) {
+        boolean hasValidSuperClass = !maxSuperClassName.equals(superclassOfBoundClass.toString()) 
+                && !Object.class.getName().equals(superclassOfBoundClass.toString())
+                && superclassOfBoundClass.getKind() == TypeKind.DECLARED;
+        
+        //if we have a valid inner class, let's scan it 
+        if (hasValidSuperClass) {
             DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
             Element superClassElement = superClassDeclaredType.asElement();
             scanningContext.getCurrentClassInfo().getListSuperClassNames().add(superClassElement.toString());
-            scanningContext.setInheritanceLevel(scanningContext.getInheritanceLevel() + 1);
-            scanningContext.setInsideEnclosedElements(false);
-            scanningContext.setInsideSuperElements(true);
-            superClassElement.accept(BoundClassScanner.this, scanningContext);
-            scanningContext.setInsideSuperElements(false);
+            
+            ClassInfo classInfo = scanningContext.getCurrentClassInfo();
+            ScanningContext newScanningContext = new ScanningContext(classInfo);
+            newScanningContext.setInheritanceLevel(scanningContext.getInheritanceLevel() + 1);
+            newScanningContext.setStatic(scanningContext.isStatic());
+            newScanningContext.setInsideEnclosedElements(false);
+            newScanningContext.setInsideSuperElements(true);
+            superClassElement.accept(BoundClassScanner.this, newScanningContext);
         }
+        
+        //and finally visit all elements of current class if : 
+        //it is an inner class of a bound class, or a super class
+        //also, root bound class is scanned in current scanning context
+        //otherwise, we don't scan
+        if (e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) || scanningContext.isInsideSuperElements() || isInnerClass) {
+            // http://stackoverflow.com/q/7738171/693752
+            for (Element enclosedElement : e.getEnclosedElements()) {
+                scanningContext.setInsideEnclosedElements(true);
+                scanningContext.setInsideSuperElements(false);
+                enclosedElement.accept(this, scanningContext);
+            }
+            scanningContext.setInsideEnclosedElements(false);
+        }
+
 
         return super.visitTypeAsClass(e, scanningContext);
     }
@@ -130,7 +156,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
                 scanningContext.getCurrentClassInfo().getListConstructorInfos().add(methodInfo);
             }
         } else {
-            methodInfo.setStaticMethod(e.getModifiers().contains(Modifier.STATIC));
+            methodInfo.setStaticMethod(e.getModifiers().contains(Modifier.STATIC) && scanningContext.isStatic());
             methodInfo.setInheritanceLevel(scanningContext.getInheritanceLevel());
             // prevents methods overriden in subclass to be re-added in super class.
             scanningContext.getCurrentClassInfo().getListMethodInfos().add(methodInfo);
@@ -150,7 +176,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     public Void visitVariableAsField(VariableElement e, ScanningContext scanningContext) {
         FieldInfo fieldInfo = new FieldInfo(e);
         fieldInfo.setInheritanceLevel(scanningContext.getInheritanceLevel());
-        fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC));
+        fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC) && scanningContext.isStatic());
         fieldInfo.setFinalField(e.getModifiers().contains(Modifier.FINAL));
         scanningContext.getCurrentClassInfo().getListFieldInfos().add(fieldInfo);
         log.info("field ->" + fieldInfo.getFieldName() + " added.");
