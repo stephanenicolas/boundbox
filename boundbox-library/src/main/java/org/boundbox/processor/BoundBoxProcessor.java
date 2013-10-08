@@ -46,6 +46,8 @@ import javax.tools.JavaFileObject;
 
 import lombok.extern.java.Log;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBox;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
@@ -68,8 +70,10 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_MAX_SUPER_CLASS = "maxSuperClass";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS = "extraFields";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_PREFIXES = "prefixes";
+    private static final String BOUNDBOX_ANNOTATION_PARAMETER_PACKAGE = "boundBoxPackage";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_NAME = "fieldName";
     private static final String BOUNDBOX_ANNOTATION_PARAMETER_EXTRA_BOUND_FIELDS_FIELD_CLASS = "fieldClass";
+    private static final String PACKAGE_SEPARATOR = ".";
 
     private Filer filer;
     private Messager messager;
@@ -97,6 +101,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
             TypeElement boundClass = null;
             String maxSuperClass = null;
             String[] prefixes = null;
+            String boundBoxPackageName = null;
+
             List<? extends AnnotationValue> extraBoundFields = null;
             List<? extends AnnotationMirror> listAnnotationMirrors = classElement.getAnnotationMirrors();
             if (listAnnotationMirrors == null) {
@@ -128,6 +134,9 @@ public class BoundBoxProcessor extends AbstractProcessor {
                             prefixes[indexAnnotation] = getAnnotationValueAsString(listPrefixes.get(indexAnnotation));
                         }
                     }
+                    if (BOUNDBOX_ANNOTATION_PARAMETER_PACKAGE.equals(entry.getKey().getSimpleName().toString())) {
+                        boundBoxPackageName = getAnnotationValueAsString(entry.getValue());
+                    }
                 }
             }
 
@@ -137,7 +146,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
 
             if (maxSuperClass != null) {
-                boundClassVisitor.setMaxSuperClass(maxSuperClass);
+                boundClassVisitor.setMaxSuperClassName(maxSuperClass);
             }
 
             if (prefixes != null && prefixes.length != 2 && prefixes.length != 1) {
@@ -150,6 +159,17 @@ public class BoundBoxProcessor extends AbstractProcessor {
             }
             boundboxWriter.setPrefixes(prefixes);
 
+            if( boundBoxPackageName == null ) {
+                String boundClassFQN = boundClass.getQualifiedName().toString();
+                if (boundClassFQN.contains(PACKAGE_SEPARATOR)) {
+                    boundBoxPackageName = StringUtils.substringBeforeLast(boundClassFQN, PACKAGE_SEPARATOR);
+                } else {
+                    boundBoxPackageName = StringUtils.EMPTY;
+                }
+            }
+            boundClassVisitor.setBoundBoxPackageName(boundBoxPackageName);
+            boundboxWriter.setBoundBoxPackageName(boundBoxPackageName);
+
             ClassInfo classInfo = boundClassVisitor.scan(boundClass);
 
             injectExtraBoundFields(extraBoundFields, classInfo);
@@ -161,16 +181,14 @@ public class BoundBoxProcessor extends AbstractProcessor {
             inheritanceComputer.computeInheritanceAndHidingFields(classInfo.getListFieldInfos());
             inheritanceComputer.computeInheritanceAndOverridingMethods(classInfo.getListMethodInfos(), boundClass, elements);
             inheritanceComputer.computeInheritanceAndHidingInnerClasses(classInfo.getListInnerClassInfo());
-            
+
 
             // write meta model to java class file
             Writer sourceWriter = null;
             try {
-                String targetPackageName = classInfo.getTargetPackageName();
                 String boundBoxClassName = boundboxWriter.getNamingGenerator().createBoundBoxName(classInfo);
-
-                String boundBoxFQN = targetPackageName.isEmpty() ? boundBoxClassName : targetPackageName + "." + boundBoxClassName;
-                JavaFileObject sourceFile = filer.createSourceFile(boundBoxFQN, (Element[]) null);
+                String boundBoxClassFQN = boundBoxPackageName.isEmpty() ? boundBoxClassName : boundBoxPackageName + PACKAGE_SEPARATOR + boundBoxClassName;
+                JavaFileObject sourceFile = filer.createSourceFile(boundBoxClassFQN, (Element[]) null);
                 sourceWriter = sourceFile.openWriter();
 
                 boundboxWriter.writeBoundBox(classInfo, sourceWriter);
@@ -179,12 +197,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
                 error(classElement, e.getMessage());
             } finally {
                 if (sourceWriter != null) {
-                    try {
-                        sourceWriter.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        error(classElement, e.getMessage());
-                    }
+                    IOUtils.closeQuietly(sourceWriter);
                 }
             }
         }

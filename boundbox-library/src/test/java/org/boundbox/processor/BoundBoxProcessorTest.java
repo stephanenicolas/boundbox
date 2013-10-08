@@ -1019,7 +1019,7 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    // NAMING PREFIXES
+    // NAMING PREFIXES 
     // ----------------------------------
     @Test
     public void testProcess_class_with_prefixes() throws URISyntaxException {
@@ -1079,6 +1079,34 @@ public class BoundBoxProcessorTest {
         assertEquals(2, capturedPrefixes.getValue().length);
         assertEquals("BB", capturedPrefixes.getValue()[0]);
         assertEquals("bb", capturedPrefixes.getValue()[1]);
+    }
+    // ----------------------------------
+    // NAMING PREFIXES 
+    // ----------------------------------
+
+    @Test
+    public void testProcess_class_with_package_name() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithPackageName.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        BoundboxWriter mockBoundBoxWriter = EasyMock.createNiceMock(BoundboxWriter.class);
+        boundBoxProcessor.setBoundboxWriter(mockBoundBoxWriter);
+        EasyMock.expect(mockBoundBoxWriter.getNamingGenerator()).andReturn(new NamingGenerator());
+        EasyMock.expectLastCall().anyTimes();
+        mockBoundBoxWriter.setBoundBoxPackageName("foo");
+        EasyMock.replay(mockBoundBoxWriter);
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertEquals( "", classInfo.getBoundClassPackageName() );
+
+        EasyMock.verify(mockBoundBoxWriter);
     }
 
     // ----------------------------------

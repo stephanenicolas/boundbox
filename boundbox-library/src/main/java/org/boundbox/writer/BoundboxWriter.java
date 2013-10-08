@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.lang.model.element.Modifier;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
@@ -49,6 +50,10 @@ public class BoundboxWriter {
 
     private DocumentationGenerator javadocGenerator = new DocumentationGenerator();
 
+    @Setter
+    @NonNull
+    private String boundBoxPackageName = StringUtils.EMPTY;
+
     // ----------------------------------
     // METHODS
     // ----------------------------------
@@ -77,11 +82,9 @@ public class BoundboxWriter {
         String boundClassName = classInfo.getClassName();
         log.info("BoundClassName is " + boundClassName);
 
-        String targetPackageName = classInfo.getTargetPackageName();
-        String targetClassName = classInfo.getTargetClassName();
         String boundBoxClassName = createBoundBoxName(classInfo);
 
-        writer.emitPackage(targetPackageName)//
+        writer.emitPackage(boundBoxPackageName)//
         .emitEmptyLine();
 
         //TODO javawriter doesn't handle imports properly. V3.0.0 should change this
@@ -92,6 +95,15 @@ public class BoundboxWriter {
         classInfo.getListImports().add(Constructor.class.getName());
         classInfo.getListImports().add(InvocationTargetException.class.getName());
         classInfo.getListImports().add(BoundBoxException.class.getName());
+       
+        //import boundClass if not in same package
+        if( !classInfo.getBoundClassPackageName().equals(boundBoxPackageName ) ) {
+            String boundClassFQN = classInfo.getBoundClassName();
+            if( StringUtils.isNotEmpty(classInfo.getBoundClassPackageName()) ) {
+                boundClassFQN = classInfo.getBoundClassPackageName()+"."+boundClassFQN;
+                classInfo.getListImports().add(boundClassFQN);
+            }
+        }
         writer.emitImports(classInfo.getListImports());
 
         // TODO search the inner class tree for imports
@@ -99,23 +111,41 @@ public class BoundboxWriter {
         writer.emitEmptyLine();
         writeJavadocForBoundBoxClass(writer, classInfo);
         writer.emitAnnotation(SUPPRESS_WARNINGS_ALL);
-        createClassWrapper(writer, classInfo, targetClassName, boundBoxClassName);
+        createClassWrapper(writer, classInfo, boundBoxClassName);
     }
 
-    private void createClassWrapper(JavaWriter writer, ClassInfo classInfo, String targetClassName, String boundBoxClassName) throws IOException {
+    private void createClassWrapper(JavaWriter writer, ClassInfo classInfo, String boundBoxClassName) throws IOException {
+        String targetClassName = classInfo.getBoundClassName();
+        String boundClassFQN = classInfo.getBoundClassName();
+        if( StringUtils.isNotEmpty(classInfo.getBoundClassPackageName()) ) {
+            boundClassFQN = classInfo.getBoundClassPackageName()+"."+boundClassFQN;
+        }
+
         writer.beginType(boundBoxClassName, "class", EnumSet.of(Modifier.PUBLIC, Modifier.FINAL), null)
         //
         .emitEmptyLine()
         //
         .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
-        //
-        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC), targetClassName + ".class")//
+        .emitField("Class<?>", "boundClass", EnumSet.of(Modifier.PRIVATE, Modifier.STATIC))//
         .emitEmptyLine();//
+
+        //allow to access classes in default package. Load class via reflection.
+        String loadBoundClassStatement = "boundClass = Class.forName("+JavaWriter.stringLiteral(boundClassFQN)+")";
+        writer.beginInitializer(true)//
+        .beginControlFlow("try")
+        .emitStatement(loadBoundClassStatement)//
+        .endControlFlow();
+        addReflectionExceptionCatchClause(writer, ClassNotFoundException.class);
+        addReflectionExceptionCatchClause(writer, IllegalArgumentException.class);
+
+        writer.endInitializer()//
+        .emitEmptyLine();
 
         writeJavadocForBoundBoxConstructor(writer, classInfo);
         writer.beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), Object.class.getName(), "boundObject")//
-        .emitStatement("this.boundObject = boundObject")//
-        .endMethod()//
+        .emitStatement("this.boundObject = boundObject");//
+        
+        writer.endMethod()//
         .emitEmptyLine();
 
         if( !classInfo.getListConstructorInfos().isEmpty() ) {

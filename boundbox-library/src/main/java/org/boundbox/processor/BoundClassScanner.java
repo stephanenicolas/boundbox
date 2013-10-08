@@ -13,6 +13,8 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor6;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 import org.boundbox.model.ClassInfo;
@@ -29,10 +31,14 @@ import org.boundbox.model.MethodInfo;
 @Log
 public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext> {
 
+    @Getter
+    @Setter
     private String maxSuperClassName = Object.class.getName();
     private ClassInfo initialclassInfo;
     private List<String> visitiedTypes = new ArrayList<String>();
-
+    @Setter
+    private String boundBoxPackageName;
+    
     public ClassInfo scan(TypeElement boundClass) {
         visitiedTypes.clear();
         initialclassInfo = new ClassInfo(boundClass.getQualifiedName().toString());
@@ -45,14 +51,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
 
     public void setMaxSuperClass(Class<?> maxSuperClass) {
         this.maxSuperClassName = maxSuperClass.getName();
-    }
-
-    public void setMaxSuperClass(String className) {
-        this.maxSuperClassName = className;
-    }
-
-    public String getMaxSuperClass() {
-        return maxSuperClassName;
     }
 
     // TODO create visitor methods visitTypeAsInnerClass and visitTypeAsSuperClass

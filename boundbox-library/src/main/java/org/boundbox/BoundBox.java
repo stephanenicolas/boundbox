@@ -24,4 +24,7 @@ public @interface BoundBox {
     
     /** Prefixes used to name BoundBox classes and methods respectively. */
     String[] prefixes() default {"BoundBoxOf","boundBox"};
+
+    /** Package name of the BoundBox. */
+    String boundBoxPackage() default "";
 }

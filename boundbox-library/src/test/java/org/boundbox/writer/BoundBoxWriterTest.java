@@ -60,14 +60,14 @@ public class BoundBoxWriterTest {
             FileUtils.deleteDirectory(sandBoxDir);
         }
         sandBoxDir.mkdirs();
-        
+
         mockDocumentationGenerator = EasyMock.createMock(DocumentationGenerator.class);
     }
 
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            //FileUtils.deleteDirectory(sandBoxDir);
+            // FileUtils.deleteDirectory(sandBoxDir);
         }
         closeSandboxWriter();
     }
@@ -82,8 +82,8 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     // JAVADOC
     // ----------------------------------
-    //TODO this test tests the documentation generator, put these in its test class
-    //TODO replace by a mock of documentation generator here
+    // TODO this test tests the documentation generator, put these in its test class
+    // TODO replace by a mock of documentation generator here
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testProcess_class_without_javadoc() throws Exception {
@@ -100,7 +100,7 @@ public class BoundBoxWriterTest {
         EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxClass(EasyMock.capture(captured))).andReturn(StringUtils.EMPTY);
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
-                //used to debug the call
+                // used to debug the call
                 System.out.println(captured.getValue());
                 assertTrue(false);
                 return null;
@@ -110,7 +110,7 @@ public class BoundBoxWriterTest {
         EasyMock.expect(mockDocumentationGenerator.generateJavadocForBoundBoxConstructor(EasyMock.capture(captured2))).andReturn(StringUtils.EMPTY);
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
-                //used to debug the call
+                // used to debug the call
                 System.out.println(captured2.getValue());
                 assertTrue(false);
                 return null;
@@ -127,7 +127,7 @@ public class BoundBoxWriterTest {
         writer.writeBoundBox(classInfo, out);
 
         // then
-        //tested by the capture.
+        // tested by the capture.
     }
 
     @Test
@@ -147,7 +147,7 @@ public class BoundBoxWriterTest {
         EasyMock.expectLastCall().atLeastOnce();
 
         EasyMock.replay(mockDocumentationGenerator);
-        
+
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
         writer.setWritingJavadoc(true);
 
@@ -186,7 +186,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_getFoo");
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
@@ -223,13 +224,14 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_getFoo");
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
         assertNotNull(method2);
     }
-    
+
     // ----------------------------------
     // FINAL FIELDS
     // ----------------------------------
@@ -258,10 +260,11 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_getFoo");
         assertNotNull(method);
-        
+
         Method method2 = null;
         try {
             method2 = clazz.getDeclaredMethod("boundBox_setFoo", String.class);
@@ -302,7 +305,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_getFoo");
         assertNotNull(method);
         assertTrue((method.getModifiers() & Modifier.STATIC) != 0);
@@ -322,9 +326,9 @@ public class BoundBoxWriterTest {
     // ----------------------------------
     // STATIC INITIALIZER
     // ----------------------------------
-    
-    //those blocks are not accessible via reflection
-    
+
+    // those blocks are not accessible via reflection
+
     // ----------------------------------
     // CONSTRUCTORS
     // ----------------------------------
@@ -352,7 +356,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_new");
         assertNotNull(method);
         assertTrue((method.getModifiers() & Modifier.STATIC) != 0);
@@ -376,9 +381,7 @@ public class BoundBoxWriterTest {
         FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
         listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
         FakeFieldInfo fieldInfo4 = new FakeFieldInfo("c", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void",
-                Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3, fieldInfo4), Arrays.asList("java.io.IOException",
-                        "java.lang.RuntimeException")));
+        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3, fieldInfo4), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
 
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListImports(new HashSet<String>());
@@ -394,7 +397,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method declaredMethod1 = clazz.getDeclaredMethod("boundBox_new");
         assertNotNull(declaredMethod1);
         assertTrue((declaredMethod1.getModifiers() & Modifier.STATIC) != 0);
@@ -456,7 +460,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("foo");
         assertNotNull(method);
     }
@@ -476,8 +481,7 @@ public class BoundBoxWriterTest {
         FakeFieldInfo fieldInfo2 = new FakeFieldInfo("a", Object.class.getName());
         listConstructorInfos.add(new FakeMethodInfo("withObjectArgument", "void", Arrays.<FieldInfo>asList(fieldInfo2), null));
         FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3),
-                null));
+        listConstructorInfos.add(new FakeMethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveCharReturnType", "char", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveByteReturnType", "byte", Arrays.<FieldInfo>asList(), null));
@@ -485,12 +489,9 @@ public class BoundBoxWriterTest {
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveLongReturnType", "long", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
         listConstructorInfos.add(new FakeMethodInfo("withPrimitiveFloatReturnType", "float", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos
-        .add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays
-                .asList("java.io.IOException")));
-        listConstructorInfos.add(new FakeMethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList(
-                "java.io.IOException", "java.lang.RuntimeException")));
+        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException")));
+        listConstructorInfos.add(new FakeMethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
 
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListImports(new HashSet<String>());
@@ -506,7 +507,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         assertNotNull(clazz.getDeclaredMethod("simple"));
         assertNotNull(clazz.getDeclaredMethod("withPrimitiveArgument", int.class));
         assertNotNull(clazz.getDeclaredMethod("withObjectArgument", Object.class));
@@ -589,7 +591,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("foo");
         assertNotNull(method);
         assertTrue((method.getModifiers() & Modifier.STATIC) != 0);
@@ -625,7 +628,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_getFoo");
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_setFoo", String.class);
@@ -662,7 +666,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         assertNotNull(clazz.getDeclaredMethod("boundBox_getFoo"));
         assertNotNull(clazz.getDeclaredMethod("boundBox_setFoo", String.class));
         assertNotNull(clazz.getDeclaredMethod("boundBox_super_TestClassWithSingleField_getFoo"));
@@ -698,7 +703,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("foo");
         assertNotNull(method);
 
@@ -741,7 +747,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("foo");
         assertNotNull(method);
 
@@ -765,8 +772,7 @@ public class BoundBoxWriterTest {
         fakeMethodInfo2.setInheritanceLevel(2);
         listMethodInfos.add(fakeMethodInfo2);
         classInfo.setListMethodInfos(listMethodInfos);
-        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod",
-                "TestClassWithSingleMethod"));
+        classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -780,7 +786,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("foo");
         assertNotNull(method);
 
@@ -803,7 +810,7 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
         FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List");
-        listParameters.add(fakeParameterInfo );
+        listParameters.add(fakeParameterInfo);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         listMethodInfos.add(fakeMethodInfo);
@@ -821,7 +828,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("doIt", List.class);
         assertNotNull(method);
     }
@@ -837,7 +845,7 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
         FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<String>");
-        listParameters.add(fakeParameterInfo );
+        listParameters.add(fakeParameterInfo);
         FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         listMethodInfos.add(fakeMethodInfo);
@@ -855,13 +863,14 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("doIt", List.class);
         assertNotNull(method);
     }
 
     // ----------------------------------
-    //  INNER CLASSES
+    // INNER CLASSES
     // ----------------------------------
     @Test
     public void testProcess_class_with_static_inner_class() throws Exception {
@@ -897,7 +906,8 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
         Method method = clazz.getDeclaredMethod("boundBox_getA");
         assertNotNull(method);
         Method method2 = clazz.getDeclaredMethod("boundBox_setA", int.class);
@@ -909,7 +919,7 @@ public class BoundBoxWriterTest {
         Class<?> class1 = clazz.getDeclaredClasses()[0];
         assertNotNull(class1);
 
-        assertEquals("BoundBoxOfInnerClass",class1.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass", class1.getSimpleName());
     }
 
     @Test
@@ -942,12 +952,13 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
 
-        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass", innerClass.getSimpleName());
 
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
@@ -991,12 +1002,13 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
 
-        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass", innerClass.getSimpleName());
 
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
@@ -1055,12 +1067,13 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
 
-        assertEquals("BoundBoxOfInnerClass",innerClass.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass", innerClass.getSimpleName());
 
         Method innerClassConstructor = clazz.getDeclaredMethod("boundBox_new_InnerClass");
         assertNotNull(innerClassConstructor);
@@ -1068,7 +1081,7 @@ public class BoundBoxWriterTest {
         Method innerClassMethodGetterFieldA = innerClass.getDeclaredMethod("boundBox_getA");
         assertNotNull(innerClassMethodGetterFieldA);
 
-        Method innerClassMethodSetterFieldA = innerClass.getDeclaredMethod("boundBox_setA",int.class);
+        Method innerClassMethodSetterFieldA = innerClass.getDeclaredMethod("boundBox_setA", int.class);
         assertNotNull(innerClassMethodSetterFieldA);
 
         Method innerClassMethodGetterFieldB = innerClass.getDeclaredMethod("boundBox_getB");
@@ -1076,7 +1089,7 @@ public class BoundBoxWriterTest {
 
         Method innerClassMethodSetterFieldB = null;
         try {
-            innerClassMethodSetterFieldB = innerClass.getDeclaredMethod("boundBox_setB",Object.class);
+            innerClassMethodSetterFieldB = innerClass.getDeclaredMethod("boundBox_setB", Object.class);
             fail();
         } catch (Exception e) {
         }
@@ -1088,9 +1101,9 @@ public class BoundBoxWriterTest {
         Method innerClassMethod2 = innerClass.getDeclaredMethod("bar", int.class);
         assertNotNull(innerClassMethod2);
     }
-    
+
     // ----------------------------------
-    //  INNER CLASSES
+    // INNER CLASSES
     // ----------------------------------
     @Test
     public void testProcess_class_with_static_inherited_inner_class() throws Exception {
@@ -1120,15 +1133,14 @@ public class BoundBoxWriterTest {
         boolean result = task.call();
         assertTrue(result);
 
-        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));;
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
 
         Class<?> class1 = clazz.getDeclaredClasses()[0];
         assertNotNull(class1);
 
-        assertEquals("BoundBoxOfInnerClass",class1.getSimpleName());
+        assertEquals("BoundBoxOfInnerClass", class1.getSimpleName());
     }
-    
-    
 
     // ----------------------------------
     // PREFIXES
@@ -1146,12 +1158,12 @@ public class BoundBoxWriterTest {
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 
-        String[] prefixes = {"BB",""};
+        String[] prefixes = { "BB", "" };
         writer.setPrefixes(prefixes);
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
 
         // when
-        
+
         writer.writeBoundBox(classInfo, out);
         closeSandboxWriter();
 
@@ -1166,7 +1178,37 @@ public class BoundBoxWriterTest {
         Method method2 = clazz.getDeclaredMethod("_setFoo", String.class);
         assertNotNull(method2);
     }
-    
+
+    // ----------------------------------
+    // PACKAGE NAME
+    // ----------------------------------
+    @Test
+    public void testProcess_class_with_package_name() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithPackageName";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        classInfo.setListImports(new HashSet<String>());
+
+        String boundBoxPackageName = "foo";
+        writer.setBoundBoxPackageName(boundBoxPackageName);
+        String boundBoxClassFQN = boundBoxPackageName + "." + writer.getNamingGenerator().createBoundBoxName(classInfo);
+        Writer out = createWriterInSandbox(boundBoxClassFQN);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(boundBoxClassFQN, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(boundBoxClassFQN);
+        assertNotNull(clazz);
+    }
+
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------
@@ -1186,17 +1228,29 @@ public class BoundBoxWriterTest {
         return task;
     }
 
-    private FileWriter createWriterInSandbox(String className) throws IOException {
-        sandboxWriter = new FileWriter(new File(sandBoxDir, classNameToJavaFile(className)));
+    private FileWriter createWriterInSandbox(String classFQN) throws IOException {
+        createFolders(classNameToPath(classFQN));
+        sandboxWriter = new FileWriter(new File(sandBoxDir, classNameToJavaFile(classFQN)));
         return sandboxWriter;
     }
 
-    private String classNameToJavaFile(String className) {
-        return className.replaceAll("\\.", "/").concat(".java");
+    private void createFolders(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return;
+        }
+
+        new File(sandBoxDir, path).mkdirs();
     }
 
-    private CompilationTask processAnnotations(String[] writtenSourceFileNames, String[] testSourceFileNames)
-            throws URISyntaxException {
+    private String classNameToPath(String classFQN) {
+        return StringUtils.substringBeforeLast(classFQN, ".").replaceAll("\\.", "/");
+    }
+
+    private String classNameToJavaFile(String classFQN) {
+        return classFQN.replaceAll("\\.", "/").concat(".java");
+    }
+
+    private CompilationTask processAnnotations(String[] writtenSourceFileNames, String[] testSourceFileNames) throws URISyntaxException {
         // Get an instance of java compiler
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -1231,7 +1285,8 @@ public class BoundBoxWriterTest {
     private final class CustomClassLoader extends ClassLoader {
         @Override
         public Class<?> loadClass(String name) throws ClassNotFoundException {
-            File classFile = new File(sandBoxDir, name + ".class");
+            String classPath = name.replaceAll("\\.", File.separator);
+            File classFile = new File(sandBoxDir, classPath + ".class");
             if (!classFile.exists()) {
                 return super.loadClass(name);
             } else {

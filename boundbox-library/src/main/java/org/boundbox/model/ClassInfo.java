@@ -15,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
-@EqualsAndHashCode(of={"className"})
+@EqualsAndHashCode(of = { "className" })
 @ToString
 public class ClassInfo {
+    private static final String PACKAGE_SEPARATOR = ".";
+
     public static final String DEFAULT_BOUND_BOX_OF_CLASS_PREFIX = "BoundBoxOf";
 
     @NonNull
@@ -34,11 +36,11 @@ public class ClassInfo {
     private List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
     @Setter
     @Getter
-    private List<String> listSuperClassNames;
+    private List<String> listSuperClassNames = new ArrayList<String>();
     @Getter
-    private String targetPackageName;
+    private String boundClassPackageName;
     @Getter
-    private String targetClassName;
+    private String boundClassName;
     @Setter
     @Getter
     private Set<String> listImports = new HashSet<String>();
@@ -48,16 +50,15 @@ public class ClassInfo {
 
     public ClassInfo(String className) {
         this.className = className;
-        if (className.contains(".")) {
-            targetPackageName = StringUtils.substringBeforeLast(className, ".");
-            targetClassName = StringUtils.substringAfterLast(className, ".");
+        if (className.contains(PACKAGE_SEPARATOR)) {
+            boundClassPackageName = StringUtils.substringBeforeLast(className, PACKAGE_SEPARATOR);
+            boundClassName = StringUtils.substringAfterLast(className, PACKAGE_SEPARATOR);
         } else {
-            targetPackageName = StringUtils.EMPTY;
-            targetClassName = className;
+            boundClassPackageName = StringUtils.EMPTY;
+            boundClassName = className;
         }
-        listSuperClassNames = new ArrayList<String>();
         listSuperClassNames.add(className);
     }
 
 }
-//CHECKSTYLE:ON 
+// CHECKSTYLE:ON
