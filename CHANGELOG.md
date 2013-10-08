@@ -9,6 +9,7 @@
 * Final fields are not handled correctly. https://github.com/stephanenicolas/boundbox/issues/10
 * Add support for inner classes. https://github.com/stephanenicolas/boundbox/issues/6
 * Increased test coverage up to 94%
+* Thanks to Philippe Prados for an example with static inner class extending static non inner class
 
 ## Release 1.1.0 (September 27th 2013)
 * Flavien Laurent joined the team of BoundBox !
