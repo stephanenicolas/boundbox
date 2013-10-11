@@ -76,7 +76,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         }
 
         visitiedTypes.add(e.toString());
-        if( !computeVisibility(e)) {
+        if (!computeVisibility(e)) {
             listOfInvisibleTypes.add(e.getQualifiedName().toString());
         }
 
@@ -94,7 +94,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             int inheritanceLevel = scanningContext.getInheritanceLevel();
             InnerClassInfo innerClassInfo = new InnerClassInfo(e.getSimpleName().toString());
-            innerClassInfo.setInnerClassIndex(classInfo.getListInnerClassInfo().size());
             innerClassInfo.setStaticInnerClass(e.getModifiers().contains(Modifier.STATIC));
             innerClassInfo.getListSuperClassNames().add(e.toString());
             innerClassInfo.setInheritanceLevel(inheritanceLevel);
@@ -154,37 +153,38 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         return super.visitTypeAsClass(e, scanningContext);
     }
 
+
     @Override
     public Void visitExecutable(ExecutableElement e, ScanningContext scanningContext) {
         log.info("executable ->" + e.getSimpleName());
         MethodInfo methodInfo = new MethodInfo(e);
-        
-        //visibility of types in signature
-        //TODO should go inside a computer
-        if( ! computeVisibility(e.getReturnType()) ) {
+
+        // visibility of types in signature
+        // TODO should go inside a computer
+        if (!computeVisibility(e.getReturnType())) {
             TypeElement visibleType = findSuperType(e.getReturnType());
             methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
         }
-        
-        for( int indexParam =0; indexParam<e.getParameters().size();indexParam++ ) {
+
+        for (int indexParam = 0; indexParam < e.getParameters().size(); indexParam++) {
             VariableElement param = e.getParameters().get(indexParam);
-            if( !computeVisibility(param.asType())) {
+            if (!computeVisibility(param.asType())) {
                 TypeElement visibleType = findSuperType(param.asType());
                 FieldInfo fieldInfo = methodInfo.getParameterTypes().get(indexParam);
                 fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
             }
         }
-        
-        for( int indexThrownTypes =0; indexThrownTypes<e.getThrownTypes().size();indexThrownTypes++ ) {
+
+        for (int indexThrownTypes = 0; indexThrownTypes < e.getThrownTypes().size(); indexThrownTypes++) {
             TypeMirror typeMirrorOfException = e.getThrownTypes().get(indexThrownTypes);
-            if( !computeVisibility(typeMirrorOfException)) {
+            if (!computeVisibility(typeMirrorOfException)) {
                 TypeElement visibleType = findSuperType(typeMirrorOfException);
                 String visibleTypeName = visibleType.getQualifiedName().toString();
                 methodInfo.getThrownTypeNames().set(indexThrownTypes, visibleTypeName);
             }
         }
-        
-        //other properties
+
+        // other properties
         if (methodInfo.isConstructor()) {
             if (scanningContext.getInheritanceLevel() == 0) {
                 scanningContext.getCurrentClassInfo().getListConstructorInfos().add(methodInfo);
@@ -209,10 +209,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     @Override
     public Void visitVariableAsField(VariableElement e, ScanningContext scanningContext) {
         FieldInfo fieldInfo = new FieldInfo(e);
-        
-        //TODO should go inside a computer
+
+        // TODO should go inside a computer
         TypeMirror typeOfField = e.asType();
-        if( ! computeVisibility(typeOfField) ) {
+        if (!computeVisibility(typeOfField)) {
             TypeElement visibleType = findSuperType(typeOfField);
             fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
         }
@@ -241,10 +241,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             addTypeToImport(classInfo, ((DeclaredType) typeMirror));
         }
     }
-    
-    //TODO should go inside a computer
+
+    // TODO should go inside a computer
     private TypeElement findSuperType(TypeMirror typeMirror) {
-        if( typeMirror.getKind() == TypeKind.DECLARED ) {
+        if (typeMirror.getKind() == TypeKind.DECLARED) {
             DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
             TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
             return findSuperType(typeElementOfTypeOfField);
@@ -252,15 +252,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             throw new RuntimeException("Type mirror " + typeMirror + " is not a class.");
         }
     }
-    
-    //TODO should go inside a computer
+
+    // TODO should go inside a computer
     private TypeElement findSuperType(TypeElement e) {
         TypeElement typeElement = e;
-        while( !computeVisibility(typeElement)) {
-            if( typeElement.asType().getKind() == TypeKind.DECLARED ) {
+        while (!computeVisibility(typeElement)) {
+            if (typeElement.asType().getKind() == TypeKind.DECLARED) {
                 TypeMirror typeMirrorOfSuperClass = typeElement.getSuperclass();
-                if(typeMirrorOfSuperClass.getKind() == TypeKind.DECLARED ) {
-                    typeElement = (TypeElement) ((DeclaredType)typeMirrorOfSuperClass).asElement();
+                if (typeMirrorOfSuperClass.getKind() == TypeKind.DECLARED) {
+                    typeElement = (TypeElement) ((DeclaredType) typeMirrorOfSuperClass).asElement();
                 } else {
                     throw new RuntimeException();
                 }
@@ -270,10 +270,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         }
         return typeElement;
     }
-    
-    //TODO should go inside a computer
+
+    // TODO should go inside a computer
     private boolean computeVisibility(TypeMirror typeMirror) {
-        if( typeMirror.getKind() == TypeKind.DECLARED ) {
+        if (typeMirror.getKind() == TypeKind.DECLARED) {
             DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
             TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
             return computeVisibility(typeElementOfTypeOfField);
@@ -281,19 +281,19 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             return true;
         }
     }
-    
-    //TODO should go inside a computer
+
+    // TODO should go inside a computer
     private boolean computeVisibility(TypeElement e) {
 
-        //for nested classes, all outer classes must be visible too
+        // for nested classes, all outer classes must be visible too
         TypeMirror outerType = e.asType();
         TypeElement outerTypeElement = e;
         while (outerTypeElement.getNestingKind().isNested()) {
-            if(outerTypeElement.getEnclosingElement().getKind() == ElementKind.CLASS || outerTypeElement.getEnclosingElement().getKind() == ElementKind.INTERFACE) {
-                outerType =  outerTypeElement.getEnclosingElement().asType();
-                if( outerType.getKind() == TypeKind.DECLARED ) {
-                    outerTypeElement = (TypeElement) ((DeclaredType)outerType).asElement();
-                    if( !computeVisibility(outerTypeElement)) {
+            if (outerTypeElement.getEnclosingElement().getKind() == ElementKind.CLASS || outerTypeElement.getEnclosingElement().getKind() == ElementKind.INTERFACE) {
+                outerType = outerTypeElement.getEnclosingElement().asType();
+                if (outerType.getKind() == TypeKind.DECLARED) {
+                    outerTypeElement = (TypeElement) ((DeclaredType) outerType).asElement();
+                    if (!computeVisibility(outerTypeElement)) {
                         return false;
                     }
                 } else {
@@ -303,7 +303,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
                 return false;
             }
         }
-        
+
         boolean isPublic = e.getModifiers().contains(Modifier.PUBLIC);
         if (isPublic) {
             return true;
@@ -325,5 +325,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         }
         return packageOfElement.equals(boundBoxPackageName);
     }
+    
 
 }

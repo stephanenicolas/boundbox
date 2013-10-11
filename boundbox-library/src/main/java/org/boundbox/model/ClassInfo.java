@@ -24,7 +24,7 @@ public class ClassInfo {
 
     @NonNull
     @Getter
-    private String className;
+    protected String className;
     @Setter
     @Getter
     private List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();

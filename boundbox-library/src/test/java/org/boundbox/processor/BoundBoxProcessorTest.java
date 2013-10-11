@@ -334,8 +334,7 @@ public class BoundBoxProcessorTest {
         assertContains(listConstructorInfos, MethodInfo4);
 
         FieldInfo paramObject3 = new FieldInfo("c", Object.class.getName());
-        MethodInfo MethodInfo5 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(),
-                RuntimeException.class.getName()));
+        MethodInfo MethodInfo5 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listConstructorInfos, MethodInfo5);
 
     }
@@ -824,6 +823,46 @@ public class BoundBoxProcessorTest {
 
     }
 
+    @Test
+    public void testProcess_class_with_many_inner_classes() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithManyInnerClasses.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(false);
+        assertContains(listInnerClassInfos, InnerClassInfo);
+
+        InnerClassInfo InnerClassInfo2 = new InnerClassInfo("InnerClass2");
+        InnerClassInfo2.setStaticInnerClass(false);
+        assertContains(listInnerClassInfos, InnerClassInfo2);
+
+        InnerClassInfo StaticInnerClassInfo = new InnerClassInfo("StaticInnerClass");
+        StaticInnerClassInfo.setStaticInnerClass(true);
+        assertContains(listInnerClassInfos, StaticInnerClassInfo);
+
+        InnerClassInfo StaticInnerClassInfo2 = new InnerClassInfo("StaticInnerClass2");
+        StaticInnerClassInfo2.setStaticInnerClass(true);
+        assertContains(listInnerClassInfos, StaticInnerClassInfo2);
+
+        assertEquals(Arrays.asList(InnerClassInfo, StaticInnerClassInfo2, StaticInnerClassInfo, InnerClassInfo2), listInnerClassInfos);
+    }
+
     // ----------------------------------
     // INHERITANCE OF INNER CLASSES
     // ----------------------------------
@@ -887,7 +926,7 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
     // TEST CLASS IS INNER CLASS
     // ----------------------------------
-    
+
     @Test
     public void testProcess_class_is_static_inner_class() throws URISyntaxException {
         // given
@@ -912,8 +951,8 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
     }
-    
-    //TDD for issue #18
+
+    // TDD for issue #18
     @Test
     public void testProcess_class_is_non_static_inner_class_that_extends_static_inner_class() throws URISyntaxException {
         // given
@@ -940,7 +979,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_is_static_inner_class_that_extends_non_static_inner_class() throws URISyntaxException {
         // given
@@ -967,7 +1006,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
     }
-    
+
     // ----------------------------------
     // IMPORTS
     // ----------------------------------
@@ -1016,7 +1055,7 @@ public class BoundBoxProcessorTest {
     }
 
     // ----------------------------------
-    // NAMING PREFIXES 
+    // NAMING PREFIXES
     // ----------------------------------
     @Test
     public void testProcess_class_with_prefixes() throws URISyntaxException {
@@ -1077,6 +1116,7 @@ public class BoundBoxProcessorTest {
         assertEquals("BB", capturedPrefixes.getValue()[0]);
         assertEquals("bb", capturedPrefixes.getValue()[1]);
     }
+
     // ----------------------------------
     // PACKAGE NAME
     // ----------------------------------
@@ -1099,9 +1139,9 @@ public class BoundBoxProcessorTest {
 
         // then
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
-        
+
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
-        assertEquals( "", classInfo.getBoundClassPackageName() );
+        assertEquals("", classInfo.getBoundClassPackageName());
 
         EasyMock.verify(mockBoundBoxWriter);
     }
@@ -1138,7 +1178,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertContains(listInnerClassInfos.get(0).getListFieldInfos(), FieldInfoFoo);
     }
-    
+
     @Test
     public void testProcess_class_with_composition_of_static_inner_class() throws URISyntaxException {
         // given
@@ -1161,11 +1201,11 @@ public class BoundBoxProcessorTest {
         FieldInfo FieldInfoFoo = new FieldInfo("a", "TestClassWithStaticInnerClass.InnerClass");
         assertContains(listFieldInfos, FieldInfoFoo);
     }
-    
+
     // ----------------------------------
     // TDD for issue #15
     // ----------------------------------
-    
+
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type() throws URISyntaxException {
         // given
@@ -1180,7 +1220,7 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType.B"));
-        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+        assertEquals(1, boundBoxProcessor.getListOfInvisibleTypes().size());
 
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
@@ -1192,7 +1232,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type2() throws URISyntaxException {
         // given
@@ -1208,7 +1248,7 @@ public class BoundBoxProcessorTest {
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType2.B"));
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType2.B.C"));
-        assertEquals(2,boundBoxProcessor.getListOfInvisibleTypes().size());
+        assertEquals(2, boundBoxProcessor.getListOfInvisibleTypes().size());
 
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
@@ -1220,7 +1260,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_method_returning_it() throws URISyntaxException {
         // given
@@ -1235,7 +1275,7 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodReturningIt.B"));
-        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+        assertEquals(1, boundBoxProcessor.getListOfInvisibleTypes().size());
 
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
@@ -1247,7 +1287,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_method_with_param_of_that_type() throws URISyntaxException {
         // given
@@ -1262,7 +1302,7 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodWithParamOfThatType.B"));
-        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+        assertEquals(1, boundBoxProcessor.getListOfInvisibleTypes().size());
 
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
@@ -1274,7 +1314,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_method_with_exception_of_that_type() throws URISyntaxException {
         // given
@@ -1299,7 +1339,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------
@@ -1373,7 +1413,7 @@ public class BoundBoxProcessorTest {
         assertEquals(InnerClassInfo.getEffectiveInheritanceLevel(), innerClassInfo2.getEffectiveInheritanceLevel());
 
         for (FieldInfo fieldInfo : InnerClassInfo.getListFieldInfos()) {
-            assertContains(innerClassInfo2.getListFieldInfos(), (FieldInfo)fieldInfo);
+            assertContains(innerClassInfo2.getListFieldInfos(), (FieldInfo) fieldInfo);
         }
     }
 

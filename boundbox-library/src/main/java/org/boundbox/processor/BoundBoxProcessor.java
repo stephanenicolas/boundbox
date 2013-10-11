@@ -100,7 +100,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
         Set<? extends Element> classElements = roundEnvironment.getElementsAnnotatedWith(BoundBox.class);
         // For each class that has the annotation
         for (final Element classElement : classElements) {
-
+            
             // Get the annotation information
             TypeElement boundClass = null;
             String maxSuperClass = null;

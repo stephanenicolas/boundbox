@@ -216,14 +216,25 @@ public class BoundboxWriter {
             boundClassFieldModifiers.add(Modifier.STATIC);
         }
         writer.beginType(boundBoxClassName, "class", modifiers, null)
+        .emitEmptyLine();
+
+        writer.emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
         //
-        .emitEmptyLine()
-        //
-        .emitField(Object.class.getName(), "boundObject", EnumSet.of(Modifier.PRIVATE))
-        //
-        .emitField("Class<?>", "boundClass", boundClassFieldModifiers, enclosingBoundBoxClassName + thisOrNot + ".boundClass.getDeclaredClasses()[" + innerClassInfo.getInnerClassIndex() + "]")//
+        .emitField("Class<?>", "boundClass", boundClassFieldModifiers)//
         .emitEmptyLine();//
 
+        
+        
+        writer.beginInitializer(innerClassInfo.isStaticInnerClass())
+        .emitSingleLineComment("We must dynamically retrieve the inner class as of %s", "http://stackoverflow.com/q/2883181/693752")
+        .beginControlFlow("for(Class<?> clazz : "+enclosingBoundBoxClassName+thisOrNot +".boundClass.getDeclaredClasses())")
+        .beginControlFlow("if( clazz.getSimpleName().equals("+JavaWriter.stringLiteral(innerClassInfo.getBoundClassName())+"))")
+        .emitStatement("boundClass = clazz")
+        .endControlFlow()
+        .endControlFlow()
+        .endInitializer()
+        .emitEmptyLine();//
+        
         writeJavadocForBoundBoxConstructor(writer, innerClassInfo);
         writer.beginMethod(null, boundBoxClassName, EnumSet.of(Modifier.PUBLIC), Object.class.getName(), "boundObject")//
         .emitStatement("this.boundObject = boundObject")//
@@ -392,8 +403,18 @@ public class BoundboxWriter {
         // emit method retrieval
         String parametersTypesCommaSeparated = createListOfParametersTypesCommaSeparated(parameterTypeList);
 
+        writer.emitSingleLineComment("We must dynamically retrieve the inner class as of %s", "http://stackoverflow.com/q/2883181/693752")
+        .emitStatement("int innerClassIndex = 0;")
+        .beginControlFlow("for(Class<?> clazz : boundClass.getDeclaredClasses())")
+        .beginControlFlow("if( clazz.getSimpleName().equals("+JavaWriter.stringLiteral(innerClassInfo.getBoundClassName())+"))")
+        .emitStatement("break")
+        .endControlFlow()
+        .emitStatement("innerClassIndex++;")
+        .endControlFlow()
+        .emitEmptyLine();//
+        
         String hiddenParameterClass = innerClassInfo.isStaticInnerClass() ? "" : "boundClass";
-        writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%d].getDeclaredConstructor(%s)", innerClassInfo.getInnerClassIndex(),
+        writer.emitStatement("Constructor<?> method = boundClass.getDeclaredClasses()[%s].getDeclaredConstructor(%s)", "innerClassIndex",
                 makeParams(hiddenParameterClass,parametersTypesCommaSeparated));
         writer.emitStatement("method.setAccessible(true)");
 
