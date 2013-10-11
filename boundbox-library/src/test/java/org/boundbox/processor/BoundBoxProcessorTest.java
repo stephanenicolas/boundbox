@@ -1167,33 +1167,6 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
     
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_method_returning_it() throws URISyntaxException {
-        // given
-        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodReturningIt.java" };
-        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
-
-        // when
-        // Perform the compilation task.
-        task.call();
-
-        // then
-        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
-        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
-        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodReturningIt.B"));
-        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
-
-        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        assertTrue(listFieldInfos.isEmpty());
-        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
-        assertFalse(listMethodInfos.isEmpty());
-        MethodInfo methodInfo = new MethodInfo("foo", Object.class.getName(), new ArrayList<FieldInfo>(), new ArrayList<String>());
-        assertContains(listMethodInfos, methodInfo);
-
-        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertFalse(listInnerClassInfos.isEmpty());
-    }
-    
-    @Test
     public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndFieldOfThatType.java" };
@@ -1220,8 +1193,61 @@ public class BoundBoxProcessorTest {
         assertFalse(listInnerClassInfos.isEmpty());
     }
     
-    
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type2() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndFieldOfThatType2.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
 
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType2.B"));
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType2.B.C"));
+        assertEquals(2,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+        FieldInfo fieldInfo = new FieldInfo("foo", Object.class.getName());
+        assertContains(listFieldInfos, fieldInfo);
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_method_returning_it() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodReturningIt.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodReturningIt.B"));
+        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        MethodInfo methodInfo = new MethodInfo("foo", Object.class.getName(), new ArrayList<FieldInfo>(), new ArrayList<String>());
+        assertContains(listMethodInfos, methodInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
     @Test
     public void testProcess_class_with_inivisble_inner_class_and_method_with_param_of_that_type() throws URISyntaxException {
         // given
@@ -1263,7 +1289,6 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
         assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodWithExceptionOfThatType.B"));
-        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
 
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());

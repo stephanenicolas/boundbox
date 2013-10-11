@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -16,7 +17,6 @@ import javax.lang.model.util.ElementKindVisitor6;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
-import net.sf.cglib.core.CollectionUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
@@ -284,6 +284,26 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     
     //TODO should go inside a computer
     private boolean computeVisibility(TypeElement e) {
+
+        //for nested classes, all outer classes must be visible too
+        TypeMirror outerType = e.asType();
+        TypeElement outerTypeElement = e;
+        while (outerTypeElement.getNestingKind().isNested()) {
+            if(outerTypeElement.getEnclosingElement().getKind() == ElementKind.CLASS || outerTypeElement.getEnclosingElement().getKind() == ElementKind.INTERFACE) {
+                outerType =  outerTypeElement.getEnclosingElement().asType();
+                if( outerType.getKind() == TypeKind.DECLARED ) {
+                    outerTypeElement = (TypeElement) ((DeclaredType)outerType).asElement();
+                    if( !computeVisibility(outerTypeElement)) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        
         boolean isPublic = e.getModifiers().contains(Modifier.PUBLIC);
         if (isPublic) {
             return true;
@@ -295,18 +315,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             return true;
         }
 
-        if (e.getNestingKind().isNested()) {
-//            if(e.getEnclosingElement().getKind() == ElementKind.CLASS) {
-//                //TODO handle static
-//                TypeMirror outerType =  e.getEnclosingElement().asType();
-//                while (outerType.getKind() == TypeKind.DECLARED && !outerType.toString().equals(Object.class)) {
-//                    if (!computeVisibility((TypeElement) ((DeclaredType)outerType).asElement())) {
-//                        return false;
-//                    }
-//                    outerType = (TypeElement) ((DeclaredType)outerType).asElement());
-//                }
-//            }
-        }
         return false;
     }
 
