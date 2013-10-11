@@ -83,7 +83,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
     @Setter
     private BoundboxWriter boundboxWriter = new BoundboxWriter();
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
-    private VisibilityComputer visibilityComputer = new VisibilityComputer();
     private BoundClassScanner boundClassVisitor = new BoundClassScanner();
     @Getter
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
@@ -187,8 +186,6 @@ public class BoundBoxProcessor extends AbstractProcessor {
             inheritanceComputer.computeInheritanceAndOverridingMethods(classInfo.getListMethodInfos(), boundClass, elements);
             inheritanceComputer.computeInheritanceAndHidingInnerClasses(classInfo.getListInnerClassInfo());
 
-            visibilityComputer.processVisibleTypes(classInfo, getListOfInvisibleTypes());
-            
             // write meta model to java class file
             Writer sourceWriter = null;
             try {

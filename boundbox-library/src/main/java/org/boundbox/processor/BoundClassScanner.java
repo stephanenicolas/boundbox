@@ -16,6 +16,7 @@ import javax.lang.model.util.ElementKindVisitor6;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
+import net.sf.cglib.core.CollectionUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
@@ -157,6 +158,33 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     public Void visitExecutable(ExecutableElement e, ScanningContext scanningContext) {
         log.info("executable ->" + e.getSimpleName());
         MethodInfo methodInfo = new MethodInfo(e);
+        
+        //visibility of types in signature
+        //TODO should go inside a computer
+        if( ! computeVisibility(e.getReturnType()) ) {
+            TypeElement visibleType = findSuperType(e.getReturnType());
+            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
+        }
+        
+        for( int indexParam =0; indexParam<e.getParameters().size();indexParam++ ) {
+            VariableElement param = e.getParameters().get(indexParam);
+            if( !computeVisibility(param.asType())) {
+                TypeElement visibleType = findSuperType(param.asType());
+                FieldInfo fieldInfo = methodInfo.getParameterTypes().get(indexParam);
+                fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
+            }
+        }
+        
+        for( int indexThrownTypes =0; indexThrownTypes<e.getThrownTypes().size();indexThrownTypes++ ) {
+            TypeMirror typeMirrorOfException = e.getThrownTypes().get(indexThrownTypes);
+            if( !computeVisibility(typeMirrorOfException)) {
+                TypeElement visibleType = findSuperType(typeMirrorOfException);
+                String visibleTypeName = visibleType.getQualifiedName().toString();
+                methodInfo.getThrownTypeNames().set(indexThrownTypes, visibleTypeName);
+            }
+        }
+        
+        //other properties
         if (methodInfo.isConstructor()) {
             if (scanningContext.getInheritanceLevel() == 0) {
                 scanningContext.getCurrentClassInfo().getListConstructorInfos().add(methodInfo);
@@ -181,6 +209,13 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     @Override
     public Void visitVariableAsField(VariableElement e, ScanningContext scanningContext) {
         FieldInfo fieldInfo = new FieldInfo(e);
+        
+        //TODO should go inside a computer
+        TypeMirror typeOfField = e.asType();
+        if( ! computeVisibility(typeOfField) ) {
+            TypeElement visibleType = findSuperType(typeOfField);
+            fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
+        }
         fieldInfo.setInheritanceLevel(scanningContext.getInheritanceLevel());
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC) && scanningContext.isStatic());
         fieldInfo.setFinalField(e.getModifiers().contains(Modifier.FINAL));
@@ -206,7 +241,48 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             addTypeToImport(classInfo, ((DeclaredType) typeMirror));
         }
     }
-
+    
+    //TODO should go inside a computer
+    private TypeElement findSuperType(TypeMirror typeMirror) {
+        if( typeMirror.getKind() == TypeKind.DECLARED ) {
+            DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
+            TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
+            return findSuperType(typeElementOfTypeOfField);
+        } else {
+            throw new RuntimeException("Type mirror " + typeMirror + " is not a class.");
+        }
+    }
+    
+    //TODO should go inside a computer
+    private TypeElement findSuperType(TypeElement e) {
+        TypeElement typeElement = e;
+        while( !computeVisibility(typeElement)) {
+            if( typeElement.asType().getKind() == TypeKind.DECLARED ) {
+                TypeMirror typeMirrorOfSuperClass = typeElement.getSuperclass();
+                if(typeMirrorOfSuperClass.getKind() == TypeKind.DECLARED ) {
+                    typeElement = (TypeElement) ((DeclaredType)typeMirrorOfSuperClass).asElement();
+                } else {
+                    throw new RuntimeException();
+                }
+            } else {
+                throw new RuntimeException();
+            }
+        }
+        return typeElement;
+    }
+    
+    //TODO should go inside a computer
+    private boolean computeVisibility(TypeMirror typeMirror) {
+        if( typeMirror.getKind() == TypeKind.DECLARED ) {
+            DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
+            TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
+            return computeVisibility(typeElementOfTypeOfField);
+        } else {
+            return true;
+        }
+    }
+    
+    //TODO should go inside a computer
     private boolean computeVisibility(TypeElement e) {
         boolean isPublic = e.getModifiers().contains(Modifier.PUBLIC);
         if (isPublic) {

@@ -60,7 +60,7 @@ public class BoundBoxProcessorTest {
     @After
     public void tearDown() throws IOException {
         if (sandBoxDir.exists()) {
-            // FileUtils.deleteDirectory(sandBoxDir);
+            FileUtils.deleteDirectory(sandBoxDir);
         }
     }
 
@@ -1219,7 +1219,62 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
+    
+    
 
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_method_with_param_of_that_type() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodWithParamOfThatType.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodWithParamOfThatType.B"));
+        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+        FieldInfo fieldInfo = new FieldInfo("b", Object.class.getName());
+        MethodInfo methodInfo = new MethodInfo("foo", "void", Arrays.asList(fieldInfo), new ArrayList<String>());
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertContains(listMethodInfos, methodInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_method_with_exception_of_that_type() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodWithExceptionOfThatType.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodWithExceptionOfThatType.B"));
+        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+        MethodInfo methodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), Arrays.asList(Exception.class.getName()));
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertContains(listMethodInfos, methodInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
     // ----------------------------------
     // PRIVATE METHODS
     // ----------------------------------
