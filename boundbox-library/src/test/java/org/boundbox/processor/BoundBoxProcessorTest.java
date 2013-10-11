@@ -1186,9 +1186,35 @@ public class BoundBoxProcessorTest {
         assertTrue(listFieldInfos.isEmpty());
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
-        //MethodInfo MethodInfo = new MethodInfo("foo", "TestClassWithInvisibleInnerClassAndMethodReturningIt.B", new ArrayList<FieldInfo>(), new ArrayList<String>());
-        MethodInfo MethodInfo = new MethodInfo("foo", Object.class.getName(), new ArrayList<FieldInfo>(), new ArrayList<String>());
-        assertContains(listMethodInfos, MethodInfo);
+        MethodInfo methodInfo = new MethodInfo("foo", Object.class.getName(), new ArrayList<FieldInfo>(), new ArrayList<String>());
+        assertContains(listMethodInfos, methodInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndFieldOfThatType.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndFieldOfThatType.B"));
+        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+        FieldInfo fieldInfo = new FieldInfo("foo", Object.class.getName());
+        assertContains(listFieldInfos, fieldInfo);
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
 
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
