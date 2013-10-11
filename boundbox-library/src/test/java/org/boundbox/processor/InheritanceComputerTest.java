@@ -6,8 +6,6 @@ import static org.junit.Assert.assertFalse;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.boundbox.FakeFieldInfo;
-import org.boundbox.FakeInnerClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.junit.Before;
@@ -26,9 +24,9 @@ public class InheritanceComputerTest {
     public void testComputeInheritanceAndHidingFields() {
         // given
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        FieldInfo fieldInfo = new FakeFieldInfo("foo", "bar");
+        FieldInfo fieldInfo = new FieldInfo("foo", "bar");
         fieldInfo.setInheritanceLevel(1);
-        FieldInfo fieldInfo2 = new FakeFieldInfo("foo", "bar");
+        FieldInfo fieldInfo2 = new FieldInfo("foo", "bar");
         fieldInfo2.setInheritanceLevel(2);
         listFieldInfos.add(fieldInfo);
         listFieldInfos.add(fieldInfo2);
@@ -46,9 +44,9 @@ public class InheritanceComputerTest {
     public void testComputeInheritanceAndHidingInnerClasses() {
         // given
         List<InnerClassInfo> listInnerClassInfos = new ArrayList<InnerClassInfo>();
-        InnerClassInfo innerClassInfo = new FakeInnerClassInfo("foo");
+        InnerClassInfo innerClassInfo = new InnerClassInfo("foo");
         innerClassInfo.setInheritanceLevel(1);
-        InnerClassInfo innerClassInfo2 = new FakeInnerClassInfo("foo");
+        InnerClassInfo innerClassInfo2 = new InnerClassInfo("foo");
         innerClassInfo2.setInheritanceLevel(2);
         listInnerClassInfos.add(innerClassInfo);
         listInnerClassInfos.add(innerClassInfo2);

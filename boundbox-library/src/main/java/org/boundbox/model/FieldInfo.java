@@ -9,13 +9,15 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
-@EqualsAndHashCode(exclude = { "effectiveInheritanceLevel", "fieldType" })
+@EqualsAndHashCode(exclude = { "effectiveInheritanceLevel" })
 @ToString
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class FieldInfo implements Inheritable {
     @Getter
     private String fieldName;
-    private TypeMirror fieldType;
+    @Getter
+    @Setter
+    private String fieldTypeName;
     @Getter
     private int inheritanceLevel;
     @Getter
@@ -30,16 +32,17 @@ public class FieldInfo implements Inheritable {
 
     public FieldInfo(@NonNull VariableElement e) {
         fieldName = e.getSimpleName().toString();
-        fieldType = e.asType();
+        fieldTypeName = e.asType().toString();
     }
 
     public FieldInfo(@NonNull String fieldName, TypeMirror fieldType) {
         this.fieldName = fieldName;
-        this.fieldType = fieldType;
+        this.fieldTypeName = fieldType.toString();
     }
-
-    public String getFieldTypeName() {
-        return fieldType.toString();
+    
+    public FieldInfo(@NonNull String fieldName, @NonNull String fieldTypeName) {
+        this.fieldName = fieldName;
+        this.fieldTypeName = fieldTypeName;
     }
 
     public void setInheritanceLevel(int inheritanceLevel) {

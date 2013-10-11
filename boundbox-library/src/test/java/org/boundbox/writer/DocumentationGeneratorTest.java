@@ -1,14 +1,14 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.boundbox.FakeFieldInfo;
-import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
@@ -60,13 +60,13 @@ public class DocumentationGeneratorTest {
         // given
         String classUnderTestName = "TestClassWithNothing";
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
-        listConstructorInfos.add(fakeMethodInfo);
+        listConstructorInfos.add(MethodInfo);
         classInfo.setListConstructorInfos(listConstructorInfos);
 
         // when
-        String javadoc = documentationGenerator.generateJavadocForBoundConstructor(classInfo, fakeMethodInfo, "");
+        String javadoc = documentationGenerator.generateJavadocForBoundConstructor(classInfo, MethodInfo, "");
 
         // then
         assertTrue(StringUtils.isNotEmpty(javadoc));
@@ -79,13 +79,13 @@ public class DocumentationGeneratorTest {
         // given
         String classUnderTestName = "TestClassWithNothing";
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
 
         // when
-        String javadoc = documentationGenerator.generateJavadocForBoundSetter(classInfo, fakeFieldInfo);
+        String javadoc = documentationGenerator.generateJavadocForBoundSetter(classInfo, FieldInfo);
 
         // then
         assertTrue(StringUtils.isNotEmpty(javadoc));
@@ -98,13 +98,13 @@ public class DocumentationGeneratorTest {
         // given
         String classUnderTestName = "TestClassWithNothing";
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
 
         // when
-        String javadoc = documentationGenerator.generateJavadocForBoundGetter(classInfo, fakeFieldInfo);
+        String javadoc = documentationGenerator.generateJavadocForBoundGetter(classInfo, FieldInfo);
 
         // then
         assertTrue(StringUtils.isNotEmpty(javadoc));
@@ -117,13 +117,13 @@ public class DocumentationGeneratorTest {
         // given
         String classUnderTestName = "TestClassWithNothing";
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
-        listConstructorInfos.add(fakeMethodInfo);
+        listConstructorInfos.add(MethodInfo);
         classInfo.setListConstructorInfos(listConstructorInfos);
 
         // when
-        String javadoc = documentationGenerator.generateJavadocForBoundMethod(classInfo, fakeMethodInfo, "");
+        String javadoc = documentationGenerator.generateJavadocForBoundMethod(classInfo, MethodInfo, "");
 
         // then
         assertTrue(StringUtils.isNotEmpty(javadoc));
@@ -150,13 +150,13 @@ public class DocumentationGeneratorTest {
         // given
         String classUnderTestName = "TestClassWithNothing";
         InnerClassInfo classInfo = new InnerClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
-        listConstructorInfos.add(fakeMethodInfo);
+        listConstructorInfos.add(MethodInfo);
         classInfo.setListConstructorInfos(listConstructorInfos);
         
         // when
-        String javadoc = documentationGenerator.generateJavadocForBoundInnerClassAccessor(classInfo, fakeMethodInfo, "");
+        String javadoc = documentationGenerator.generateJavadocForBoundInnerClassAccessor(classInfo, MethodInfo, "");
         
         // then
         assertTrue(StringUtils.isNotEmpty(javadoc));

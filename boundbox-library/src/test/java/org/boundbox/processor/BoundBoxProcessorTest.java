@@ -24,9 +24,6 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
-import org.boundbox.FakeFieldInfo;
-import org.boundbox.FakeInnerClassInfo;
-import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
@@ -87,8 +84,8 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, FieldInfo);
     }
 
     @Test
@@ -108,14 +105,14 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(listFieldInfos, fakeFieldInfo);
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        assertContains(listFieldInfos, fakeFieldInfo2);
-        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
-        assertContains(listFieldInfos, fakeFieldInfo3);
-        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
-        assertContains(listFieldInfos, fakeFieldInfo4);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, FieldInfo);
+        FieldInfo FieldInfo2 = new FieldInfo("a", "int");
+        assertContains(listFieldInfos, FieldInfo2);
+        FieldInfo FieldInfo3 = new FieldInfo("array1", "double[]");
+        assertContains(listFieldInfos, FieldInfo3);
+        FieldInfo FieldInfo4 = new FieldInfo("array2", "float[][]");
+        assertContains(listFieldInfos, FieldInfo4);
 
     }
 
@@ -140,9 +137,9 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setFinalField(true);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setFinalField(true);
+        assertContains(listFieldInfos, FieldInfo);
     }
 
     // ----------------------------------
@@ -184,8 +181,8 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, FieldInfo);
     }
 
     @Test
@@ -207,8 +204,8 @@ public class BoundBoxProcessorTest {
         assertEquals(listFieldInfos.size(), 1); // only one field even if foo already exists in the
                                                 // class
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, FieldInfo);
     }
 
     @Test
@@ -227,16 +224,16 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(listFieldInfos, fakeFieldInfo);
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        assertContains(listFieldInfos, fakeFieldInfo2);
-        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
-        assertContains(listFieldInfos, fakeFieldInfo3);
-        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
-        assertContains(listFieldInfos, fakeFieldInfo4);
-        FakeFieldInfo fakeFieldInfo5 = new FakeFieldInfo("ss", "java.util.ArrayList");
-        assertContains(listFieldInfos, fakeFieldInfo5);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(listFieldInfos, FieldInfo);
+        FieldInfo FieldInfo2 = new FieldInfo("a", "int");
+        assertContains(listFieldInfos, FieldInfo2);
+        FieldInfo FieldInfo3 = new FieldInfo("array1", "double[]");
+        assertContains(listFieldInfos, FieldInfo3);
+        FieldInfo FieldInfo4 = new FieldInfo("array2", "float[][]");
+        assertContains(listFieldInfos, FieldInfo4);
+        FieldInfo FieldInfo5 = new FieldInfo("ss", "java.util.ArrayList");
+        assertContains(listFieldInfos, FieldInfo5);
 
     }
 
@@ -260,13 +257,13 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setStaticField(true);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setStaticField(true);
+        assertContains(listFieldInfos, FieldInfo);
 
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        fakeFieldInfo2.setStaticField(true);
-        assertContains(listFieldInfos, fakeFieldInfo2);
+        FieldInfo FieldInfo2 = new FieldInfo("a", "int");
+        FieldInfo2.setStaticField(true);
+        assertContains(listFieldInfos, FieldInfo2);
     }
 
     // ----------------------------------
@@ -321,25 +318,25 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
-        assertContains(listConstructorInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listConstructorInfos, MethodInfo);
 
-        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt), null);
-        assertContains(listConstructorInfos, fakeMethodInfo2);
+        FieldInfo paramInt = new FieldInfo("a", int.class.getName());
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        assertContains(listConstructorInfos, MethodInfo2);
 
-        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo3 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramObject), null);
-        assertContains(listConstructorInfos, fakeMethodInfo3);
+        FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        assertContains(listConstructorInfos, MethodInfo3);
 
-        FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2), null);
-        assertContains(listConstructorInfos, fakeMethodInfo4);
+        FieldInfo paramObject2 = new FieldInfo("b", Object.class.getName());
+        MethodInfo MethodInfo4 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2), null);
+        assertContains(listConstructorInfos, MethodInfo4);
 
-        FieldInfo paramObject3 = new FakeFieldInfo("c", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(),
+        FieldInfo paramObject3 = new FieldInfo("c", Object.class.getName());
+        MethodInfo MethodInfo5 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(),
                 RuntimeException.class.getName()));
-        assertContains(listConstructorInfos, fakeMethodInfo5);
+        assertContains(listConstructorInfos, MethodInfo5);
 
     }
 
@@ -383,50 +380,50 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("simple", "void", new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("simple", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfo);
 
-        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("withPrimitiveArgument", "void", Arrays.asList(paramInt), null);
-        assertContains(listMethodInfos, fakeMethodInfo2);
+        FieldInfo paramInt = new FieldInfo("a", int.class.getName());
+        MethodInfo MethodInfo2 = new MethodInfo("withPrimitiveArgument", "void", Arrays.asList(paramInt), null);
+        assertContains(listMethodInfos, MethodInfo2);
 
-        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo3 = new FakeMethodInfo("withObjectArgument", "void", Arrays.asList(paramObject), null);
-        assertContains(listMethodInfos, fakeMethodInfo3);
+        FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
+        MethodInfo MethodInfo3 = new MethodInfo("withObjectArgument", "void", Arrays.asList(paramObject), null);
+        assertContains(listMethodInfos, MethodInfo3);
 
-        FieldInfo paramObject2 = new FakeFieldInfo("b", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo4 = new FakeMethodInfo("withManyArguments", "void", Arrays.asList(paramInt, paramObject2), null);
-        assertContains(listMethodInfos, fakeMethodInfo4);
+        FieldInfo paramObject2 = new FieldInfo("b", Object.class.getName());
+        MethodInfo MethodInfo4 = new MethodInfo("withManyArguments", "void", Arrays.asList(paramInt, paramObject2), null);
+        assertContains(listMethodInfos, MethodInfo4);
 
-        FakeMethodInfo fakeMethodInfoChar = new FakeMethodInfo("withPrimitiveCharReturnType", char.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfoChar);
+        MethodInfo MethodInfoChar = new MethodInfo("withPrimitiveCharReturnType", char.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfoChar);
 
-        FakeMethodInfo fakeMethodInfo5 = new FakeMethodInfo("withPrimitiveIntReturnType", int.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfo5);
+        MethodInfo MethodInfo5 = new MethodInfo("withPrimitiveIntReturnType", int.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfo5);
 
-        FakeMethodInfo fakeMethodInfoLong = new FakeMethodInfo("withPrimitiveLongReturnType", long.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfoLong);
+        MethodInfo MethodInfoLong = new MethodInfo("withPrimitiveLongReturnType", long.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfoLong);
 
-        FakeMethodInfo fakeMethodInfoShort = new FakeMethodInfo("withPrimitiveShortReturnType", short.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfoShort);
+        MethodInfo MethodInfoShort = new MethodInfo("withPrimitiveShortReturnType", short.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfoShort);
 
-        FakeMethodInfo fakeMethodInfoByte = new FakeMethodInfo("withPrimitiveByteReturnType", byte.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfoByte);
+        MethodInfo MethodInfoByte = new MethodInfo("withPrimitiveByteReturnType", byte.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfoByte);
 
-        FakeMethodInfo fakeMethodInfo6 = new FakeMethodInfo("withPrimitiveDoubleReturnType", double.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfo6);
+        MethodInfo MethodInfo6 = new MethodInfo("withPrimitiveDoubleReturnType", double.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfo6);
 
-        FakeMethodInfo fakeMethodInfoFloat = new FakeMethodInfo("withPrimitiveFloatReturnType", float.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfoFloat);
+        MethodInfo MethodInfoFloat = new MethodInfo("withPrimitiveFloatReturnType", float.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfoFloat);
 
-        FakeMethodInfo fakeMethodInfo7 = new FakeMethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(), new ArrayList<FieldInfo>(), null);
-        assertContains(listMethodInfos, fakeMethodInfo7);
+        MethodInfo MethodInfo7 = new MethodInfo("withPrimitiveBooleanReturnType", boolean.class.getName(), new ArrayList<FieldInfo>(), null);
+        assertContains(listMethodInfos, MethodInfo7);
 
-        FakeMethodInfo fakeMethodInfo8 = new FakeMethodInfo("withSingleThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName()));
-        assertContains(listMethodInfos, fakeMethodInfo8);
+        MethodInfo MethodInfo8 = new MethodInfo("withSingleThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName()));
+        assertContains(listMethodInfos, MethodInfo8);
 
-        FakeMethodInfo fakeMethodInfo9 = new FakeMethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
-        assertContains(listMethodInfos, fakeMethodInfo9);
+        MethodInfo MethodInfo9 = new MethodInfo("withManyThrownType", "void", new ArrayList<FieldInfo>(), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        assertContains(listMethodInfos, MethodInfo9);
     }
 
     // ----------------------------------
@@ -496,10 +493,10 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(1);
-        fakeFieldInfo.setEffectiveInheritanceLevel(0);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setInheritanceLevel(1);
+        FieldInfo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfo);
     }
 
     @Test
@@ -519,13 +516,13 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(0);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfo);
 
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo2.setInheritanceLevel(1);
-        assertContains(listFieldInfos, fakeFieldInfo2);
+        FieldInfo FieldInfo2 = new FieldInfo("foo", "java.lang.String");
+        FieldInfo2.setInheritanceLevel(1);
+        assertContains(listFieldInfos, FieldInfo2);
     }
 
     // ----------------------------------
@@ -548,9 +545,9 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo.setInheritanceLevel(1);
-        assertContains(listMethodInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo.setInheritanceLevel(1);
+        assertContains(listMethodInfos, MethodInfo);
     }
 
     @Test
@@ -570,14 +567,14 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo.setInheritanceLevel(1);
-        fakeMethodInfo.setOverriden(true);
-        assertContains(listMethodInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo.setInheritanceLevel(1);
+        MethodInfo.setOverriden(true);
+        assertContains(listMethodInfos, MethodInfo);
 
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo2.setInheritanceLevel(0);
-        assertContains(listMethodInfos, fakeMethodInfo2);
+        MethodInfo MethodInfo2 = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo2.setInheritanceLevel(0);
+        assertContains(listMethodInfos, MethodInfo2);
 
     }
 
@@ -598,15 +595,15 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertFalse(listMethodInfos.isEmpty());
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo.setInheritanceLevel(2);
-        fakeMethodInfo.setOverriden(true);
-        assertContains(listMethodInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo.setInheritanceLevel(2);
+        MethodInfo.setOverriden(true);
+        assertContains(listMethodInfos, MethodInfo);
 
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo2.setInheritanceLevel(1);
-        fakeMethodInfo2.setEffectiveInheritanceLevel(0);
-        assertContains(listMethodInfos, fakeMethodInfo2);
+        MethodInfo MethodInfo2 = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo2.setInheritanceLevel(1);
+        MethodInfo2.setEffectiveInheritanceLevel(0);
+        assertContains(listMethodInfos, MethodInfo2);
     }
 
     // ----------------------------------
@@ -658,10 +655,10 @@ public class BoundBoxProcessorTest {
         assertFalse(listMethodInfos.isEmpty());
 
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
-        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<java.lang.String>");
-        listParameters.add(fakeParameterInfo);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
-        assertContains(listMethodInfos, fakeMethodInfo);
+        FieldInfo ParameterInfo = new FieldInfo("strings", "java.util.List<java.lang.String>");
+        listParameters.add(ParameterInfo);
+        MethodInfo MethodInfo = new MethodInfo("doIt", "void", listParameters, null);
+        assertContains(listMethodInfos, MethodInfo);
     }
 
     // ----------------------------------
@@ -687,10 +684,10 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
     }
 
     @Test
@@ -712,10 +709,10 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
     }
 
     @Test
@@ -737,14 +734,14 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
-        assertContains(listInnerClassConstructorInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listInnerClassConstructorInfos, MethodInfo);
     }
 
     @Test
@@ -766,22 +763,22 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
-        assertContains(listInnerClassConstructorInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listInnerClassConstructorInfos, MethodInfo);
 
-        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt), null);
-        assertContains(listInnerClassConstructorInfos, fakeMethodInfo2);
+        FieldInfo paramInt = new FieldInfo("a", int.class.getName());
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        assertContains(listInnerClassConstructorInfos, MethodInfo2);
 
-        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
-        FakeMethodInfo fakeMethodInfo3 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramObject), null);
-        assertContains(listInnerClassConstructorInfos, fakeMethodInfo3);
+        FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        assertContains(listInnerClassConstructorInfos, MethodInfo3);
 
     }
 
@@ -804,26 +801,26 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<FieldInfo> listInnerClassFieldsInfos = classInfo.getListInnerClassInfo().get(0).getListFieldInfos();
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
-        assertContains(listInnerClassFieldsInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("a", "int");
+        assertContains(listInnerClassFieldsInfos, FieldInfo);
 
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("b", Object.class.getName());
-        fakeFieldInfo2.setFinalField(true);
-        assertContains(listInnerClassFieldsInfos, fakeFieldInfo2);
+        FieldInfo FieldInfo2 = new FieldInfo("b", Object.class.getName());
+        FieldInfo2.setFinalField(true);
+        assertContains(listInnerClassFieldsInfos, FieldInfo2);
 
         List<MethodInfo> listInnerClassMethodInfos = classInfo.getListInnerClassInfo().get(0).getListMethodInfos();
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        assertContains(listInnerClassMethodInfos, fakeMethodInfo);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        assertContains(listInnerClassMethodInfos, MethodInfo);
 
-        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("bar", "void", Arrays.asList(paramInt), null);
-        assertContains(listInnerClassMethodInfos, fakeMethodInfo2);
+        FieldInfo paramInt = new FieldInfo("a", int.class.getName());
+        MethodInfo MethodInfo2 = new MethodInfo("bar", "void", Arrays.asList(paramInt), null);
+        assertContains(listInnerClassMethodInfos, MethodInfo2);
 
     }
 
@@ -850,12 +847,12 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setInheritanceLevel(1);
-        fakeInnerClassInfo.setEffectiveInheritanceLevel(0);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setInheritanceLevel(1);
+        InnerClassInfo.setEffectiveInheritanceLevel(0);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
     }
 
     @Test
@@ -875,16 +872,16 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setInheritanceLevel(2);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setInheritanceLevel(2);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos, fakeInnerClassInfo);
+        assertContains(listInnerClassInfos, InnerClassInfo);
 
-        FakeInnerClassInfo fakeInnerClassInfo2 = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo2.setStaticInnerClass(true);
-        fakeInnerClassInfo2.setInheritanceLevel(0);
-        assertContains(listInnerClassInfos, fakeInnerClassInfo2);
+        InnerClassInfo InnerClassInfo2 = new InnerClassInfo("InnerClass");
+        InnerClassInfo2.setStaticInnerClass(true);
+        InnerClassInfo2.setInheritanceLevel(0);
+        assertContains(listInnerClassInfos, InnerClassInfo2);
     }
 
     // ----------------------------------
@@ -908,9 +905,9 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertTrue(listMethodInfos.isEmpty());
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", int.class.getSimpleName());
-        fakeFieldInfo.setStaticField(true);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", int.class.getSimpleName());
+        FieldInfo.setStaticField(true);
+        assertContains(listFieldInfos, FieldInfo);
 
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
@@ -934,11 +931,11 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertTrue(listMethodInfos.isEmpty());
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", int.class.getSimpleName());
-        fakeFieldInfo.setStaticField(false);
-        fakeFieldInfo.setInheritanceLevel(1);
-        fakeFieldInfo.setEffectiveInheritanceLevel(0);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", int.class.getSimpleName());
+        FieldInfo.setStaticField(false);
+        FieldInfo.setInheritanceLevel(1);
+        FieldInfo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfo);
 
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
@@ -961,11 +958,11 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertTrue(listMethodInfos.isEmpty());
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", int.class.getSimpleName());
-        fakeFieldInfo.setStaticField(false);
-        fakeFieldInfo.setInheritanceLevel(1);
-        fakeFieldInfo.setEffectiveInheritanceLevel(0);
-        assertContains(listFieldInfos, fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", int.class.getSimpleName());
+        FieldInfo.setStaticField(false);
+        FieldInfo.setInheritanceLevel(1);
+        FieldInfo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfo);
 
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertTrue(listInnerClassInfos.isEmpty());
@@ -1042,8 +1039,8 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(classInfo.getListFieldInfos(), FieldInfo);
 
         EasyMock.verify(mockBoundBoxWriter);
         assertEquals(2, capturedPrefixes.getValue().length);
@@ -1072,8 +1069,8 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        assertContains(classInfo.getListFieldInfos(), fakeFieldInfo);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        assertContains(classInfo.getListFieldInfos(), FieldInfo);
 
         EasyMock.verify(mockBoundBoxWriter);
         assertEquals(2, capturedPrefixes.getValue().length);
@@ -1081,7 +1078,7 @@ public class BoundBoxProcessorTest {
         assertEquals("bb", capturedPrefixes.getValue()[1]);
     }
     // ----------------------------------
-    // NAMING PREFIXES 
+    // PACKAGE NAME
     // ----------------------------------
 
     @Test
@@ -1132,18 +1129,18 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertTrue(listFieldInfos.isEmpty());
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        FakeFieldInfo fakeFieldInfoFoo = new FakeFieldInfo("foo", int.class.getName());
-        fakeFieldInfoFoo.setStaticField(true);
-        fakeFieldInfoFoo.setInheritanceLevel(1);
-        fakeFieldInfoFoo.setEffectiveInheritanceLevel(1);
-        fakeInnerClassInfo.getListFieldInfos().add(fakeFieldInfoFoo);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        FieldInfo FieldInfoFoo = new FieldInfo("foo", int.class.getName());
+        FieldInfoFoo.setStaticField(true);
+        FieldInfoFoo.setInheritanceLevel(1);
+        FieldInfoFoo.setEffectiveInheritanceLevel(1);
+        InnerClassInfo.getListFieldInfos().add(FieldInfoFoo);
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos.get(0).getListFieldInfos(), fakeFieldInfoFoo);
+        assertContains(listInnerClassInfos.get(0).getListFieldInfos(), FieldInfoFoo);
     }
     
     @Test
-    public void testProcess_class_with_compoisition_of_static_inner_class() throws URISyntaxException {
+    public void testProcess_class_with_composition_of_static_inner_class() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithCompositionOfStaticInnerClass.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1161,8 +1158,40 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
 
-        FakeFieldInfo fakeFieldInfoFoo = new FakeFieldInfo("a", "TestClassWithStaticInnerClass.InnerClass");
-        assertContains(listFieldInfos, fakeFieldInfoFoo);
+        FieldInfo FieldInfoFoo = new FieldInfo("a", "TestClassWithStaticInnerClass.InnerClass");
+        assertContains(listFieldInfos, FieldInfoFoo);
+    }
+    
+    // ----------------------------------
+    // TDD for issue #15
+    // ----------------------------------
+    
+    @Test
+    public void testProcess_class_with_inivisble_inner_class_and_method_returning_it() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodReturningIt.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().contains("TestClassWithInvisibleInnerClassAndMethodReturningIt.B"));
+        assertEquals(1,boundBoxProcessor.getListOfInvisibleTypes().size());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertTrue(listFieldInfos.isEmpty());
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertFalse(listMethodInfos.isEmpty());
+        //MethodInfo MethodInfo = new MethodInfo("foo", "TestClassWithInvisibleInnerClassAndMethodReturningIt.B", new ArrayList<FieldInfo>(), new ArrayList<String>());
+        MethodInfo MethodInfo = new MethodInfo("foo", Object.class.getName(), new ArrayList<FieldInfo>(), new ArrayList<String>());
+        assertContains(listMethodInfos, MethodInfo);
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
     }
 
     // ----------------------------------
@@ -1202,63 +1231,63 @@ public class BoundBoxProcessorTest {
         return task;
     }
 
-    private void assertContains(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {
-        FieldInfo fieldInfo2 = retrieveFieldInfo(listFieldInfos, fakeFieldInfo);
+    private void assertContains(List<FieldInfo> listFieldInfos, FieldInfo FieldInfo) {
+        FieldInfo fieldInfo2 = retrieveFieldInfo(listFieldInfos, FieldInfo);
         assertNotNull(fieldInfo2);
-        assertEquals(fakeFieldInfo.getFieldTypeName(), fieldInfo2.getFieldTypeName());
-        assertEquals(fakeFieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
-        assertEquals(fakeFieldInfo.isStaticField(), fieldInfo2.isStaticField());
-        assertEquals(fakeFieldInfo.getEffectiveInheritanceLevel(), fieldInfo2.getEffectiveInheritanceLevel());
+        assertEquals(FieldInfo.getFieldTypeName(), fieldInfo2.getFieldTypeName());
+        assertEquals(FieldInfo.getInheritanceLevel(), fieldInfo2.getInheritanceLevel());
+        assertEquals(FieldInfo.isStaticField(), fieldInfo2.isStaticField());
+        assertEquals(FieldInfo.getEffectiveInheritanceLevel(), fieldInfo2.getEffectiveInheritanceLevel());
     }
 
-    private void assertContains(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
-        MethodInfo methodInfo2 = retrieveMethodInfo(listMethodInfos, fakeMethodInfo);
+    private void assertContains(List<MethodInfo> listMethodInfos, MethodInfo MethodInfo) {
+        MethodInfo methodInfo2 = retrieveMethodInfo(listMethodInfos, MethodInfo);
         assertNotNull(methodInfo2);
-        assertEquals(fakeMethodInfo.getReturnTypeName(), methodInfo2.getReturnTypeName());
-        assertEquals(fakeMethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
-        assertEquals(fakeMethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
+        assertEquals(MethodInfo.getReturnTypeName(), methodInfo2.getReturnTypeName());
+        assertEquals(MethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
+        assertEquals(MethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
 
         for (int indexParameter = 0; indexParameter < methodInfo2.getParameterTypes().size(); indexParameter++) {
             FieldInfo fieldInfo = methodInfo2.getParameterTypes().get(indexParameter);
-            assertEquals(fakeMethodInfo.getParameterTypes().get(indexParameter).getFieldName(), fieldInfo.getFieldName());
-            assertEquals(fakeMethodInfo.getParameterTypes().get(indexParameter).getFieldTypeName(), fieldInfo.getFieldTypeName());
+            assertEquals(MethodInfo.getParameterTypes().get(indexParameter).getFieldName(), fieldInfo.getFieldName());
+            assertEquals(MethodInfo.getParameterTypes().get(indexParameter).getFieldTypeName(), fieldInfo.getFieldTypeName());
         }
 
         for (int indexThrownType = 0; indexThrownType < methodInfo2.getThrownTypeNames().size(); indexThrownType++) {
             String thrownTypeName = methodInfo2.getThrownTypeNames().get(indexThrownType);
-            assertEquals(fakeMethodInfo.getThrownTypeNames().get(indexThrownType), thrownTypeName);
+            assertEquals(MethodInfo.getThrownTypeNames().get(indexThrownType), thrownTypeName);
         }
     }
 
-    private void assertContains(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
-        InnerClassInfo innerClassInfo2 = retrieveInnerClassInfo(listInnerClassInfos, fakeInnerClassInfo);
+    private void assertContains(List<InnerClassInfo> listInnerClassInfos, InnerClassInfo InnerClassInfo) {
+        InnerClassInfo innerClassInfo2 = retrieveInnerClassInfo(listInnerClassInfos, InnerClassInfo);
         assertNotNull(innerClassInfo2);
-        assertEquals(fakeInnerClassInfo.getInheritanceLevel(), innerClassInfo2.getInheritanceLevel());
-        assertEquals(fakeInnerClassInfo.isStaticInnerClass(), innerClassInfo2.isStaticInnerClass());
-        assertEquals(fakeInnerClassInfo.getEffectiveInheritanceLevel(), innerClassInfo2.getEffectiveInheritanceLevel());
+        assertEquals(InnerClassInfo.getInheritanceLevel(), innerClassInfo2.getInheritanceLevel());
+        assertEquals(InnerClassInfo.isStaticInnerClass(), innerClassInfo2.isStaticInnerClass());
+        assertEquals(InnerClassInfo.getEffectiveInheritanceLevel(), innerClassInfo2.getEffectiveInheritanceLevel());
 
-        for (FieldInfo fieldInfo : fakeInnerClassInfo.getListFieldInfos()) {
-            assertContains(innerClassInfo2.getListFieldInfos(), (FakeFieldInfo)fieldInfo);
+        for (FieldInfo fieldInfo : InnerClassInfo.getListFieldInfos()) {
+            assertContains(innerClassInfo2.getListFieldInfos(), (FieldInfo)fieldInfo);
         }
     }
 
-    private FieldInfo retrieveFieldInfo(List<FieldInfo> listFieldInfos, FakeFieldInfo fakeFieldInfo) {
+    private FieldInfo retrieveFieldInfo(List<FieldInfo> listFieldInfos, FieldInfo FieldInfo) {
         for (FieldInfo fieldInfo : listFieldInfos) {
-            if (fieldInfo.equals(fakeFieldInfo)) {
+            if (fieldInfo.equals(FieldInfo)) {
                 return fieldInfo;
             }
         }
         return null;
     }
 
-    private MethodInfo retrieveMethodInfo(List<MethodInfo> listMethodInfos, FakeMethodInfo fakeMethodInfo) {
+    private MethodInfo retrieveMethodInfo(List<MethodInfo> listMethodInfos, MethodInfo MethodInfo) {
         for (MethodInfo methodInfo : listMethodInfos) {
-            if (methodInfo.equals(fakeMethodInfo)) {
+            if (methodInfo.equals(MethodInfo)) {
                 boolean haveSameParams = true;
                 for (int indexParam = 0; indexParam < methodInfo.getParameterTypes().size() && haveSameParams; indexParam++) {
                     FieldInfo paramInfo = methodInfo.getParameterTypes().get(indexParam);
-                    FieldInfo fakeParamInfo = fakeMethodInfo.getParameterTypes().get(indexParam);
-                    if (!paramInfo.getFieldName().equals(fakeParamInfo.getFieldName()) || !paramInfo.getFieldTypeName().equals(fakeParamInfo.getFieldTypeName())) {
+                    FieldInfo ParamInfo = MethodInfo.getParameterTypes().get(indexParam);
+                    if (!paramInfo.getFieldName().equals(ParamInfo.getFieldName()) || !paramInfo.getFieldTypeName().equals(ParamInfo.getFieldTypeName())) {
                         haveSameParams = false;
                     }
                 }
@@ -1270,9 +1299,9 @@ public class BoundBoxProcessorTest {
         return null;
     }
 
-    private InnerClassInfo retrieveInnerClassInfo(List<InnerClassInfo> listInnerClassInfos, FakeInnerClassInfo fakeInnerClassInfo) {
+    private InnerClassInfo retrieveInnerClassInfo(List<InnerClassInfo> listInnerClassInfos, InnerClassInfo InnerClassInfo) {
         for (InnerClassInfo innerClassInfo : listInnerClassInfos) {
-            if (innerClassInfo.equals(fakeInnerClassInfo)) {
+            if (innerClassInfo.equals(InnerClassInfo)) {
                 return innerClassInfo;
             }
         }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -17,6 +18,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
+import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
@@ -38,9 +40,12 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     private List<String> visitiedTypes = new ArrayList<String>();
     @Setter
     private String boundBoxPackageName;
-    
+    @Getter
+    private List<String> listOfInvisibleTypes = new ArrayList<String>();
+
     public ClassInfo scan(TypeElement boundClass) {
         visitiedTypes.clear();
+        listOfInvisibleTypes.clear();
         initialclassInfo = new ClassInfo(boundClass.getQualifiedName().toString());
         ScanningContext initialScanningContext = new ScanningContext(initialclassInfo);
         boundClass.accept(this, initialScanningContext);
@@ -58,7 +63,9 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     // most bricks are in place.
     @Override
     public Void visitTypeAsClass(TypeElement e, ScanningContext scanningContext) {
-        if (!e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) && !scanningContext.isInsideEnclosedElements() && !scanningContext.isInsideSuperElements()) {
+        boolean isBoundClass = e.getQualifiedName().toString().equals(initialclassInfo.getClassName());
+
+        if (!isBoundClass && !scanningContext.isInsideEnclosedElements() && !scanningContext.isInsideSuperElements()) {
             log.info("dropping class ->" + e.getSimpleName());
             return null;
         }
@@ -67,8 +74,11 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             log.info("dropping visitied class ->" + e.getSimpleName());
             return null;
         }
-        
+
         visitiedTypes.add(e.toString());
+        if( !computeVisibility(e)) {
+            listOfInvisibleTypes.add(e.getQualifiedName().toString());
+        }
 
         log.info("class ->" + e.getSimpleName());
 
@@ -76,11 +86,11 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         log.info("nested ->" + isInnerClass);
 
         boolean isStaticElement = e.getModifiers().contains(Modifier.STATIC);
-        scanningContext.setStatic((!isInnerClass || isStaticElement ) && scanningContext.isStatic());
+        scanningContext.setStatic((!isInnerClass || isStaticElement) && scanningContext.isStatic());
 
-        //boundboxes around inner classes should not be considered as inner classes
-        //but otherwise, if we are an inner class
-        if (isInnerClass && !e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) ) {
+        // boundboxes around inner classes should not be considered as inner classes
+        // but otherwise, if we are an inner class
+        if (isInnerClass && !isBoundClass) {
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             int inheritanceLevel = scanningContext.getInheritanceLevel();
             InnerClassInfo innerClassInfo = new InnerClassInfo(e.getSimpleName().toString());
@@ -89,14 +99,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             innerClassInfo.getListSuperClassNames().add(e.toString());
             innerClassInfo.setInheritanceLevel(inheritanceLevel);
 
-            //Current element is an inner class and we are currently scanning elements of someone
-            //so we add innerclassinfo to that someone : the current class info.
+            // Current element is an inner class and we are currently scanning elements of someone
+            // so we add innerclassinfo to that someone : the current class info.
             if (scanningContext.isInsideEnclosedElements()) {
                 classInfo.getListInnerClassInfo().add(innerClassInfo);
             }
-            
-            //inside super classes we don't change the classInfo being scanned (inheritance flatenning)
-            //but outside, we do, to scan the inner class itself.
+
+            // inside super classes we don't change the classInfo being scanned (inheritance
+            // flatenning)
+            // but outside, we do, to scan the inner class itself.
             if (!scanningContext.isInsideSuperElements()) {
                 ScanningContext newScanningContext = new ScanningContext(innerClassInfo);
                 newScanningContext.setInheritanceLevel(inheritanceLevel);
@@ -108,16 +119,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
 
         log.info("super class ->" + e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
-        boolean hasValidSuperClass = !maxSuperClassName.equals(superclassOfBoundClass.toString()) 
-                && !Object.class.getName().equals(superclassOfBoundClass.toString())
+        boolean hasValidSuperClass = !maxSuperClassName.equals(superclassOfBoundClass.toString()) && !Object.class.getName().equals(superclassOfBoundClass.toString())
                 && superclassOfBoundClass.getKind() == TypeKind.DECLARED;
-        
-        //if we have a valid inner class, let's scan it 
+
+        // if we have a valid inner class, let's scan it
         if (hasValidSuperClass) {
             DeclaredType superClassDeclaredType = (DeclaredType) superclassOfBoundClass;
             Element superClassElement = superClassDeclaredType.asElement();
             scanningContext.getCurrentClassInfo().getListSuperClassNames().add(superClassElement.toString());
-            
+
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             ScanningContext newScanningContext = new ScanningContext(classInfo);
             newScanningContext.setInheritanceLevel(scanningContext.getInheritanceLevel() + 1);
@@ -126,12 +136,12 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             newScanningContext.setInsideSuperElements(true);
             superClassElement.accept(BoundClassScanner.this, newScanningContext);
         }
-        
-        //and finally visit all elements of current class if : 
-        //it is an inner class of a bound class, or a super class
-        //also, root bound class is scanned in current scanning context
-        //otherwise, we don't scan
-        if (e.getQualifiedName().toString().equals(initialclassInfo.getClassName()) || scanningContext.isInsideSuperElements() || isInnerClass) {
+
+        // and finally visit all elements of current class if :
+        // it is an inner class of a bound class, or a super class
+        // also, root bound class is scanned in current scanning context
+        // otherwise, we don't scan
+        if (isBoundClass || scanningContext.isInsideSuperElements() || isInnerClass) {
             // http://stackoverflow.com/q/7738171/693752
             for (Element enclosedElement : e.getEnclosedElements()) {
                 scanningContext.setInsideEnclosedElements(true);
@@ -140,7 +150,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             }
             scanningContext.setInsideEnclosedElements(false);
         }
-
 
         return super.visitTypeAsClass(e, scanningContext);
     }
@@ -198,4 +207,40 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             addTypeToImport(classInfo, ((DeclaredType) typeMirror));
         }
     }
+
+    private boolean computeVisibility(TypeElement e) {
+        boolean isPublic = e.getModifiers().contains(Modifier.PUBLIC);
+        if (isPublic) {
+            return true;
+        }
+        boolean isPrivate = e.getModifiers().contains(Modifier.PRIVATE);
+        boolean isProtectedOrPackage = !isPrivate;
+        String elementFQN = e.getQualifiedName().toString();
+        if (isProtectedOrPackage && isInBoundBoxPackage(elementFQN)) {
+            return true;
+        }
+
+        if (e.getNestingKind().isNested()) {
+//            if(e.getEnclosingElement().getKind() == ElementKind.CLASS) {
+//                //TODO handle static
+//                TypeMirror outerType =  e.getEnclosingElement().asType();
+//                while (outerType.getKind() == TypeKind.DECLARED && !outerType.toString().equals(Object.class)) {
+//                    if (!computeVisibility((TypeElement) ((DeclaredType)outerType).asElement())) {
+//                        return false;
+//                    }
+//                    outerType = (TypeElement) ((DeclaredType)outerType).asElement());
+//                }
+//            }
+        }
+        return false;
+    }
+
+    private boolean isInBoundBoxPackage(String elementFQN) {
+        String packageOfElement = "";
+        if (elementFQN.contains(".")) {
+            packageOfElement = StringUtils.substringBefore(elementFQN, ".");
+        }
+        return packageOfElement.equals(boundBoxPackageName);
+    }
+
 }

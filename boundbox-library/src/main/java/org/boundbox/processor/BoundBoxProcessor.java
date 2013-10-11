@@ -44,6 +44,8 @@ import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaFileObject;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 import org.apache.commons.io.IOUtils;
@@ -78,9 +80,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     private Filer filer;
     private Messager messager;
     private Elements elements;
+    @Setter
     private BoundboxWriter boundboxWriter = new BoundboxWriter();
     private InheritanceComputer inheritanceComputer = new InheritanceComputer();
+    private VisibilityComputer visibilityComputer = new VisibilityComputer();
     private BoundClassScanner boundClassVisitor = new BoundClassScanner();
+    @Getter
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
 
     @Override
@@ -182,7 +187,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
             inheritanceComputer.computeInheritanceAndOverridingMethods(classInfo.getListMethodInfos(), boundClass, elements);
             inheritanceComputer.computeInheritanceAndHidingInnerClasses(classInfo.getListInnerClassInfo());
 
-
+            visibilityComputer.processVisibleTypes(classInfo, getListOfInvisibleTypes());
+            
             // write meta model to java class file
             Writer sourceWriter = null;
             try {
@@ -246,12 +252,8 @@ public class BoundBoxProcessor extends AbstractProcessor {
         }
     }
 
-    public void setBoundboxWriter(BoundboxWriter boundboxWriter) {
-        this.boundboxWriter = boundboxWriter;
-    }
-
-    public List<ClassInfo> getListClassInfo() {
-        return listClassInfo;
+    public List<String> getListOfInvisibleTypes() {
+        return boundClassVisitor.getListOfInvisibleTypes();
     }
 
     // ----------------------------------

@@ -17,7 +17,7 @@ import lombok.ToString;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // for testing
-@EqualsAndHashCode(exclude = { "returnType", "thrownTypeNames", "effectiveInheritanceLevel", "element" })
+@EqualsAndHashCode(exclude = { "returnTypeName", "thrownTypeNames", "effectiveInheritanceLevel", "element" })
 @ToString
 @SuppressWarnings("PMD.UnusedPrivateField")
 public class MethodInfo implements Inheritable {
@@ -27,7 +27,7 @@ public class MethodInfo implements Inheritable {
     @Getter
     protected String methodName;
     @Setter
-    protected TypeMirror returnType;
+    protected String returnTypeName;
     @Getter
     protected List<FieldInfo> parameterTypes;
     @Getter
@@ -53,7 +53,7 @@ public class MethodInfo implements Inheritable {
     public MethodInfo(@NonNull ExecutableElement element) {
         this.element = element;
         methodName = element.getSimpleName().toString();
-        returnType = element.getReturnType();
+        returnTypeName = element.getReturnType().toString();
         parameterTypes = new ArrayList<FieldInfo>();
         for (VariableElement variableElement : element.getParameters()) {
             parameterTypes.add(new FieldInfo(variableElement));
@@ -63,12 +63,21 @@ public class MethodInfo implements Inheritable {
             thrownTypeNames.add(typeMirror.toString());
         }
     }
+    
+    public MethodInfo(@NonNull String methodName,@NonNull String returnTypeName, List<FieldInfo> listParameters,
+            List<String> listThrownTypeNames) {
+        this.methodName = methodName;
+        this.returnTypeName = returnTypeName;
+        this.parameterTypes = listParameters;
+        this.thrownTypeNames = listThrownTypeNames;
+    }
+
 
     // ----------------------------------
     // PUBLIC METHODS
     // ----------------------------------
     public String getReturnTypeName() {
-        return returnType.toString();
+        return returnTypeName;
     }
 
     public boolean isConstructor() {
@@ -84,7 +93,7 @@ public class MethodInfo implements Inheritable {
     }
 
     public boolean hasReturnType() {
-        return returnType != null && !"void".equalsIgnoreCase(returnType.toString());
+        return returnTypeName != null && !"void".equalsIgnoreCase(returnTypeName);
     }
 
     public void setInheritanceLevel(int inheritanceLevel) {

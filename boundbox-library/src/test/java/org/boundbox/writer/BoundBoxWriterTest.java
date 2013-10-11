@@ -1,6 +1,11 @@
 package org.boundbox.writer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,9 +32,6 @@ import lombok.Getter;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.boundbox.FakeFieldInfo;
-import org.boundbox.FakeInnerClassInfo;
-import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
@@ -169,9 +171,9 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -201,15 +203,15 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        FakeFieldInfo fakeFieldInfo3 = new FakeFieldInfo("array1", "double[]");
-        FakeFieldInfo fakeFieldInfo4 = new FakeFieldInfo("array2", "float[][]");
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo FieldInfo2 = new FieldInfo("a", "int");
+        FieldInfo FieldInfo3 = new FieldInfo("array1", "double[]");
+        FieldInfo FieldInfo4 = new FieldInfo("array2", "float[][]");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
-        listFieldInfos.add(fakeFieldInfo2);
-        listFieldInfos.add(fakeFieldInfo3);
-        listFieldInfos.add(fakeFieldInfo4);
+        listFieldInfos.add(FieldInfo);
+        listFieldInfos.add(FieldInfo2);
+        listFieldInfos.add(FieldInfo3);
+        listFieldInfos.add(FieldInfo4);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -242,10 +244,10 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setFinalField(true);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setFinalField(true);
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -284,13 +286,13 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setStaticField(true);
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("a", "int");
-        fakeFieldInfo2.setStaticField(true);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setStaticField(true);
+        FieldInfo FieldInfo2 = new FieldInfo("a", "int");
+        FieldInfo2.setStaticField(true);
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
-        listFieldInfos.add(fakeFieldInfo2);
+        listFieldInfos.add(FieldInfo);
+        listFieldInfos.add(FieldInfo2);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -339,9 +341,9 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
-        listConstructorInfos.add(fakeMethodInfo);
+        listConstructorInfos.add(MethodInfo);
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -373,15 +375,15 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
 
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null));
-        FakeFieldInfo fieldInfo = new FakeFieldInfo("a", "int");
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo), null));
-        FakeFieldInfo fieldInfo2 = new FakeFieldInfo("a", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo2), null));
-        FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
-        FakeFieldInfo fieldInfo4 = new FakeFieldInfo("c", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3, fieldInfo4), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
+        listConstructorInfos.add(new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null));
+        FieldInfo fieldInfo = new FieldInfo("a", "int");
+        listConstructorInfos.add(new MethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo), null));
+        FieldInfo fieldInfo2 = new FieldInfo("a", Object.class.getName());
+        listConstructorInfos.add(new MethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo2), null));
+        FieldInfo fieldInfo3 = new FieldInfo("b", Object.class.getName());
+        listConstructorInfos.add(new MethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
+        FieldInfo fieldInfo4 = new FieldInfo("c", Object.class.getName());
+        listConstructorInfos.add(new MethodInfo("<init>", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3, fieldInfo4), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
 
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListImports(new HashSet<String>());
@@ -443,9 +445,9 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -475,23 +477,23 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         List<MethodInfo> listConstructorInfos = new ArrayList<MethodInfo>();
 
-        listConstructorInfos.add(new FakeMethodInfo("simple", "void", new ArrayList<FieldInfo>(), null));
-        FakeFieldInfo fieldInfo = new FakeFieldInfo("a", "int");
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveArgument", "void", Arrays.<FieldInfo>asList(fieldInfo), null));
-        FakeFieldInfo fieldInfo2 = new FakeFieldInfo("a", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("withObjectArgument", "void", Arrays.<FieldInfo>asList(fieldInfo2), null));
-        FakeFieldInfo fieldInfo3 = new FakeFieldInfo("b", Object.class.getName());
-        listConstructorInfos.add(new FakeMethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveCharReturnType", "char", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveByteReturnType", "byte", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveShortReturnType", "short", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveLongReturnType", "long", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveFloatReturnType", "float", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
-        listConstructorInfos.add(new FakeMethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException")));
-        listConstructorInfos.add(new FakeMethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
+        listConstructorInfos.add(new MethodInfo("simple", "void", new ArrayList<FieldInfo>(), null));
+        FieldInfo fieldInfo = new FieldInfo("a", "int");
+        listConstructorInfos.add(new MethodInfo("withPrimitiveArgument", "void", Arrays.<FieldInfo>asList(fieldInfo), null));
+        FieldInfo fieldInfo2 = new FieldInfo("a", Object.class.getName());
+        listConstructorInfos.add(new MethodInfo("withObjectArgument", "void", Arrays.<FieldInfo>asList(fieldInfo2), null));
+        FieldInfo fieldInfo3 = new FieldInfo("b", Object.class.getName());
+        listConstructorInfos.add(new MethodInfo("withManyArguments", "void", Arrays.<FieldInfo>asList(fieldInfo, fieldInfo3), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveCharReturnType", "char", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveIntReturnType", "int", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveByteReturnType", "byte", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveShortReturnType", "short", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveLongReturnType", "long", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveDoubleReturnType", "double", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveFloatReturnType", "float", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withPrimitiveBooleanReturnType", "boolean", Arrays.<FieldInfo>asList(), null));
+        listConstructorInfos.add(new MethodInfo("withSingleThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException")));
+        listConstructorInfos.add(new MethodInfo("withManyThrownType", "void", Arrays.<FieldInfo>asList(), Arrays.asList("java.io.IOException", "java.lang.RuntimeException")));
 
         classInfo.setListConstructorInfos(listConstructorInfos);
         classInfo.setListImports(new HashSet<String>());
@@ -573,10 +575,10 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo.setStaticMethod(true);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo.setStaticMethod(true);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -609,10 +611,10 @@ public class BoundBoxWriterTest {
         neededClasses.add("TestClassWithSingleField");
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(1);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setInheritanceLevel(1);
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField", "TestClassWithSingleField"));
         classInfo.setListImports(new HashSet<String>());
@@ -645,12 +647,12 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo.setInheritanceLevel(0);
-        listFieldInfos.add(fakeFieldInfo);
-        FakeFieldInfo fakeFieldInfo2 = new FakeFieldInfo("foo", "java.lang.String");
-        fakeFieldInfo2.setInheritanceLevel(1);
-        listFieldInfos.add(fakeFieldInfo2);
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
+        FieldInfo.setInheritanceLevel(0);
+        listFieldInfos.add(FieldInfo);
+        FieldInfo FieldInfo2 = new FieldInfo("foo", "java.lang.String");
+        FieldInfo2.setInheritanceLevel(1);
+        listFieldInfos.add(FieldInfo2);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedField", "TestClassWithSingleField"));
         classInfo.setListImports(new HashSet<String>());
@@ -685,9 +687,9 @@ public class BoundBoxWriterTest {
         neededClasses.add("TestClassWithSingleMethod");
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
@@ -726,12 +728,12 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        listMethodInfos.add(fakeMethodInfo);
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo2.setInheritanceLevel(1);
-        fakeMethodInfo2.setOverriden(true);
-        listMethodInfos.add(fakeMethodInfo2);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        listMethodInfos.add(MethodInfo);
+        MethodInfo MethodInfo2 = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo2.setInheritanceLevel(1);
+        MethodInfo2.setOverriden(true);
+        listMethodInfos.add(MethodInfo2);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
@@ -766,11 +768,11 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        listMethodInfos.add(fakeMethodInfo);
-        FakeMethodInfo fakeMethodInfo2 = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        fakeMethodInfo2.setInheritanceLevel(2);
-        listMethodInfos.add(fakeMethodInfo2);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        listMethodInfos.add(MethodInfo);
+        MethodInfo MethodInfo2 = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo2.setInheritanceLevel(2);
+        listMethodInfos.add(MethodInfo2);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListSuperClassNames(Arrays.asList("TestClassWithInheritedOverridingMethod", "TestClassWithInheritedMethod", "TestClassWithSingleMethod"));
         classInfo.setListImports(new HashSet<String>());
@@ -809,11 +811,11 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
-        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List");
-        listParameters.add(fakeParameterInfo);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        FieldInfo ParameterInfo = new FieldInfo("strings", "java.util.List");
+        listParameters.add(ParameterInfo);
+        MethodInfo MethodInfo = new MethodInfo("doIt", "void", listParameters, null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -844,11 +846,11 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
         ArrayList<FieldInfo> listParameters = new ArrayList<FieldInfo>();
-        FieldInfo fakeParameterInfo = new FakeFieldInfo("strings", "java.util.List<String>");
-        listParameters.add(fakeParameterInfo);
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("doIt", "void", listParameters, null);
+        FieldInfo ParameterInfo = new FieldInfo("strings", "java.util.List<String>");
+        listParameters.add(ParameterInfo);
+        MethodInfo MethodInfo = new MethodInfo("doIt", "void", listParameters, null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
         classInfo.setListMethodInfos(listMethodInfos);
         classInfo.setListImports(new HashSet<String>());
 
@@ -880,19 +882,19 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("a", "int");
+        FieldInfo FieldInfo = new FieldInfo("a", "int");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
 
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
-        listMethodInfos.add(fakeMethodInfo);
+        listMethodInfos.add(MethodInfo);
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListMethodInfos(listMethodInfos);
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -930,15 +932,15 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
-        FakeMethodInfo fakeInnerClassConstructorInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
-        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo);
+        listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -973,22 +975,22 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
-        FakeMethodInfo fakeInnerClassConstructorInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
-        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
-        FieldInfo paramInt = new FakeFieldInfo("a", int.class.getName());
-        FakeMethodInfo fakeInnerClassConstructorInfo2 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramInt), null);
-        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo2);
+        FieldInfo paramInt = new FieldInfo("a", int.class.getName());
+        MethodInfo InnerClassConstructorInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        listInnerClassConstructorInfos.add(InnerClassConstructorInfo2);
 
-        FieldInfo paramObject = new FakeFieldInfo("a", Object.class.getName());
-        FakeMethodInfo fakeInnerClassConstructorInfo3 = new FakeMethodInfo("<init>", "void", Arrays.asList(paramObject), null);
-        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo3);
+        FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
+        MethodInfo InnerClassConstructorInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        listInnerClassConstructorInfos.add(InnerClassConstructorInfo3);
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1029,31 +1031,31 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
-        FakeMethodInfo fakeInnerClassConstructorInfo = new FakeMethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
-        listInnerClassConstructorInfos.add(fakeInnerClassConstructorInfo);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
         List<FieldInfo> listInnerClassFieldInfos = new ArrayList<FieldInfo>();
-        FieldInfo fakeInnerClassFieldInfo = new FakeFieldInfo("a", int.class.getName());
-        listInnerClassFieldInfos.add(fakeInnerClassFieldInfo);
+        FieldInfo InnerClassFieldInfo = new FieldInfo("a", int.class.getName());
+        listInnerClassFieldInfos.add(InnerClassFieldInfo);
 
-        FieldInfo fakeInnerClassFieldInfo2 = new FakeFieldInfo("b", Object.class.getName());
-        fakeInnerClassFieldInfo2.setFinalField(true);
-        listInnerClassFieldInfos.add(fakeInnerClassFieldInfo2);
+        FieldInfo InnerClassFieldInfo2 = new FieldInfo("b", Object.class.getName());
+        InnerClassFieldInfo2.setFinalField(true);
+        listInnerClassFieldInfos.add(InnerClassFieldInfo2);
 
         List<MethodInfo> listInnerClassMethodInfos = new ArrayList<MethodInfo>();
-        FakeMethodInfo fakeInnerClassMethodInfo = new FakeMethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
-        listInnerClassMethodInfos.add(fakeInnerClassMethodInfo);
+        MethodInfo InnerClassMethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        listInnerClassMethodInfos.add(InnerClassMethodInfo);
 
-        FakeMethodInfo fakeInnerClassMethodInfo2 = new FakeMethodInfo("bar", "void", Arrays.asList(fakeInnerClassFieldInfo), null);
-        listInnerClassMethodInfos.add(fakeInnerClassMethodInfo2);
+        MethodInfo InnerClassMethodInfo2 = new MethodInfo("bar", "void", Arrays.asList(InnerClassFieldInfo), null);
+        listInnerClassMethodInfos.add(InnerClassMethodInfo2);
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
-        fakeInnerClassInfo.setListFieldInfos(listInnerClassFieldInfos);
-        fakeInnerClassInfo.setListMethodInfos(listInnerClassMethodInfos);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        InnerClassInfo.setListFieldInfos(listInnerClassFieldInfos);
+        InnerClassInfo.setListMethodInfos(listInnerClassMethodInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1114,12 +1116,12 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
-        FakeInnerClassInfo fakeInnerClassInfo = new FakeInnerClassInfo("InnerClass");
-        fakeInnerClassInfo.setStaticInnerClass(true);
-        fakeInnerClassInfo.setInheritanceLevel(1);
+        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
+        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo.setInheritanceLevel(1);
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(fakeInnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1152,9 +1154,9 @@ public class BoundBoxWriterTest {
         List<String> neededClasses = new ArrayList<String>();
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
-        FakeFieldInfo fakeFieldInfo = new FakeFieldInfo("foo", "java.lang.String");
+        FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
         List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
-        listFieldInfos.add(fakeFieldInfo);
+        listFieldInfos.add(FieldInfo);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListImports(new HashSet<String>());
 

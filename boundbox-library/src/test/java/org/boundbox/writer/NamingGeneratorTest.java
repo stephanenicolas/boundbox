@@ -5,8 +5,8 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.boundbox.FakeMethodInfo;
 import org.boundbox.model.FieldInfo;
+import org.boundbox.model.MethodInfo;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,10 +22,10 @@ public class NamingGeneratorTest {
     @Test(expected=IllegalArgumentException.class)
     public void testCreateMethodName_throws_exception_for_instance_initializer() {
         //given
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("", "void", new ArrayList<FieldInfo>(), null);
 
         //when
-        namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
+        namingGenerator.createMethodName(MethodInfo, Collections.<String>emptyList());
 
         //then
         fail();
@@ -34,10 +34,10 @@ public class NamingGeneratorTest {
     @Test(expected=IllegalArgumentException.class)
     public void testCreateMethodName_throws_exception_for_static_initializer() {
         //given
-        FakeMethodInfo fakeMethodInfo = new FakeMethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<clinit>", "void", new ArrayList<FieldInfo>(), null);
 
         //when
-        namingGenerator.createMethodName(fakeMethodInfo, Collections.<String>emptyList());
+        namingGenerator.createMethodName(MethodInfo, Collections.<String>emptyList());
 
         //then
         fail();
