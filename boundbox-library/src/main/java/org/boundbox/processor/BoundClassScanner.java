@@ -7,6 +7,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -18,7 +19,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
-import org.apache.commons.lang3.StringUtils;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
@@ -153,7 +153,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         return super.visitTypeAsClass(e, scanningContext);
     }
 
-
     @Override
     public Void visitExecutable(ExecutableElement e, ScanningContext scanningContext) {
         log.info("executable ->" + e.getSimpleName());
@@ -162,14 +161,19 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         // visibility of types in signature
         // TODO should go inside a computer
         if (!computeVisibility(e.getReturnType())) {
-            TypeElement visibleType = findSuperType(e.getReturnType());
+            TypeElement visibleType = findVisibleSuperType(e.getReturnType());
+            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
+        }
+        
+        if( methodInfo.isConstructor() ) {
+            TypeElement visibleType = findVisibleSuperType((TypeElement) e.getEnclosingElement());
             methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
         }
 
         for (int indexParam = 0; indexParam < e.getParameters().size(); indexParam++) {
             VariableElement param = e.getParameters().get(indexParam);
             if (!computeVisibility(param.asType())) {
-                TypeElement visibleType = findSuperType(param.asType());
+                TypeElement visibleType = findVisibleSuperType(param.asType());
                 FieldInfo fieldInfo = methodInfo.getParameterTypes().get(indexParam);
                 fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
             }
@@ -178,7 +182,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         for (int indexThrownTypes = 0; indexThrownTypes < e.getThrownTypes().size(); indexThrownTypes++) {
             TypeMirror typeMirrorOfException = e.getThrownTypes().get(indexThrownTypes);
             if (!computeVisibility(typeMirrorOfException)) {
-                TypeElement visibleType = findSuperType(typeMirrorOfException);
+                TypeElement visibleType = findVisibleSuperType(typeMirrorOfException);
                 String visibleTypeName = visibleType.getQualifiedName().toString();
                 methodInfo.getThrownTypeNames().set(indexThrownTypes, visibleTypeName);
             }
@@ -213,7 +217,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         // TODO should go inside a computer
         TypeMirror typeOfField = e.asType();
         if (!computeVisibility(typeOfField)) {
-            TypeElement visibleType = findSuperType(typeOfField);
+            TypeElement visibleType = findVisibleSuperType(typeOfField);
             fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
         }
         fieldInfo.setInheritanceLevel(scanningContext.getInheritanceLevel());
@@ -243,18 +247,18 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     }
 
     // TODO should go inside a computer
-    private TypeElement findSuperType(TypeMirror typeMirror) {
+    private TypeElement findVisibleSuperType(TypeMirror typeMirror) {
         if (typeMirror.getKind() == TypeKind.DECLARED) {
             DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
             TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
-            return findSuperType(typeElementOfTypeOfField);
+            return findVisibleSuperType(typeElementOfTypeOfField);
         } else {
             throw new RuntimeException("Type mirror " + typeMirror + " is not a class.");
         }
     }
 
     // TODO should go inside a computer
-    private TypeElement findSuperType(TypeElement e) {
+    private TypeElement findVisibleSuperType(TypeElement e) {
         TypeElement typeElement = e;
         while (!computeVisibility(typeElement)) {
             if (typeElement.asType().getKind() == TypeKind.DECLARED) {
@@ -310,21 +314,17 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         }
         boolean isPrivate = e.getModifiers().contains(Modifier.PRIVATE);
         boolean isProtectedOrPackage = !isPrivate;
-        String elementFQN = e.getQualifiedName().toString();
-        if (isProtectedOrPackage && isInBoundBoxPackage(elementFQN)) {
+        if (isProtectedOrPackage && isInBoundBoxPackage(outerTypeElement)) {
             return true;
         }
 
         return false;
     }
 
-    private boolean isInBoundBoxPackage(String elementFQN) {
-        String packageOfElement = "";
-        if (elementFQN.contains(".")) {
-            packageOfElement = StringUtils.substringBefore(elementFQN, ".");
-        }
+    private boolean isInBoundBoxPackage(Element e) {
+        PackageElement packageOfOuterElement = (PackageElement) e.getEnclosingElement();
+        String packageOfElement = packageOfOuterElement.getQualifiedName().toString();
         return packageOfElement.equals(boundBoxPackageName);
     }
-    
 
 }

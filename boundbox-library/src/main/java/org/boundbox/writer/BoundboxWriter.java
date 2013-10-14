@@ -383,7 +383,7 @@ public class BoundboxWriter {
     }
 
     private void createInnerClassAccessor(JavaWriter writer, InnerClassInfo innerClassInfo, MethodInfo methodInfo) throws IOException {
-        String returnType = "Object";
+        String returnType = methodInfo.getReturnTypeName();
         List<FieldInfo> parameterTypeList = methodInfo.getParameterTypes();
 
         List<String> parameters = createListOfParameterTypesAndNames(parameterTypeList);
@@ -422,7 +422,7 @@ public class BoundboxWriter {
         String parametersNamesCommaSeparated = createListOfParametersNamesCommaSeparated(parameterTypeList);
 
         String hiddenParameter = innerClassInfo.isStaticInnerClass() ? "" : "boundObject";
-        writer.emitStatement("return method.newInstance(%s)", makeParams(hiddenParameter,parametersNamesCommaSeparated));
+        writer.emitStatement("return (%s) method.newInstance(%s)", returnType, makeParams(hiddenParameter,parametersNamesCommaSeparated));
 
         writer.endControlFlow();
         addReflectionExceptionCatchClause(writer, IllegalAccessException.class);

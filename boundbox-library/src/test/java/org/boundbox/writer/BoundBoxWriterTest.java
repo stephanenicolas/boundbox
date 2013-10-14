@@ -890,11 +890,11 @@ public class BoundBoxWriterTest {
         List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
         listMethodInfos.add(MethodInfo);
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
-        InnerClassInfo.setStaticInnerClass(true);
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
         classInfo.setListFieldInfos(listFieldInfos);
         classInfo.setListMethodInfos(listMethodInfos);
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -932,15 +932,15 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
-        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "Object", new ArrayList<FieldInfo>(), null);
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
         listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
-        InnerClassInfo.setStaticInnerClass(true);
-        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -955,7 +955,6 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
-        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
@@ -975,22 +974,22 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
-        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "Object", new ArrayList<FieldInfo>(), null);
         listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
         FieldInfo paramInt = new FieldInfo("a", int.class.getName());
-        MethodInfo InnerClassConstructorInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        MethodInfo InnerClassConstructorInfo2 = new MethodInfo("<init>", "Object", Arrays.asList(paramInt), null);
         listInnerClassConstructorInfos.add(InnerClassConstructorInfo2);
 
         FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
-        MethodInfo InnerClassConstructorInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        MethodInfo InnerClassConstructorInfo3 = new MethodInfo("<init>", "Object", Arrays.asList(paramObject), null);
         listInnerClassConstructorInfos.add(InnerClassConstructorInfo3);
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
-        InnerClassInfo.setStaticInnerClass(true);
-        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1005,7 +1004,6 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
-        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
@@ -1031,7 +1029,7 @@ public class BoundBoxWriterTest {
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
         List<MethodInfo> listInnerClassConstructorInfos = new ArrayList<MethodInfo>();
-        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo InnerClassConstructorInfo = new MethodInfo("<init>", "Object", new ArrayList<FieldInfo>(), null);
         listInnerClassConstructorInfos.add(InnerClassConstructorInfo);
 
         List<FieldInfo> listInnerClassFieldInfos = new ArrayList<FieldInfo>();
@@ -1049,13 +1047,13 @@ public class BoundBoxWriterTest {
         MethodInfo InnerClassMethodInfo2 = new MethodInfo("bar", "void", Arrays.asList(InnerClassFieldInfo), null);
         listInnerClassMethodInfos.add(InnerClassMethodInfo2);
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
-        InnerClassInfo.setStaticInnerClass(true);
-        InnerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
-        InnerClassInfo.setListFieldInfos(listInnerClassFieldInfos);
-        InnerClassInfo.setListMethodInfos(listInnerClassMethodInfos);
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setListConstructorInfos(listInnerClassConstructorInfos);
+        innerClassInfo.setListFieldInfos(listInnerClassFieldInfos);
+        innerClassInfo.setListMethodInfos(listInnerClassMethodInfos);
 
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1070,7 +1068,6 @@ public class BoundBoxWriterTest {
         assertTrue(result);
 
         Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
-        ;
 
         Class<?> innerClass = clazz.getDeclaredClasses()[0];
         assertNotNull(innerClass);
@@ -1116,12 +1113,12 @@ public class BoundBoxWriterTest {
 
         ClassInfo classInfo = new ClassInfo(classUnderTestName);
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
-        InnerClassInfo.setStaticInnerClass(true);
-        InnerClassInfo.setInheritanceLevel(1);
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setInheritanceLevel(1);
         classInfo.setListFieldInfos(Collections.<FieldInfo>emptyList());
         classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
-        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(InnerClassInfo));
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
         classInfo.setListImports(new HashSet<String>());
 
         Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
@@ -1209,6 +1206,95 @@ public class BoundBoxWriterTest {
 
         Class<?> clazz = loadBoundBoxClass(boundBoxClassFQN);
         assertNotNull(clazz);
+    }
+    
+    // ----------------------------------
+    // INVISIBILITY
+    // ----------------------------------
+    
+    @Test
+    public void testProcess_class_with_invisible_inner_class_and_field_of_that_type() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithInvisibleInnerClassAndFieldOfThatType";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        classInfo.setListImports(new HashSet<String>());
+
+        InnerClassInfo innerClassInfo = new InnerClassInfo("B");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setInheritanceLevel(0);
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
+
+        FieldInfo fieldInfo = new FieldInfo("foo","Object");
+        classInfo.setListFieldInfos(Arrays.<FieldInfo>asList(fieldInfo));
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new HashSet<String>());
+        
+        String boundBoxClassFQN = writer.getNamingGenerator().createBoundBoxName(classInfo);
+        Writer out = createWriterInSandbox(boundBoxClassFQN);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(boundBoxClassFQN, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(boundBoxClassFQN);
+        assertNotNull(clazz);
+        
+        Method methodGetFoo = clazz.getMethod("boundBox_getFoo");
+        assertNotNull(methodGetFoo);
+        assertEquals(Object.class.getName(), methodGetFoo.getReturnType().getName());
+    }
+    
+    @Test
+    public void testProcess_class_with_package_invisible_inner_class_and_field_of_that_type() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithPackageInvisibleInnerClassAndFieldOfThatType";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+        classInfo.setListImports(new HashSet<String>());
+
+        InnerClassInfo innerClassInfo = new InnerClassInfo("B");
+        innerClassInfo.setStaticInnerClass(true);
+        innerClassInfo.setInheritanceLevel(0);
+        MethodInfo constructorOfB = new MethodInfo("<init>", "TestClassWithPackageInvisibleInnerClassAndFieldOfThatType.B", new ArrayList<FieldInfo>(), new ArrayList<String>());
+        innerClassInfo.setListConstructorInfos(Arrays.asList(constructorOfB));
+        
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
+
+        FieldInfo fieldInfo = new FieldInfo("foo","TestClassWithPackageInvisibleInnerClassAndFieldOfThatType.B");
+        classInfo.setListFieldInfos(Arrays.<FieldInfo>asList(fieldInfo));
+        classInfo.setListMethodInfos(Collections.<MethodInfo>emptyList());
+        classInfo.setListImports(new HashSet<String>());
+        
+        String boundBoxClassFQN = writer.getNamingGenerator().createBoundBoxName(classInfo);
+        Writer out = createWriterInSandbox(boundBoxClassFQN);
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(boundBoxClassFQN, neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(boundBoxClassFQN);
+        assertNotNull(clazz);
+        
+        Method methodGetFoo = clazz.getMethod("boundBox_getFoo");
+        assertNotNull(methodGetFoo);
+        assertEquals("TestClassWithPackageInvisibleInnerClassAndFieldOfThatType$B", methodGetFoo.getReturnType().getName());
+        
+        Method methodNewB = clazz.getMethod("boundBox_new_B");
+        assertNotNull(methodNewB);
+        assertEquals("TestClassWithPackageInvisibleInnerClassAndFieldOfThatType$B", methodNewB.getReturnType().getName());
     }
 
     // ----------------------------------

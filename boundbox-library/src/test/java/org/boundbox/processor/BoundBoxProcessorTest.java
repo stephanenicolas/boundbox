@@ -318,23 +318,23 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
 
-        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithManyConstructors", new ArrayList<FieldInfo>(), null);
         assertContains(listConstructorInfos, MethodInfo);
 
         FieldInfo paramInt = new FieldInfo("a", int.class.getName());
-        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt), null);
         assertContains(listConstructorInfos, MethodInfo2);
 
         FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
-        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramObject), null);
         assertContains(listConstructorInfos, MethodInfo3);
 
         FieldInfo paramObject2 = new FieldInfo("b", Object.class.getName());
-        MethodInfo MethodInfo4 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2), null);
+        MethodInfo MethodInfo4 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt, paramObject2), null);
         assertContains(listConstructorInfos, MethodInfo4);
 
         FieldInfo paramObject3 = new FieldInfo("c", Object.class.getName());
-        MethodInfo MethodInfo5 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        MethodInfo MethodInfo5 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listConstructorInfos, MethodInfo5);
 
     }
@@ -739,7 +739,7 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithConstructor.InnerClass", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo);
     }
 
@@ -768,15 +768,15 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo);
 
         FieldInfo paramInt = new FieldInfo("a", int.class.getName());
-        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", Arrays.asList(paramInt), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo2);
 
         FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
-        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", Arrays.asList(paramObject), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo3);
 
     }
@@ -1207,7 +1207,7 @@ public class BoundBoxProcessorTest {
     // ----------------------------------
 
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type() throws URISyntaxException {
+    public void testProcess_class_with_invisble_inner_class_and_field_of_that_type() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndFieldOfThatType.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1234,7 +1234,7 @@ public class BoundBoxProcessorTest {
     }
 
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_field_of_that_type2() throws URISyntaxException {
+    public void testProcess_class_with_invisble_inner_class_and_field_of_that_type2() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndFieldOfThatType2.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1262,7 +1262,7 @@ public class BoundBoxProcessorTest {
     }
 
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_method_returning_it() throws URISyntaxException {
+    public void testProcess_class_with_invisble_inner_class_and_method_returning_it() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodReturningIt.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1289,7 +1289,7 @@ public class BoundBoxProcessorTest {
     }
 
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_method_with_param_of_that_type() throws URISyntaxException {
+    public void testProcess_class_with_invisble_inner_class_and_method_with_param_of_that_type() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodWithParamOfThatType.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1316,7 +1316,7 @@ public class BoundBoxProcessorTest {
     }
 
     @Test
-    public void testProcess_class_with_inivisble_inner_class_and_method_with_exception_of_that_type() throws URISyntaxException {
+    public void testProcess_class_with_invisble_inner_class_and_method_with_exception_of_that_type() throws URISyntaxException {
         // given
         String[] testSourceFileNames = new String[] { "TestClassWithInvisibleInnerClassAndMethodWithExceptionOfThatType.java" };
         CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
@@ -1339,6 +1339,33 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
+    
+    @Test
+    public void testProcess_class_with_package_invisble_inner_class_and_field_of_that_type() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithPackageInvisibleInnerClassAndFieldOfThatType.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+        assertTrue(boundBoxProcessor.getListOfInvisibleTypes().isEmpty());
+
+        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
+        assertFalse(listFieldInfos.isEmpty());
+        FieldInfo fieldInfo = new FieldInfo("foo", "TestClassWithPackageInvisibleInnerClassAndFieldOfThatType.B");
+        assertContains(listFieldInfos, fieldInfo);
+        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
+        assertTrue(listMethodInfos.isEmpty());
+
+        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
+        assertFalse(listInnerClassInfos.isEmpty());
+    }
+    
 
     // ----------------------------------
     // PRIVATE METHODS
