@@ -7,6 +7,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -68,6 +70,9 @@ public class MethodInfo implements Inheritable {
             List<String> listThrownTypeNames) {
         this.methodName = methodName;
         this.returnTypeName = returnTypeName;
+        if( isConstructor() && (StringUtils.isEmpty(returnTypeName)||"void".equals(returnTypeName))) {
+            this.returnTypeName = Object.class.getName();
+        }
         this.parameterTypes = listParameters;
         this.thrownTypeNames = listThrownTypeNames;
     }

@@ -202,7 +202,7 @@ public class BoundBoxProcessorTest {
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         assertFalse(listFieldInfos.isEmpty());
         assertEquals(listFieldInfos.size(), 1); // only one field even if foo already exists in the
-                                                // class
+        // class
 
         FieldInfo FieldInfo = new FieldInfo("foo", "java.lang.String");
         assertContains(listFieldInfos, FieldInfo);
@@ -318,23 +318,23 @@ public class BoundBoxProcessorTest {
         List<MethodInfo> listConstructorInfos = classInfo.getListConstructorInfos();
         assertFalse(listConstructorInfos.isEmpty());
 
-        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithManyConstructors", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         assertContains(listConstructorInfos, MethodInfo);
 
         FieldInfo paramInt = new FieldInfo("a", int.class.getName());
-        MethodInfo MethodInfo2 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt), null);
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
         assertContains(listConstructorInfos, MethodInfo2);
 
         FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
-        MethodInfo MethodInfo3 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramObject), null);
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
         assertContains(listConstructorInfos, MethodInfo3);
 
         FieldInfo paramObject2 = new FieldInfo("b", Object.class.getName());
-        MethodInfo MethodInfo4 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt, paramObject2), null);
+        MethodInfo MethodInfo4 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2), null);
         assertContains(listConstructorInfos, MethodInfo4);
 
         FieldInfo paramObject3 = new FieldInfo("c", Object.class.getName());
-        MethodInfo MethodInfo5 = new MethodInfo("<init>", "TestClassWithManyConstructors", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
+        MethodInfo MethodInfo5 = new MethodInfo("<init>", "void", Arrays.asList(paramInt, paramObject2, paramObject3), Arrays.asList(IOException.class.getName(), RuntimeException.class.getName()));
         assertContains(listConstructorInfos, MethodInfo5);
 
     }
@@ -739,7 +739,7 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithConstructor.InnerClass", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo);
     }
 
@@ -768,15 +768,15 @@ public class BoundBoxProcessorTest {
         assertContains(listInnerClassInfos, InnerClassInfo);
 
         List<MethodInfo> listInnerClassConstructorInfos = classInfo.getListInnerClassInfo().get(0).getListConstructorInfos();
-        MethodInfo MethodInfo = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", new ArrayList<FieldInfo>(), null);
+        MethodInfo MethodInfo = new MethodInfo("<init>", "void", new ArrayList<FieldInfo>(), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo);
 
         FieldInfo paramInt = new FieldInfo("a", int.class.getName());
-        MethodInfo MethodInfo2 = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", Arrays.asList(paramInt), null);
+        MethodInfo MethodInfo2 = new MethodInfo("<init>", "void", Arrays.asList(paramInt), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo2);
 
         FieldInfo paramObject = new FieldInfo("a", Object.class.getName());
-        MethodInfo MethodInfo3 = new MethodInfo("<init>", "TestClassWithStaticInnerClassWithManyConstructors.InnerClass", Arrays.asList(paramObject), null);
+        MethodInfo MethodInfo3 = new MethodInfo("<init>", "void", Arrays.asList(paramObject), null);
         assertContains(listInnerClassConstructorInfos, MethodInfo3);
 
     }
@@ -1339,7 +1339,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
     @Test
     public void testProcess_class_with_package_invisble_inner_class_and_field_of_that_type() throws URISyntaxException {
         // given
@@ -1365,7 +1365,7 @@ public class BoundBoxProcessorTest {
         List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
         assertFalse(listInnerClassInfos.isEmpty());
     }
-    
+
 
     // ----------------------------------
     // PRIVATE METHODS
@@ -1416,7 +1416,11 @@ public class BoundBoxProcessorTest {
     private void assertContains(List<MethodInfo> listMethodInfos, MethodInfo MethodInfo) {
         MethodInfo methodInfo2 = retrieveMethodInfo(listMethodInfos, MethodInfo);
         assertNotNull(methodInfo2);
-        assertEquals(MethodInfo.getReturnTypeName(), methodInfo2.getReturnTypeName());
+        if( MethodInfo.isConstructor()) {
+            assertTrue(methodInfo2.isConstructor());
+        } else {
+            assertEquals(MethodInfo.getReturnTypeName(), methodInfo2.getReturnTypeName());
+        } 
         assertEquals(MethodInfo.getInheritanceLevel(), methodInfo2.getInheritanceLevel());
         assertEquals(MethodInfo.isStaticMethod(), methodInfo2.isStaticMethod());
 
