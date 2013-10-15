@@ -7,14 +7,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
-
 //CHECKSTYLE:OFF HideUtilityClassConstructorCheck
 @SuppressWarnings("PMD.UnusedPrivateField")
 @EqualsAndHashCode(callSuper=true,exclude={"effectiveInheritanceLevel","element"})
 @ToString(callSuper=true)
-public class InnerClassInfo extends ClassInfo implements Inheritable, Comparable<InnerClassInfo> {
+public class InnerClassInfo extends ClassInfo implements Inheritable {
 
     @Setter
     @Getter
@@ -48,13 +45,5 @@ public class InnerClassInfo extends ClassInfo implements Inheritable, Comparable
         this.effectiveInheritanceLevel = inheritanceLevel;
     }
     
-    @Override
-    public int compareTo(InnerClassInfo other) {
-        return new CompareToBuilder() 
-        .append(isStaticInnerClass(), other.isStaticInnerClass()) 
-        .append(className, other.className) 
-        .toComparison();
-    }
-
 }
 //CHECKSTYLE:ON 
