@@ -11,12 +11,23 @@ import javax.lang.model.util.Elements;
 
 import lombok.extern.java.Log;
 
+import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.model.InnerClassInfo;
 import org.boundbox.model.MethodInfo;
 
 @Log
 public class InheritanceComputer {
+    
+    public void computeInheritanceInInnerClasses(ClassInfo classInfo, Elements elements) {
+        for( InnerClassInfo innerClassInfo : classInfo.getListInnerClassInfo() ) {
+            computeInheritanceAndHidingFields(innerClassInfo.getListFieldInfos());
+            computeInheritanceAndOverridingMethods(innerClassInfo.getListMethodInfos(), innerClassInfo.getElement(), elements );
+            computeInheritanceAndHidingInnerClasses(innerClassInfo.getListInnerClassInfo());
+            computeInheritanceInInnerClasses( innerClassInfo, elements);
+        }
+    }
+    
     public void computeInheritanceAndHidingFields(List<FieldInfo> listFieldInfos) {
         // get min inheritance level of Field.
         Map<String, FieldInfo> mapFieldNameToMinFieldInfo = new HashMap<String, FieldInfo>();

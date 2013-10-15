@@ -1100,6 +1100,57 @@ public class BoundBoxWriterTest {
         Method innerClassMethod2 = innerClass.getDeclaredMethod("bar", int.class);
         assertNotNull(innerClassMethod2);
     }
+    
+    //issue #18
+    @Test
+    public void testProcess_class_with_non_static_inner_class_inheriting_static_inner_class() throws Exception {
+        // given
+        String classUnderTestName = "TestClassWithNonStaticInnerClassInheritingStaticInnerClass";
+        List<String> neededClasses = new ArrayList<String>();
+
+        ClassInfo classInfo = new ClassInfo(classUnderTestName);
+
+        FieldInfo FieldInfo = new FieldInfo("a", "int");
+        List<FieldInfo> listFieldInfos = new ArrayList<FieldInfo>();
+        listFieldInfos.add(FieldInfo);
+
+        MethodInfo MethodInfo = new MethodInfo("foo", "void", new ArrayList<FieldInfo>(), null);
+        List<MethodInfo> listMethodInfos = new ArrayList<MethodInfo>();
+        listMethodInfos.add(MethodInfo);
+
+        InnerClassInfo innerClassInfo = new InnerClassInfo("InnerClass");
+        innerClassInfo.setStaticInnerClass(true);
+        classInfo.setListFieldInfos(listFieldInfos);
+        classInfo.setListMethodInfos(listMethodInfos);
+        classInfo.setListInnerClassInfo(Arrays.<InnerClassInfo>asList(innerClassInfo));
+        classInfo.setListImports(new HashSet<String>());
+
+        Writer out = createWriterInSandbox(writer.getNamingGenerator().createBoundBoxName(classInfo));
+
+        // when
+        writer.writeBoundBox(classInfo, out);
+        closeSandboxWriter();
+
+        // then
+        CompilationTask task = createCompileTask(writer.getNamingGenerator().createBoundBoxName(classInfo), neededClasses);
+        boolean result = task.call();
+        assertTrue(result);
+
+        Class<?> clazz = loadBoundBoxClass(writer.getNamingGenerator().createBoundBoxName(classInfo));
+        ;
+        Method method = clazz.getDeclaredMethod("boundBox_getA");
+        assertNotNull(method);
+        Method method2 = clazz.getDeclaredMethod("boundBox_setA", int.class);
+        assertNotNull(method2);
+
+        Method method3 = clazz.getDeclaredMethod("foo");
+        assertNotNull(method3);
+
+        Class<?> class1 = clazz.getDeclaredClasses()[0];
+        assertNotNull(class1);
+
+        assertEquals("BoundBoxOfInnerClass", class1.getSimpleName());
+    }
 
     // ----------------------------------
     // INNER CLASSES

@@ -181,11 +181,11 @@ public class BoundBoxProcessor extends AbstractProcessor {
             listClassInfo.add(classInfo);
 
             // perform some computations on meta model
-            //TODO shouldn't we do this in inner classes as well ?
             inheritanceComputer.computeInheritanceAndHidingFields(classInfo.getListFieldInfos());
             inheritanceComputer.computeInheritanceAndOverridingMethods(classInfo.getListMethodInfos(), boundClass, elements);
             inheritanceComputer.computeInheritanceAndHidingInnerClasses(classInfo.getListInnerClassInfo());
-
+            inheritanceComputer.computeInheritanceInInnerClasses(classInfo, elements);
+            
             // write meta model to java class file
             Writer sourceWriter = null;
             try {

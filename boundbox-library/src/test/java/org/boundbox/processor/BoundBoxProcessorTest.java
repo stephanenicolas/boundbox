@@ -969,6 +969,7 @@ public class BoundBoxProcessorTest {
 
         List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
         assertTrue(listMethodInfos.isEmpty());
+        
         List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
         FieldInfo FieldInfo = new FieldInfo("foo", int.class.getSimpleName());
         FieldInfo.setStaticField(false);
@@ -1164,19 +1165,13 @@ public class BoundBoxProcessorTest {
         assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
         ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
 
-        List<MethodInfo> listMethodInfos = classInfo.getListMethodInfos();
-        assertTrue(listMethodInfos.isEmpty());
-        List<FieldInfo> listFieldInfos = classInfo.getListFieldInfos();
-        assertTrue(listFieldInfos.isEmpty());
+        List<FieldInfo> listFieldInfos = classInfo.getListInnerClassInfo().get(0).getListFieldInfos();
 
-        InnerClassInfo InnerClassInfo = new InnerClassInfo("InnerClass");
         FieldInfo FieldInfoFoo = new FieldInfo("foo", int.class.getName());
-        FieldInfoFoo.setStaticField(true);
+        FieldInfoFoo.setStaticField(false);
         FieldInfoFoo.setInheritanceLevel(1);
-        FieldInfoFoo.setEffectiveInheritanceLevel(1);
-        InnerClassInfo.getListFieldInfos().add(FieldInfoFoo);
-        List<InnerClassInfo> listInnerClassInfos = classInfo.getListInnerClassInfo();
-        assertContains(listInnerClassInfos.get(0).getListFieldInfos(), FieldInfoFoo);
+        FieldInfoFoo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfoFoo);
     }
 
     @Test

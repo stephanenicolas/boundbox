@@ -69,4 +69,17 @@ public class InnerClassTest {
         assertNotNull( boundBoxOfInnerClass );
     }
     
+    //TDD for issue #18
+    @BoundBox(boundClass = NonStaticInnerClassInheritsStaticInnerClassTestClass.class)
+    @Test
+    public void test_access_non_static_inner_class_inheriting_static_inner_class() {
+        NonStaticInnerClassInheritsStaticInnerClassTestClass instanceOfOuterClass = new NonStaticInnerClassInheritsStaticInnerClassTestClass();
+        BoundBoxOfNonStaticInnerClassInheritsStaticInnerClassTestClass boundBoxOfOuterClass = new BoundBoxOfNonStaticInnerClassInheritsStaticInnerClassTestClass(instanceOfOuterClass);
+        
+        NonStaticInnerClassInheritsStaticInnerClassTestClass.InnerClass instanceOfInnerClass = instanceOfOuterClass.new InnerClass();
+        BoundBoxOfNonStaticInnerClassInheritsStaticInnerClassTestClass.BoundBoxOfInnerClass boundBoxOfInnerClass = boundBoxOfOuterClass.new BoundBoxOfInnerClass(instanceOfInnerClass);
+        assertNotNull(boundBoxOfInnerClass);
+        assertEquals(2, boundBoxOfInnerClass.boundBox_getFoo());
+    }
+    
 }

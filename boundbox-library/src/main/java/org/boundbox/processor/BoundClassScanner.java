@@ -86,16 +86,19 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         log.info("nested ->" + isInnerClass);
 
         boolean isStaticElement = e.getModifiers().contains(Modifier.STATIC);
-        scanningContext.setStatic((!isInnerClass || isStaticElement) && scanningContext.isStatic());
+        if( !scanningContext.isInsideSuperElements()) {
+            scanningContext.setStatic((!isInnerClass || isStaticElement) && scanningContext.isStatic());
+        } else {
+            scanningContext.setStatic( isStaticElement && scanningContext.isStatic());
+        }
 
         // boundboxes around inner classes should not be considered as inner classes
         // but otherwise, if we are an inner class
         if (isInnerClass && !isBoundClass) {
             ClassInfo classInfo = scanningContext.getCurrentClassInfo();
             int inheritanceLevel = scanningContext.getInheritanceLevel();
-            InnerClassInfo innerClassInfo = new InnerClassInfo(e.getSimpleName().toString());
+            InnerClassInfo innerClassInfo = new InnerClassInfo(e);
             innerClassInfo.setStaticInnerClass(e.getModifiers().contains(Modifier.STATIC));
-            innerClassInfo.getListSuperClassNames().add(e.toString());
             innerClassInfo.setInheritanceLevel(inheritanceLevel);
 
             // Current element is an inner class and we are currently scanning elements of someone
@@ -109,14 +112,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             // but outside, we do, to scan the inner class itself.
             if (!scanningContext.isInsideSuperElements()) {
                 ScanningContext newScanningContext = new ScanningContext(innerClassInfo);
-                newScanningContext.setInheritanceLevel(inheritanceLevel);
+                newScanningContext.setInheritanceLevel(0);
+                newScanningContext.setStatic(isStaticElement && scanningContext.isStatic());
                 scanningContext = newScanningContext;
             }
         }
 
         addTypeToImport(scanningContext.getCurrentClassInfo(), e.asType());
 
-        log.info("super class ->" + e.getSuperclass().toString());
+        log.info("super class -> " +e.toString() +"-->"+ e.getSuperclass().toString());
         TypeMirror superclassOfBoundClass = e.getSuperclass();
         boolean hasValidSuperClass = !maxSuperClassName.equals(superclassOfBoundClass.toString()) && !Object.class.getName().equals(superclassOfBoundClass.toString())
                 && superclassOfBoundClass.getKind() == TypeKind.DECLARED;
@@ -224,7 +228,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC) && scanningContext.isStatic());
         fieldInfo.setFinalField(e.getModifiers().contains(Modifier.FINAL));
         scanningContext.getCurrentClassInfo().getListFieldInfos().add(fieldInfo);
-        log.info("field ->" + fieldInfo.getFieldName() + " added.");
+        log.info("field ->" + fieldInfo.getFieldName() + " added. Static = " + fieldInfo.isStaticField());
 
         addTypeToImport(scanningContext.getCurrentClassInfo(), e.asType());
 

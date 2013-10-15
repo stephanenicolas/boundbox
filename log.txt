@@ -1,0 +1,211 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.boundbox:boundbox-sample-integration-tests:jar:1.1.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 78, column 12
+[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ line 60, column 12
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.boundbox:boundbox-sample:jar:1.1.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 77, column 12
+[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ line 59, column 12
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.boundbox:boundbox-android-sample:apk:1.1.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 63, column 12
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.boundbox:boundbox-android-sample-tests:apk:1.1.1-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 94, column 12
+[WARNING] 'build.plugins.plugin.version' for org.codehaus.mojo:build-helper-maven-plugin is missing. @ line 76, column 12
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] boundbox-parent
+[INFO] boundbox-library
+[INFO] BoundBox Library Integration tests
+[INFO] BoundBox Sample
+[INFO] boundbox-android-sample
+[INFO] boundbox-android-sample-tests
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building boundbox-parent 1.1.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ boundbox-parent ---
+[INFO] Deleting /Users/stephanenicolas/git/boundbox/target
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ boundbox-parent ---
+[INFO] 
+[INFO] --- maven-checkstyle-plugin:2.9.1:check (checkstyle-check) @ boundbox-parent ---
+[INFO] 
+[INFO] 
+[INFO] >>> findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-parent >>>
+[INFO] 
+[INFO] --- findbugs-maven-plugin:2.5.2:findbugs (findbugs) @ boundbox-parent ---
+[INFO] 
+[INFO] <<< findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-parent <<<
+[INFO] 
+[INFO] --- findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-parent ---
+[INFO] 
+[INFO] >>> maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-parent >>>
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:pmd (pmd) @ boundbox-parent ---
+[INFO] 
+[INFO] <<< maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-parent <<<
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-parent ---
+[INFO] 
+[INFO] >>> maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-parent >>>
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:cpd (cpd) @ boundbox-parent ---
+[INFO] 
+[INFO] <<< maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-parent <<<
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-parent ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ boundbox-parent ---
+[INFO] Installing /Users/stephanenicolas/git/boundbox/pom.xml to /Users/stephanenicolas/.m2/repository/org/boundbox/boundbox-parent/1.1.1-SNAPSHOT/boundbox-parent-1.1.1-SNAPSHOT.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building boundbox-library 1.1.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ boundbox-library ---
+[INFO] Deleting /Users/stephanenicolas/git/boundbox/boundbox-library/target
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ boundbox-library ---
+[INFO] 
+[INFO] --- maven-checkstyle-plugin:2.9.1:check (checkstyle-check) @ boundbox-library ---
+[INFO] 
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ boundbox-library ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.5.1:compile (default-compile) @ boundbox-library ---
+[INFO] Compiling 15 source files to /Users/stephanenicolas/git/boundbox/boundbox-library/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ boundbox-library ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 45 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.5.1:testCompile (default-testCompile) @ boundbox-library ---
+[INFO] Compiling 5 source files to /Users/stephanenicolas/git/boundbox/boundbox-library/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.7.2:test (default-test) @ boundbox-library ---
+[INFO] Surefire report directory: /Users/stephanenicolas/git/boundbox/boundbox-library/target/surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+There are no tests to run.
+
+Results :
+
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ boundbox-library ---
+[INFO] Building jar: /Users/stephanenicolas/git/boundbox/boundbox-library/target/boundbox-library-1.1.1-SNAPSHOT.jar
+[INFO] 
+[INFO] >>> findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-library >>>
+[INFO] 
+[INFO] --- findbugs-maven-plugin:2.5.2:findbugs (findbugs) @ boundbox-library ---
+[INFO] Fork Value is true
+[INFO] Done FindBugs Analysis....
+[INFO] 
+[INFO] <<< findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-library <<<
+[INFO] 
+[INFO] --- findbugs-maven-plugin:2.5.2:check (findbugs-check) @ boundbox-library ---
+[INFO] BugInstance size is 0
+[INFO] Error size is 0
+[INFO] No errors/warnings found
+[INFO] 
+[INFO] >>> maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-library >>>
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:pmd (pmd) @ boundbox-library ---
+[WARNING] Unable to locate Source XRef to link to - DISABLED
+[INFO] 
+[INFO] <<< maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-library <<<
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:check (pmd-check) @ boundbox-library ---
+[INFO] 
+[INFO] 
+[INFO] >>> maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-library >>>
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:cpd (cpd) @ boundbox-library ---
+[WARNING] Unable to locate Source XRef to link to - DISABLED
+[INFO] 
+[INFO] <<< maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-library <<<
+[INFO] 
+[INFO] --- maven-pmd-plugin:2.7.1:cpd-check (pmd-check) @ boundbox-library ---
+[INFO] 
+[INFO] 
+[INFO] --- maven-install-plugin:2.3.1:install (default-install) @ boundbox-library ---
+[INFO] Installing /Users/stephanenicolas/git/boundbox/boundbox-library/target/boundbox-library-1.1.1-SNAPSHOT.jar to /Users/stephanenicolas/.m2/repository/org/boundbox/boundbox-library/1.1.1-SNAPSHOT/boundbox-library-1.1.1-SNAPSHOT.jar
+[INFO] Installing /Users/stephanenicolas/git/boundbox/boundbox-library/pom.xml to /Users/stephanenicolas/.m2/repository/org/boundbox/boundbox-library/1.1.1-SNAPSHOT/boundbox-library-1.1.1-SNAPSHOT.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building BoundBox Library Integration tests 1.1.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ boundbox-sample-integration-tests ---
+[INFO] Deleting /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/target
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ boundbox-sample-integration-tests ---
+[INFO] 
+[INFO] --- build-helper-maven-plugin:1.8:add-source (add-source) @ boundbox-sample-integration-tests ---
+[INFO] Source directory: /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/target/generated-sources/annotations added.
+[INFO] 
+[INFO] --- maven-checkstyle-plugin:2.9.1:check (checkstyle-check) @ boundbox-sample-integration-tests ---
+[INFO] 
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ boundbox-sample-integration-tests ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ boundbox-sample-integration-tests ---
+[INFO] Compiling 23 source files to /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ boundbox-sample-integration-tests ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ boundbox-sample-integration-tests ---
+[INFO] Compiling 13 source files to /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/target/test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/src/test/java/org/boundbox/sample/InnerClassTest.java:[82,44] error: cannot find symbol
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] boundbox-parent ................................... SUCCESS [2.563s]
+[INFO] boundbox-library .................................. SUCCESS [17.808s]
+[INFO] BoundBox Library Integration tests ................ FAILURE [2.012s]
+[INFO] BoundBox Sample ................................... SKIPPED
+[INFO] boundbox-android-sample ........................... SKIPPED
+[INFO] boundbox-android-sample-tests ..................... SKIPPED
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 23.976s
+[INFO] Finished at: Tue Oct 15 11:08:42 CEST 2013
+[INFO] Final Memory: 44M/426M
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile (default-testCompile) on project boundbox-sample-integration-tests: Compilation failure
+[ERROR] /Users/stephanenicolas/git/boundbox/boundbox-library-integration-tests/src/test/java/org/boundbox/sample/InnerClassTest.java:[82,44] error: cannot find symbol
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <goals> -rf :boundbox-sample-integration-tests
