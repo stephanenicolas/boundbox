@@ -11,5 +11,4 @@ public class NonStaticInnerClassInheritsStaticInnerClassTestClass {
 
     public class InnerClass extends StaticInnerClass {
     };
-
 }
