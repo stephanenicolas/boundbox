@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -38,10 +36,10 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     private String maxSuperClassName = Object.class.getName();
     private ClassInfo initialclassInfo;
     private List<String> visitiedTypes = new ArrayList<String>();
-    @Setter
-    private String boundBoxPackageName;
     @Getter
     private List<String> listOfInvisibleTypes = new ArrayList<String>();
+    
+    private VisbilityComputer visbilityComputer = new VisbilityComputer();
 
     public ClassInfo scan(TypeElement boundClass) {
         visitiedTypes.clear();
@@ -53,14 +51,15 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         maxSuperClassName = Object.class.getName();
         return initialclassInfo;
     }
+    
+    public void setBoundBoxPackageName(String boundBoxPackageName) {
+        this.visbilityComputer.setBoundBoxPackageName(boundBoxPackageName);
+    }
 
     public void setMaxSuperClass(Class<?> maxSuperClass) {
         this.maxSuperClassName = maxSuperClass.getName();
     }
 
-    // TODO create visitor methods visitTypeAsInnerClass and visitTypeAsSuperClass
-    // it will make things more clear. Processing is a in a fuzzy state right now, but I believe
-    // most bricks are in place.
     @Override
     public Void visitTypeAsClass(TypeElement e, ScanningContext scanningContext) {
         boolean isBoundClass = e.getQualifiedName().toString().equals(initialclassInfo.getClassName());
@@ -74,11 +73,9 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             log.info("dropping visitied class ->" + e.getSimpleName());
             return null;
         }
-
         visitiedTypes.add(e.toString());
-        if (!computeVisibility(e)) {
-            listOfInvisibleTypes.add(e.getQualifiedName().toString());
-        }
+        
+        doCheckVisibilityOfType(e);
 
         log.info("class ->" + e.getSimpleName());
 
@@ -162,35 +159,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         log.info("executable ->" + e.getSimpleName());
         MethodInfo methodInfo = new MethodInfo(e);
 
-        // visibility of types in signature
-        // TODO should go inside a computer
-        if (!computeVisibility(e.getReturnType())) {
-            TypeElement visibleType = findVisibleSuperType(e.getReturnType());
-            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
-        }
-        
-        if( methodInfo.isConstructor() ) {
-            TypeElement visibleType = findVisibleSuperType((TypeElement) e.getEnclosingElement());
-            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
-        }
-
-        for (int indexParam = 0; indexParam < e.getParameters().size(); indexParam++) {
-            VariableElement param = e.getParameters().get(indexParam);
-            if (!computeVisibility(param.asType())) {
-                TypeElement visibleType = findVisibleSuperType(param.asType());
-                FieldInfo fieldInfo = methodInfo.getParameterTypes().get(indexParam);
-                fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
-            }
-        }
-
-        for (int indexThrownTypes = 0; indexThrownTypes < e.getThrownTypes().size(); indexThrownTypes++) {
-            TypeMirror typeMirrorOfException = e.getThrownTypes().get(indexThrownTypes);
-            if (!computeVisibility(typeMirrorOfException)) {
-                TypeElement visibleType = findVisibleSuperType(typeMirrorOfException);
-                String visibleTypeName = visibleType.getQualifiedName().toString();
-                methodInfo.getThrownTypeNames().set(indexThrownTypes, visibleTypeName);
-            }
-        }
+        doCheckVisibilityOfTypesInSignature(e, methodInfo);
 
         // other properties
         if (methodInfo.isConstructor()) {
@@ -217,13 +186,7 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
     @Override
     public Void visitVariableAsField(VariableElement e, ScanningContext scanningContext) {
         FieldInfo fieldInfo = new FieldInfo(e);
-
-        // TODO should go inside a computer
-        TypeMirror typeOfField = e.asType();
-        if (!computeVisibility(typeOfField)) {
-            TypeElement visibleType = findVisibleSuperType(typeOfField);
-            fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
-        }
+        doCheckVisibilityOfField(e, fieldInfo);
         fieldInfo.setInheritanceLevel(scanningContext.getInheritanceLevel());
         fieldInfo.setStaticField(e.getModifiers().contains(Modifier.STATIC) && scanningContext.isStatic());
         fieldInfo.setFinalField(e.getModifiers().contains(Modifier.FINAL));
@@ -250,85 +213,48 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
         }
     }
 
-    // TODO should go inside a computer
-    private TypeElement findVisibleSuperType(TypeMirror typeMirror) {
-        if (typeMirror.getKind() == TypeKind.DECLARED) {
-            DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
-            TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
-            return findVisibleSuperType(typeElementOfTypeOfField);
-        } else {
-            throw new RuntimeException("Type mirror " + typeMirror + " is not a class.");
+    private void doCheckVisibilityOfType(TypeElement e) {
+        if (!visbilityComputer.computeVisibility(e)) {
+            listOfInvisibleTypes.add(e.getQualifiedName().toString());
         }
     }
-
-    // TODO should go inside a computer
-    private TypeElement findVisibleSuperType(TypeElement e) {
-        TypeElement typeElement = e;
-        while (!computeVisibility(typeElement)) {
-            if (typeElement.asType().getKind() == TypeKind.DECLARED) {
-                TypeMirror typeMirrorOfSuperClass = typeElement.getSuperclass();
-                if (typeMirrorOfSuperClass.getKind() == TypeKind.DECLARED) {
-                    typeElement = (TypeElement) ((DeclaredType) typeMirrorOfSuperClass).asElement();
-                } else {
-                    throw new RuntimeException();
-                }
-            } else {
-                throw new RuntimeException();
-            }
+    
+    private void doCheckVisibilityOfTypesInSignature(ExecutableElement e, MethodInfo methodInfo) {
+        if (!visbilityComputer.computeVisibility(e.getReturnType())) {
+            TypeElement visibleType = visbilityComputer.findVisibleSuperType(e.getReturnType());
+            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
         }
-        return typeElement;
-    }
-
-    // TODO should go inside a computer
-    private boolean computeVisibility(TypeMirror typeMirror) {
-        if (typeMirror.getKind() == TypeKind.DECLARED) {
-            DeclaredType declaredTypeOfField = (DeclaredType) typeMirror;
-            TypeElement typeElementOfTypeOfField = (TypeElement) declaredTypeOfField.asElement();
-            return computeVisibility(typeElementOfTypeOfField);
-        } else {
-            return true;
+        
+        if( methodInfo.isConstructor() ) {
+            TypeElement visibleType = visbilityComputer.findVisibleSuperType((TypeElement) e.getEnclosingElement());
+            methodInfo.setReturnTypeName(visibleType.getQualifiedName().toString());
         }
-    }
 
-    // TODO should go inside a computer
-    private boolean computeVisibility(TypeElement e) {
-
-        // for nested classes, all outer classes must be visible too
-        TypeMirror outerType = e.asType();
-        TypeElement outerTypeElement = e;
-        while (outerTypeElement.getNestingKind().isNested()) {
-            if (outerTypeElement.getEnclosingElement().getKind() == ElementKind.CLASS || outerTypeElement.getEnclosingElement().getKind() == ElementKind.INTERFACE) {
-                outerType = outerTypeElement.getEnclosingElement().asType();
-                if (outerType.getKind() == TypeKind.DECLARED) {
-                    outerTypeElement = (TypeElement) ((DeclaredType) outerType).asElement();
-                    if (!computeVisibility(outerTypeElement)) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
+        for (int indexParam = 0; indexParam < e.getParameters().size(); indexParam++) {
+            VariableElement param = e.getParameters().get(indexParam);
+            if (!visbilityComputer.computeVisibility(param.asType())) {
+                TypeElement visibleType = visbilityComputer.findVisibleSuperType(param.asType());
+                FieldInfo fieldInfo = methodInfo.getParameterTypes().get(indexParam);
+                fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
             }
         }
 
-        boolean isPublic = e.getModifiers().contains(Modifier.PUBLIC);
-        if (isPublic) {
-            return true;
+        for (int indexThrownTypes = 0; indexThrownTypes < e.getThrownTypes().size(); indexThrownTypes++) {
+            TypeMirror typeMirrorOfException = e.getThrownTypes().get(indexThrownTypes);
+            if (!visbilityComputer.computeVisibility(typeMirrorOfException)) {
+                TypeElement visibleType = visbilityComputer.findVisibleSuperType(typeMirrorOfException);
+                String visibleTypeName = visibleType.getQualifiedName().toString();
+                methodInfo.getThrownTypeNames().set(indexThrownTypes, visibleTypeName);
+            }
         }
-        boolean isPrivate = e.getModifiers().contains(Modifier.PRIVATE);
-        boolean isProtectedOrPackage = !isPrivate;
-        if (isProtectedOrPackage && isInBoundBoxPackage(outerTypeElement)) {
-            return true;
-        }
-
-        return false;
     }
-
-    private boolean isInBoundBoxPackage(Element e) {
-        PackageElement packageOfOuterElement = (PackageElement) e.getEnclosingElement();
-        String packageOfElement = packageOfOuterElement.getQualifiedName().toString();
-        return packageOfElement.equals(boundBoxPackageName);
+    
+    private void doCheckVisibilityOfField(VariableElement e, FieldInfo fieldInfo) {
+        TypeMirror typeOfField = e.asType();
+        if (!visbilityComputer.computeVisibility(typeOfField)) {
+            TypeElement visibleType = visbilityComputer.findVisibleSuperType(typeOfField);
+            fieldInfo.setFieldTypeName(visibleType.getQualifiedName().toString());
+        }
     }
 
 }

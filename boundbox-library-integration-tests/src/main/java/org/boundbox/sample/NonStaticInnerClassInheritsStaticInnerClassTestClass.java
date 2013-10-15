@@ -4,7 +4,8 @@ package org.boundbox.sample;
 @SuppressWarnings("unused")
 //TDD for issue #18
 public class NonStaticInnerClassInheritsStaticInnerClassTestClass {
-    //this test is order dependent, that's a fail. TODO FIXME
+    //this test is order dependent, that's a fail. 
+    //there is absolutely nothing that we can do to prevent this.
     private static class StaticInnerClass {
         private static int foo = 2;
     }
