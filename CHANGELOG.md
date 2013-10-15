@@ -1,15 +1,14 @@
 ## Release 1.2.0 (Planned October 27th 2013)
 * TODO Create ubber jar for easier deployment in IDE's. https://github.com/stephanenicolas/boundbox/issues/17
-* TODO remove m prefix in BoundBox class. https://github.com/stephanenicolas/boundbox/issues/14
-* TODO Make the name and package of the BoundBox generated class customizable. https://github.com/stephanenicolas/boundbox/issues/8
-* We now know why we won't support instance and static initializers. https://github.com/stephanenicolas/boundbox/issues/13
 
-## Release 1.1.1 (Planned October 10th 2013)
-* TODO Replace all unvisible types by Object. https://github.com/stephanenicolas/boundbox/issues/15
+## Release 1.1.1 (October 15th 2013)
+* Replace all unvisible types by Object. https://github.com/stephanenicolas/boundbox/issues/15
 * Final fields are not handled correctly. https://github.com/stephanenicolas/boundbox/issues/10
 * Add support for inner classes. https://github.com/stephanenicolas/boundbox/issues/6
-* Increased test coverage up to 94%
 * Thanks to Philippe Prados for an example with static inner class extending static non inner class
+* Make the name and package of the BoundBox generated class customizable. https://github.com/stephanenicolas/boundbox/issues/8
+* We now know why we won't support instance and static initializers. https://github.com/stephanenicolas/boundbox/issues/13
+* Increased test coverage up to 95%
 
 ## Release 1.1.0 (September 27th 2013)
 * Flavien Laurent joined the team of BoundBox !
