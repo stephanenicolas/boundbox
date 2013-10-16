@@ -22,6 +22,7 @@
 		<!-- Plugins -->
 		<maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
 		<android-maven-plugin.version>3.6.1</android-maven-plugin.version>
+		<maven-deploy-plugin>2.7</maven-deploy-plugin>
 	</properties>
 
 	<dependencies>
@@ -31,11 +32,6 @@
 			<version>${android.platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.boundbox</groupId>
-			<artifactId>boundbox-library</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -43,7 +39,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
+				<version>${maven-deploy-plugin}</version>
 				<configuration>
 					<skip>true</skip>
 				</configuration>
