@@ -1173,6 +1173,30 @@ public class BoundBoxProcessorTest {
         FieldInfoFoo.setEffectiveInheritanceLevel(0);
         assertContains(listFieldInfos, FieldInfoFoo);
     }
+    
+    @Test
+    public void testProcess_class_with_non_static_inner_class_inheriting_fields_from_a_static_inner_class_in_same_outer_class() throws URISyntaxException {
+        // given
+        String[] testSourceFileNames = new String[] { "TestClassWithNonStaticInnerClassInheritingStaticInnerClassInSameOuterClass.java" };
+        CompilationTask task = processAnnotations(testSourceFileNames, boundBoxProcessor);
+
+        // when
+        // Perform the compilation task.
+        task.call();
+
+        // then
+        assertFalse(boundBoxProcessor.getListClassInfo().isEmpty());
+        ClassInfo classInfo = boundBoxProcessor.getListClassInfo().get(0);
+
+        List<FieldInfo> listFieldInfos = classInfo.getListInnerClassInfo().get(1).getListFieldInfos();
+
+        FieldInfo FieldInfoFoo = new FieldInfo("foo", int.class.getName());
+        FieldInfoFoo.setStaticField(false);
+        FieldInfoFoo.setInheritanceLevel(1);
+        FieldInfoFoo.setEffectiveInheritanceLevel(0);
+        assertContains(listFieldInfos, FieldInfoFoo);
+    }
+    
 
     @Test
     public void testProcess_class_with_composition_of_static_inner_class() throws URISyntaxException {

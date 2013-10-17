@@ -1,16 +1,12 @@
 import org.boundbox.BoundBox;
 
-//Thanks to Philippe Prados for this nasty example
-@BoundBox(boundClass = TestClassIsNonStaticInnerClassThatExtendsStaticInnerClass.StaticInner.class)
-@SuppressWarnings("unused")
+//TDD for issue #18
+@BoundBox(boundClass = TestClassIsNonStaticInnerClassThatExtendsStaticInnerClass.InnerClass.class)
 public class TestClassIsNonStaticInnerClassThatExtendsStaticInnerClass {
-    public class InnerClass {
-        private int foo = 2;
+    public class InnerClass extends StaticInner {
     }
 
-    public static class StaticInner extends InnerClass {
-        public StaticInner(TestClassIsNonStaticInnerClassThatExtendsStaticInnerClass obj) {
-            obj.super();
-        }
+    public static class StaticInner {
+        public static int foo = 2;
     }
 }

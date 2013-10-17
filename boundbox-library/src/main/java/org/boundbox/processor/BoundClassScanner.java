@@ -69,10 +69,6 @@ public class BoundClassScanner extends ElementKindVisitor6<Void, ScanningContext
             return null;
         }
 
-        if (visitiedTypes.contains(e.toString())) {
-            log.info("dropping visitied class ->" + e.getSimpleName());
-            return null;
-        }
         visitiedTypes.add(e.toString());
         
         doCheckVisibilityOfType(e);
