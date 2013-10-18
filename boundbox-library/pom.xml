@@ -22,6 +22,9 @@
 		<maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
 		<jacoco-maven-plugin.version>0.6.3.201306030806</jacoco-maven-plugin.version>
 		<maven-shade-plugin.version>2.1</maven-shade-plugin.version>
+
+		<!-- feature flipping -->
+		<log.level>Level.ALL</log.level>
 	</properties>
 
 	<dependencies>
@@ -73,6 +76,26 @@
 						<annotationProcessor>lombok.core.AnnotationProcessor</annotationProcessor>
 					</annotationProcessors>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>templating-maven-plugin</artifactId>
+				<version>1.0-alpha-3</version>
+				<executions>
+					<execution>
+						<id>filter-src</id>
+						<goals>
+							<goal>filter-sources</goal>
+						</goals>
+						<configuration>
+							<!-- Note the two following parameters are the default one. These 
+								are specified here just as a reminder. But as the Maven philosophy is strongly 
+								about conventions, it's better to just not specify them. -->
+							<sourceDirectory>${basedir}/src/main/java-templates</sourceDirectory>
+							<outputDirectory>${project.build.directory}/generated-sources/java-templates</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- Uber jar -->
 			<plugin>
@@ -131,9 +154,52 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											templating-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.0-alpha-3,)
+										</versionRange>
+										<goals>
+											<goal>filter-sources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
+		<profile>
+			<id>release</id>
+			<properties>
+				<log.level>Level.OFF</log.level>
+			</properties>
+		</profile>
+
 		<profile>
 			<id>coveralls</id>
 			<activation>

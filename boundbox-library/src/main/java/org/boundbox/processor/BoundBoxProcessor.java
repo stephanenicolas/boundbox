@@ -52,6 +52,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.boundbox.BoundBox;
+import org.boundbox.feature.FeatureFlip;
 import org.boundbox.model.ClassInfo;
 import org.boundbox.model.FieldInfo;
 import org.boundbox.writer.BoundboxWriter;
@@ -88,9 +89,12 @@ public class BoundBoxProcessor extends AbstractProcessor {
     @Getter
     private List<ClassInfo> listClassInfo = new ArrayList<ClassInfo>();
 
+    static {
+        log.getParent().setLevel(FeatureFlip.LOG_LEVEL);
+    }
+    
     @Override
     public void init(ProcessingEnvironment env) {
-        log.getParent().setLevel(Level.OFF);
         filer = env.getFiler();
         messager = env.getMessager();
         elements = env.getElementUtils();

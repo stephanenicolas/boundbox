@@ -19,6 +19,9 @@
 		<root.basedir>${project.parent.basedir}</root.basedir>
 		<maven-compiler-plugin.version>2.5.1</maven-compiler-plugin.version>
 		<build-helper-maven-plugin.version>1.8</build-helper-maven-plugin.version>
+		
+		<!-- feature flipping -->
+		<log.level>Level.OFF</log.level>
 	</properties>
 
 	<dependencies>
