@@ -37,6 +37,7 @@
               <artifactSet>
                 <includes>
                   <include>org.apache.commons:*</include>
+                  <include>commons-io:*</include>
                   <include>com.squareup:*</include>
                 </includes>
               </artifactSet>

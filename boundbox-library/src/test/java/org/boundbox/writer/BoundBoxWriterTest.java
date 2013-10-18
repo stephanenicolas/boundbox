@@ -103,7 +103,7 @@ public class BoundBoxWriterTest {
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
                 // used to debug the call
-                System.out.println(captured.getValue());
+                //System.out.println(captured.getValue());
                 assertTrue(false);
                 return null;
             }
@@ -113,7 +113,7 @@ public class BoundBoxWriterTest {
         EasyMock.expectLastCall().andAnswer(new IAnswer() {
             public Object answer() {
                 // used to debug the call
-                System.out.println(captured2.getValue());
+                //System.out.println(captured2.getValue());
                 assertTrue(false);
                 return null;
             }

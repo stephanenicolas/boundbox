@@ -21,10 +21,6 @@ public class VisibilityTest {
 
     @Test
     public void test_read_access_to_field() {
-        System.out.println("Inner classes of VisibilityTestClass");
-        for(Class<?> c : VisibilityTestClass.class.getDeclaredClasses()) {
-            System.out.println(c.getName());
-        }
         //given
         Object innerInstance = boundBoxOfA.boundBox_new_Inner();
         Object cInstance = BoundBoxOfVisibilityTestClass.boundBox_new_C();

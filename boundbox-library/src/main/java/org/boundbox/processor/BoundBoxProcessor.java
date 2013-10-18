@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -89,6 +90,7 @@ public class BoundBoxProcessor extends AbstractProcessor {
 
     @Override
     public void init(ProcessingEnvironment env) {
+        log.getParent().setLevel(Level.OFF);
         filer = env.getFiler();
         messager = env.getMessager();
         elements = env.getElementUtils();
