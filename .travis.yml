@@ -58,4 +58,4 @@ install: echo "Skipping mvn install"
 
 script: mvn clean install -Pcoveralls -Dandroid.device=test -Dmaven.javadoc.skip=true
 
-after_script: zipinfo /home/travis/.m2/repository/org/boundbox/boundbox-library/1.2.0-SNAPSHOT/boundbox-library-1.2.0-SNAPSHOT.jar
+#after_script: zipinfo /home/travis/.m2/repository/org/boundbox/boundbox-library/1.2.0-SNAPSHOT/boundbox-library-1.2.0-SNAPSHOT.jar
