@@ -141,7 +141,7 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco-maven-plugin}</version>
+						<version>${jacoco-maven-plugin.version}</version>
 						<configuration>
 							<excludes>
 								<exclude>**/*Exception.class</exclude>
