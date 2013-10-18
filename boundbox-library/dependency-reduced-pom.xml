@@ -9,6 +9,34 @@
   <artifactId>boundbox-library</artifactId>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>templating-maven-plugin</artifactId>
+                    <versionRange>[1.0-alpha-3,)</versionRange>
+                    <goals>
+                      <goal>filter-sources</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -20,6 +48,20 @@
             <annotationProcessor>lombok.core.AnnotationProcessor</annotationProcessor>
           </annotationProcessors>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>templating-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
+        <executions>
+          <execution>
+            <id>filter-src</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>filter-sources</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
@@ -76,6 +118,12 @@
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>release</id>
+      <properties>
+        <log.level>Level.OFF</log.level>
+      </properties>
+    </profile>
     <profile>
       <id>coveralls</id>
       <build>
@@ -180,6 +228,7 @@
     <jacoco-maven-plugin.version>0.6.3.201306030806</jacoco-maven-plugin.version>
     <javawriter.version>2.2.0</javawriter.version>
     <easymock.version>3.2</easymock.version>
+    <log.level>Level.ALL</log.level>
   </properties>
 </project>
 
