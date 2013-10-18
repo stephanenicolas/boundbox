@@ -100,6 +100,11 @@
 									<pattern>org.apache</pattern>
 									<shadedPattern>org.shaded</shadedPattern>
 								</relocation>
+								<!-- This relocation is for Travis only -->
+								<relocation>
+									<pattern>commons-io</pattern>
+									<shadedPattern>org.shaded</shadedPattern>
+								</relocation>
 								<relocation>
 									<pattern>com.squareup</pattern>
 									<shadedPattern>com.shaded</shadedPattern>
