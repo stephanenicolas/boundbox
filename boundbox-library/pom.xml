@@ -92,6 +92,8 @@
 							<artifactSet>
 								<includes>
 									<include>org.apache.commons:*</include>
+									<!-- This include is for Travis only -->
+									<include>commons-io:*</include>
 									<include>com.squareup:*</include>
 								</includes>
 							</artifactSet>

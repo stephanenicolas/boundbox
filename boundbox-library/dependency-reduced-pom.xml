@@ -46,6 +46,10 @@
                   <shadedPattern>org.shaded</shadedPattern>
                 </relocation>
                 <relocation>
+                  <pattern>commons-io</pattern>
+                  <shadedPattern>org.shaded</shadedPattern>
+                </relocation>
+                <relocation>
                   <pattern>com.squareup</pattern>
                   <shadedPattern>com.shaded</shadedPattern>
                 </relocation>
@@ -78,7 +82,7 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>${jacoco-maven-plugin}</version>
+            <version>${jacoco-maven-plugin.version}</version>
             <executions>
               <execution>
                 <id>pre-unit-test</id>
