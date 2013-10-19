@@ -62,7 +62,6 @@
 		<maven-checkstyle-plugin.version>2.9.1</maven-checkstyle-plugin.version>
 		<lint-maven-plugin.version>0.0.6</lint-maven-plugin.version>
 		<eclipse-lifecycle-plugin.version>1.0.0</eclipse-lifecycle-plugin.version>
-		<gradle-maven-plugin.version>1.0.5</gradle-maven-plugin.version>
 	</properties>
 	<build>
 		<pluginManagement>
@@ -135,8 +134,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
 					<configuration>
-						<arguments>-Psilent</arguments>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
+						<releaseProfiles>release</releaseProfiles>
 					</configuration>
 				</plugin>
 				<!-- Quality Analysis Tools -->

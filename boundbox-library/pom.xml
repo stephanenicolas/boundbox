@@ -87,7 +87,13 @@
 						<goals>
 							<goal>filter-sources</goal>
 						</goals>
-						<phase>process-sources</phase>
+						<configuration>
+							<!-- Note the two following parameters are the default one. These 
+								are specified here just as a reminder. But as the Maven philosophy is strongly 
+								about conventions, it's better to just not specify them. -->
+							<sourceDirectory>${basedir}/src/main/java-templates</sourceDirectory>
+							<outputDirectory>${project.build.directory}/generated-sources/java-templates</outputDirectory>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -188,10 +194,7 @@
 
 	<profiles>
 		<profile>
-			<id>silent</id>
-			<activation>
-			    <activeByDefault>true</activeByDefault>
-			</activation>
+			<id>release</id>
 			<properties>
 				<log.level>Level.OFF</log.level>
 			</properties>
