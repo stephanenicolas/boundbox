@@ -119,7 +119,7 @@
   </build>
   <profiles>
     <profile>
-      <id>release</id>
+      <id>silent</id>
       <properties>
         <log.level>Level.OFF</log.level>
       </properties>
