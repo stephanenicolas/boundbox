@@ -7,7 +7,14 @@ import com.android.build.gradle.api.TestVariant
 buildscript {
     repositories {
         mavenCentral()
+        
+        //WHEN USING SNAPSHOTS, USE THIS INSTEAD
         //maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        
+        //YOU DO NOT NEED THE FOLLOWING LINE IN A STANDARD BUILD
+        //this line is for BoundBox developpers only (and Travis)
+        //it will pick up the last artifact installed via maven
+        mavenLocal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.6.+'

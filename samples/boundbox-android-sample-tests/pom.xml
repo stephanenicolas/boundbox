@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -108,6 +109,29 @@
 				<configuration>
 					<skip>true</skip>
 				</configuration>
+			</plugin>
+			<!-- Invoke gradle build of android sample -->
+			<plugin>
+				<groupId>org.fortasoft</groupId>
+				<artifactId>gradle-maven-plugin</artifactId>
+				<version>${gradle-maven-plugin.version}</version>
+				<inherited>false</inherited>
+				<configuration>
+					<gradleVersion>1.8</gradleVersion>
+					<gradleProjectDirectory>${project.basedir}/../boundbox-android-sample</gradleProjectDirectory>
+					<tasks>
+						<task>connectedCheck</task>
+					</tasks>
+				</configuration>
+				<executions>
+					<execution>
+						<id>build-android-sample-via-maven</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>invoke</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

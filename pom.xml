@@ -229,29 +229,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
 			</plugin>
-			<!-- Invoke gradle build of android sample -->
-			<plugin>
-				<groupId>org.fortasoft</groupId>
-				<artifactId>gradle-maven-plugin</artifactId>
-				<version>${gradle-maven-plugin.version}</version>
-				<inherited>false</inherited>
-				<configuration>
-				    <gradleVersion>1.8</gradleVersion>
-				    <gradleProjectDirectory>${project.basedir}/samples/boundbox-android-sample</gradleProjectDirectory>
-					<tasks>
-						<task>connectedCheck</task>
-					</tasks>
-				</configuration>
-				<executions>
-					<execution>
-					    <id>build-android-sample-via-maven</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>invoke</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 </project>
