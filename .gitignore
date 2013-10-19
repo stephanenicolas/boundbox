@@ -32,6 +32,10 @@ release.properties
 *.idea/
 *.iml
 
+#Gradle files
+build/
+.gradle
+
 #Maven project files
 target/
 

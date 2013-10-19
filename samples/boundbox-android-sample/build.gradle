@@ -1,0 +1,78 @@
+import com.android.build.gradle.api.TestVariant
+
+//useful debug stuff
+//project.configurations.compile.getProperties().each { println it }
+//println android.sourceSets.main.java.srcDirs
+
+buildscript {
+    repositories {
+        mavenCentral()
+        //maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+
+configure(allprojects) {
+    group = 'org.boundbox'
+
+    ext.androidVersion           = "4.3_r2"
+    ext.androidSDKVersion        = "18"
+    ext.androidBuildToolsVersion = "18.0"
+    ext.boundBoxVersion           = "1.2.0-SNAPSHOT"
+}
+
+//-------------------------
+//-- Android Sample Project
+//-------------------------
+
+description = "BoundBox android sample"
+
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    instrumentTestCompile "org.boundbox:boundbox-library:$boundBoxVersion"
+}
+
+
+android {
+    buildToolsVersion "$androidBuildToolsVersion"
+    compileSdkVersion 18
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        instrumentTest.setRoot('../boundbox-boundbox-android-sample-tests')
+        instrumentTest {
+            java { srcDirs = [
+                    '../boundbox-android-sample-tests/src/main/java'
+                ] }
+            res.srcDirs = ['res']
+            assets.srcDirs = [
+                '../boundbox-android-sample-tests/assets'
+            ]
+            resources.srcDirs = [
+                '../boundbox-android-sample-tests/src'
+            ]
+        }
+    }
+
+    defaultConfig {
+        testPackageName "org.boundbox.sample.android.tests"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+}
