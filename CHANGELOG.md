@@ -1,5 +1,10 @@
-## Release 1.2.0 (Planned October 27th 2013)
-* TODO Create ubber jar for easier deployment in IDE's. https://github.com/stephanenicolas/boundbox/issues/17
+## Release 1.2.1 (Planned November 10th 2013)
+
+
+## Release 1.2.0 (October 19th 2013)
+* Create ubber jar for easier deployment in IDE's. https://github.com/stephanenicolas/boundbox/issues/17
+* Add gradle support for samples on Android https://github.com/stephanenicolas/boundbox/issues/20
+* Use feature flipping for logging http://stackoverflow.com/q/19456107/693752
 
 ## Release 1.1.1 (October 15th 2013)
 * Replace all unvisible types by Object. https://github.com/stephanenicolas/boundbox/issues/15
