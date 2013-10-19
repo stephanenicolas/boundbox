@@ -52,6 +52,14 @@ before_install:
   - mvn clean install -N 
   - cd -
   
+  # newer version of gradle
+  - wget http://services.gradle.org/distributions/gradle-1.8-bin.zip
+  - unzip -qq gradle-1.8-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-1.8
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  # just to test gradle version, against our provided one
+  - gradle -v
+  
 # We will run findbugs and checkstyle in the script phase
 #install: mvn clean install --quiet -DskipTests=true -Dmaven.javadoc.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true
 install: echo "Skipping mvn install"
