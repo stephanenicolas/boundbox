@@ -26,7 +26,7 @@ configure(allprojects) {
 
     ext.androidVersion           = "4.3_r2"
     ext.androidSDKVersion        = "18"
-    ext.androidBuildToolsVersion = "18.0"
+    ext.androidBuildToolsVersion = "18.0.1"
     ext.boundBoxVersion           = "1.2.0-SNAPSHOT"
 }
 
