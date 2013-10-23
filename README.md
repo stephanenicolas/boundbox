@@ -8,7 +8,7 @@ BoundBox breaks encapsulation.
 
 BoundBox has been designed with *Android* in mind. But it will work for *pure Java* projects as well (J2SE and JEE), for instance to test legacy code.
 
-To get started, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki) or the samples below.
+To get started, have a look at [BoundBox's Wiki](https://github.com/stephanenicolas/boundbox/wiki) or [these slides](http://slid.es/stephanenicolas/boundbox) or the samples below.
 
 Android Sample
 --------------
