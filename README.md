@@ -188,3 +188,9 @@ License
 	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 	See the License for the specific language governing permissions and
 	limitations under the License.
+
+Alternatives
+------------
+
+* [Accessive](https://code.google.com/p/accessive/wiki/Documentation)
+* WhiteBox from [PowerMock](https://code.google.com/p/powermock/)
