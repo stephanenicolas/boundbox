@@ -1,11 +1,11 @@
 #Thanks to https://raw.github.com/embarkmobile/android-maven-example/master/.travis.yml
 
-branches:
-  only:
-    - master
+#branches:
+#  only:
+#    - master
 
 language: java
-jdk: oraclejdk6
+jdk: oraclejdk7
 
 before_install:
   # check the travis file
