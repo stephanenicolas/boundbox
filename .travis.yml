@@ -21,6 +21,7 @@ before_install:
   
   #genymotion 
   - wget http://files2.genymotion.com/genymotion/genymotion-2.1.1/genymotion-2.1.1_x64.bin
+  - chmod +x genymotion-2.1.1_x64.bin
   - ./genymotion-2.1.1_x64.bin
 
   # Install required components.
