@@ -27,6 +27,7 @@ before_install:
   - wget http://files2.genymotion.com/genymotion/genymotion-2.1.1/genymotion-2.1.1_x64.bin
   - chmod +x genymotion-2.1.1_x64.bin
   - echo "y" | ./genymotion-2.1.1_x64.bin
+  - mkdir -p ~/.Genymobile/Genymotion/ova/
   - cd ~/.Genymobile/Genymotion/ova/
   - wget https://cloud.genymotion.com/vmtemplate/4edf6e49-c44a-4834-b240-7e3b1c93bd69/getova
   - cd -
