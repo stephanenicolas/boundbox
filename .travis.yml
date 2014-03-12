@@ -20,8 +20,9 @@ before_install:
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
   
   #Virtual box
-  - wget http://download.virtualbox.org/virtualbox/4.3.8/virtualbox-4.3_4.3.8-92456~Ubuntu~quantal_i386.deb
-  - sudo dpkg -i virtualbox-4.3_4.3.8-92456~Ubuntu~quantal_i386.deb
+  - wget http://download.virtualbox.org/virtualbox/4.3.8/VirtualBox-4.3.8-92456-Linux_x86.run
+  - chmod +x VirtualBox-4.3.8-92456-Linux_x86.run
+  - ./VirtualBox-4.3.8-92456-Linux_x86.run
   
   #genymotion 
   - wget http://files2.genymotion.com/genymotion/genymotion-2.1.1/genymotion-2.1.1_x64.bin
