@@ -21,7 +21,7 @@ before_install:
   
   #Virtual box
   - wget http://download.virtualbox.org/virtualbox/4.3.8/virtualbox-4.3_4.3.8-92456~Ubuntu~quantal_i386.deb
-  - dpkg -i virtualbox-4.3_4.3.8-92456~Ubuntu~quantal_i386.deb
+  - sudo dpkg -i virtualbox-4.3_4.3.8-92456~Ubuntu~quantal_i386.deb
   
   #genymotion 
   - wget http://files2.genymotion.com/genymotion/genymotion-2.1.1/genymotion-2.1.1_x64.bin
