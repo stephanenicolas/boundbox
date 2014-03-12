@@ -31,7 +31,11 @@ before_install:
   - mkdir -p ~/.Genymobile/Genymotion/ova/
   - cd ~/.Genymobile/Genymotion/ova/
   - wget https://cloud.genymotion.com/vmtemplate/4edf6e49-c44a-4834-b240-7e3b1c93bd69/getova
+  - ls -la
   - cd -
+  
+  #install VM
+  - VBoxManage import  ~/.Genymobile/Genymotion/ova//genymotion_vbox86p_4.4.2_140129_175534.ova
 
   # Install required components.
   # For a full list, run `android list sdk -a --extended`
